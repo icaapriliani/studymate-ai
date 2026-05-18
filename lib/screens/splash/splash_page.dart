@@ -1,6 +1,7 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import '../../constants/app_colors.dart';
+import '../auth/login_page.dart';
 
 class SplashPage extends StatefulWidget {
   const SplashPage({super.key});
@@ -21,6 +22,13 @@ class _SplashPageState extends State<SplashPage> {
         setState(() {
           _startAnimation = true;
         });
+      }
+    });
+
+    // Automatically transition to LoginPage after 3 seconds of loading animation
+    Future.delayed(const Duration(seconds: 3), () {
+      if (mounted) {
+        _navigateToNextScreen();
       }
     });
   }
@@ -177,10 +185,6 @@ class _SplashPageState extends State<SplashPage> {
                                 tween: Tween<double>(begin: 0.0, end: 1.0),
                                 duration: const Duration(milliseconds: 3000),
                                 curve: Curves.easeInOutQuart,
-                                onEnd: () {
-                                  // Navigate to home or login page after animation completed
-                                  _navigateToNextScreen();
-                                },
                                 builder: (context, progressValue, child) {
                                   return SizedBox(
                                     width: isTablet ? 280 : 210,
@@ -296,7 +300,7 @@ class _SplashPageState extends State<SplashPage> {
     Navigator.of(context).pushReplacement(
       PageRouteBuilder(
         pageBuilder: (context, animation, secondaryAnimation) =>
-            const _PlaceholderNextPage(),
+            const LoginPage(),
         transitionsBuilder: (context, animation, secondaryAnimation, child) {
           return FadeTransition(
             opacity: animation,
@@ -362,98 +366,4 @@ class AILogoPainter extends CustomPainter {
   bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
 
-/// A beautiful temporary landing page that StudyMate AI transitions to.
-/// This acts as a robust placeholder for the actual login/register pages.
-class _PlaceholderNextPage extends StatelessWidget {
-  const _PlaceholderNextPage();
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: Container(
-        width: double.infinity,
-        height: double.infinity,
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            colors: [
-              AppColors.bgGradientStart,
-              AppColors.bgGradientEnd,
-            ],
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-          ),
-        ),
-        child: SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.all(24.0),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Spacer(),
-                const Icon(
-                  Icons.auto_awesome,
-                  size: 64,
-                  color: AppColors.primaryGradientStart,
-                ),
-                const SizedBox(height: 24),
-                ShaderMask(
-                  shaderCallback: (bounds) => const LinearGradient(
-                    colors: [
-                      AppColors.primaryGradientStart,
-                      AppColors.primaryGradientEnd,
-                    ],
-                  ).createShader(bounds),
-                  child: const Text(
-                    'StudyMate AI',
-                    style: TextStyle(
-                      fontSize: 36,
-                      fontWeight: FontWeight.w900,
-                      color: Colors.white,
-                      letterSpacing: -0.5,
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 12),
-                const Text(
-                  'Welcome to your personal AI study partner!',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 16,
-                    color: AppColors.textSecondary,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-                const Spacer(),
-                ElevatedButton(
-                  onPressed: () {
-                    // Navigate back or perform auth action
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.primaryGradientStart,
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 48,
-                      vertical: 16,
-                    ),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(100),
-                    ),
-                    elevation: 4,
-                  ),
-                  child: const Text(
-                    'Get Started',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 20),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-}
