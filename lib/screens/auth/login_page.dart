@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../constants/app_colors.dart';
 import '../../utils/custom_textfield.dart';
+import '../home/home_page.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -316,6 +317,28 @@ class _LoginPageState extends State<LoginPage> {
                                                       .primaryGradientStart,
                                                 ),
                                               );
+                                              
+                                              // Store navigator reference before the async gap to satisfy lints
+                                              final navigator = Navigator.of(context);
+                                              
+                                              // Smooth transition to the dashboard
+                                              Future.delayed(const Duration(milliseconds: 600), () {
+                                                if (mounted) {
+                                                  navigator.pushReplacement(
+                                                    PageRouteBuilder(
+                                                      pageBuilder: (context, animation, secondaryAnimation) =>
+                                                          const HomePage(),
+                                                      transitionsBuilder: (context, animation, secondaryAnimation, child) {
+                                                        return FadeTransition(
+                                                          opacity: animation,
+                                                          child: child,
+                                                        );
+                                                      },
+                                                      transitionDuration: const Duration(milliseconds: 500),
+                                                    ),
+                                                  );
+                                                }
+                                              });
                                             }
                                           },
                                           style: ElevatedButton.styleFrom(
