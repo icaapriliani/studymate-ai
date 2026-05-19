@@ -112,22 +112,32 @@ class AuthProvider extends ChangeNotifier {
     _errorMessage = null;
   }
 
-  // Parse Firebase exceptions into user-friendly messages
+  // Parse Firebase exceptions into user-friendly messages in Indonesian
   String _parseException(dynamic exception) {
     final message = exception.toString();
-    if (message.contains('user-not-found')) {
-      return 'No user found for that email address.';
-    } else if (message.contains('wrong-password')) {
-      return 'Incorrect password provided.';
-    } else if (message.contains('email-already-in-use')) {
-      return 'An account already exists for that email.';
-    } else if (message.contains('invalid-email')) {
-      return 'The email address is poorly formatted.';
-    } else if (message.contains('weak-password')) {
-      return 'The password is too weak.';
-    } else if (message.contains('network-request-failed')) {
-      return 'Network connection failed. Please check your internet connection.';
+    
+    // Cloud Firestore-specific troubleshooting errors
+    if (message.contains('PERMISSION_DENIED')) {
+      return 'Akses Firestore ditolak. Harap pastikan aturan keamanan (Security Rules) Firestore Anda sudah diatur ke publik/mode pengujian, dan Database Firestore telah dibuat di Firebase Console.';
+    } else if (message.contains('API_DISABLED') || message.contains('Firestore API has not been used')) {
+      return 'API Cloud Firestore belum diaktifkan pada proyek Firebase Anda. Harap aktifkan Firestore Database melalui Firebase Console.';
     }
+    
+    // Firebase Authentication errors
+    if (message.contains('user-not-found')) {
+      return 'Tidak ada akun yang ditemukan dengan alamat email tersebut.';
+    } else if (message.contains('wrong-password')) {
+      return 'Kata sandi yang Anda masukkan salah.';
+    } else if (message.contains('email-already-in-use')) {
+      return 'Alamat email ini sudah terdaftar pada akun lain.';
+    } else if (message.contains('invalid-email')) {
+      return 'Format alamat email yang Anda masukkan tidak valid.';
+    } else if (message.contains('weak-password')) {
+      return 'Kata sandi terlalu lemah. Harap gunakan minimal 6 karakter.';
+    } else if (message.contains('network-request-failed')) {
+      return 'Koneksi jaringan gagal. Silakan periksa koneksi internet Anda.';
+    }
+    
     return message.replaceAll(RegExp(r'\[.*?\]'), '').trim();
   }
 }

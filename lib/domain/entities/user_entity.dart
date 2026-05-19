@@ -3,12 +3,14 @@ class UserEntity {
   final String email;
   final String displayName;
   final String photoUrl;
+  final DateTime? createdAt;
 
   const UserEntity({
     required this.uid,
     required this.email,
     required this.displayName,
     required this.photoUrl,
+    this.createdAt,
   });
 
   // Empty placeholder instance
@@ -17,6 +19,7 @@ class UserEntity {
     email: '',
     displayName: '',
     photoUrl: '',
+    createdAt: null,
   );
 
   bool get isEmpty => this == UserEntity.empty;

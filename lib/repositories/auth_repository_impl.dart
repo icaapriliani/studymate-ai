@@ -75,6 +75,7 @@ class AuthRepositoryImpl implements AuthRepository {
         email: email,
         displayName: displayName,
         photoUrl: '',
+        createdAt: DateTime.now(),
       );
       await _firestoreService.saveUserProfile(userModel);
 
@@ -84,6 +85,7 @@ class AuthRepositoryImpl implements AuthRepository {
         email: email,
         displayName: displayName,
         photoUrl: '',
+        createdAt: userModel.createdAt,
       );
     } catch (e) {
       rethrow;

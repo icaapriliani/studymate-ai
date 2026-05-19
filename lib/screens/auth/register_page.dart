@@ -187,7 +187,7 @@ class _RegisterPageState extends State<RegisterPage> {
                                             validator: (value) {
                                               if (value == null ||
                                                   value.trim().isEmpty) {
-                                                return 'Please enter your full name';
+                                                return 'Silakan masukkan nama lengkap Anda';
                                               }
                                               return null;
                                             },
@@ -205,12 +205,12 @@ class _RegisterPageState extends State<RegisterPage> {
                                             validator: (value) {
                                               if (value == null ||
                                                   value.trim().isEmpty) {
-                                                return 'Please enter your email';
+                                                return 'Silakan masukkan alamat email Anda';
                                               }
                                               if (!RegExp(
                                                       r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$')
                                                   .hasMatch(value)) {
-                                                return 'Please enter a valid email';
+                                                return 'Silakan masukkan format alamat email yang valid';
                                               }
                                               return null;
                                             },
@@ -241,10 +241,10 @@ class _RegisterPageState extends State<RegisterPage> {
                                             ),
                                             validator: (value) {
                                               if (value == null || value.isEmpty) {
-                                                return 'Please enter your password';
+                                                return 'Silakan masukkan kata sandi Anda';
                                               }
                                               if (value.length < 6) {
-                                                return 'Password must be at least 6 characters';
+                                                return 'Kata sandi harus terdiri dari minimal 6 karakter';
                                               }
                                               return null;
                                             },
@@ -275,10 +275,10 @@ class _RegisterPageState extends State<RegisterPage> {
                                             ),
                                             validator: (value) {
                                               if (value == null || value.isEmpty) {
-                                                return 'Please confirm your password';
+                                                return 'Silakan konfirmasi kata sandi Anda';
                                               }
                                               if (value != _passwordController.text) {
-                                                return 'Passwords do not match';
+                                                return 'Konfirmasi kata sandi tidak cocok dengan kata sandi di atas';
                                               }
                                               return null;
                                             },
@@ -369,16 +369,17 @@ class _RegisterPageState extends State<RegisterPage> {
 
                                                       if (_formKey.currentState!
                                                           .validate()) {
+                                                        final navigator = Navigator.of(context);
+                                                        final scaffoldMessenger = ScaffoldMessenger.of(context);
+
                                                         final success = await authProvider.signUp(
                                                           email: _emailController.text,
                                                           password: _passwordController.text,
                                                           displayName: _nameController.text,
                                                         );
 
-                                                        if (!mounted) return;
-
                                                         if (success) {
-                                                          ScaffoldMessenger.of(context)
+                                                          scaffoldMessenger
                                                               .showSnackBar(
                                                             const SnackBar(
                                                               content: Text(
@@ -388,7 +389,7 @@ class _RegisterPageState extends State<RegisterPage> {
                                                             ),
                                                           );
 
-                                                          Navigator.of(context)
+                                                          navigator
                                                               .pushReplacement(
                                                             PageRouteBuilder(
                                                               pageBuilder: (context,
@@ -413,7 +414,7 @@ class _RegisterPageState extends State<RegisterPage> {
                                                             ),
                                                           );
                                                         } else {
-                                                          ScaffoldMessenger.of(context)
+                                                          scaffoldMessenger
                                                               .showSnackBar(
                                                             SnackBar(
                                                               content: Text(
