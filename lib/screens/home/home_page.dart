@@ -1,6 +1,8 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../../constants/app_colors.dart';
+import '../../providers/auth_provider.dart';
 import '../auth/login_page.dart';
 
 class HomePage extends StatefulWidget {
@@ -240,6 +242,9 @@ class _HomePageState extends State<HomePage> {
 
   // --- SCREEN 1: BERANDA ---
   Widget _buildBeranda(BuildContext context, bool isTablet) {
+    final authProvider = Provider.of<AuthProvider>(context);
+    final user = authProvider.currentUser;
+
     return LayoutBuilder(
       builder: (context, constraints) {
         return SingleChildScrollView(
@@ -260,10 +265,12 @@ class _HomePageState extends State<HomePage> {
                     children: [
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
-                        children: const [
+                        children: [
                           Text(
-                            'Hai, Alex Rivers 👋',
-                            style: TextStyle(
+                            user.displayName.isNotEmpty
+                                ? 'Hai, ${user.displayName} 👋'
+                                : 'Hai, Alex Rivers 👋',
+                            style: const TextStyle(
                               fontSize: 22,
                               fontWeight: FontWeight.w900,
                               color: AppColors.textPrimary,
@@ -1399,6 +1406,19 @@ class _HomePageState extends State<HomePage> {
 
   // --- SCREEN 5: PROFIL ---
   Widget _buildProfil(BuildContext context, bool isTablet) {
+    final authProvider = Provider.of<AuthProvider>(context);
+    final user = authProvider.currentUser;
+    final String initials = user.displayName.isNotEmpty
+        ? user.displayName
+            .trim()
+            .split(' ')
+            .where((e) => e.isNotEmpty)
+            .map((e) => e[0])
+            .take(2)
+            .join()
+            .toUpperCase()
+        : 'AR';
+
     return LayoutBuilder(
       builder: (context, constraints) {
         return SingleChildScrollView(
@@ -1465,10 +1485,10 @@ class _HomePageState extends State<HomePage> {
                                 ),
                               ],
                             ),
-                            child: const Center(
+                            child: Center(
                               child: Text(
-                                'AR',
-                                style: TextStyle(
+                                initials,
+                                style: const TextStyle(
                                   fontSize: 28,
                                   fontWeight: FontWeight.w900,
                                   color: Colors.white,
@@ -1478,18 +1498,18 @@ class _HomePageState extends State<HomePage> {
                             ),
                           ),
                           const SizedBox(height: 16),
-                          const Text(
-                            'Alex Rivers',
-                            style: TextStyle(
+                          Text(
+                            user.displayName.isNotEmpty ? user.displayName : 'Alex Rivers',
+                            style: const TextStyle(
                               fontSize: 20,
                               fontWeight: FontWeight.w900,
                               color: AppColors.textPrimary,
                             ),
                           ),
                           const SizedBox(height: 4),
-                          const Text(
-                            'alex.rivers@university.edu',
-                            style: TextStyle(
+                          Text(
+                            user.email.isNotEmpty ? user.email : 'alex.rivers@university.edu',
+                            style: const TextStyle(
                               fontSize: 13,
                               fontWeight: FontWeight.w600,
                               color: AppColors.textSecondary,
@@ -1552,17 +1572,22 @@ class _HomePageState extends State<HomePage> {
                     width: double.infinity,
                     height: 54,
                     child: TextButton(
-                      onPressed: () {
-                        // Smooth navigation transition back to LoginPage
-                        Navigator.of(context).pushReplacement(
-                          PageRouteBuilder(
-                            pageBuilder: (context, animation, secondaryAnimation) => const LoginPage(),
-                            transitionsBuilder: (context, animation, secondaryAnimation, child) {
-                              return FadeTransition(opacity: animation, child: child);
-                            },
-                            transitionDuration: const Duration(milliseconds: 500),
-                          ),
-                        );
+                      onPressed: () async {
+                        // Perform real sign out from Firebase
+                        await authProvider.signOut();
+                        
+                        if (context.mounted) {
+                          // Smooth navigation transition back to LoginPage
+                          Navigator.of(context).pushReplacement(
+                            PageRouteBuilder(
+                              pageBuilder: (context, animation, secondaryAnimation) => const LoginPage(),
+                              transitionsBuilder: (context, animation, secondaryAnimation, child) {
+                                return FadeTransition(opacity: animation, child: child);
+                              },
+                              transitionDuration: const Duration(milliseconds: 500),
+                            ),
+                          );
+                        }
                       },
                       style: TextButton.styleFrom(
                         backgroundColor: Colors.red.withAlpha(15),

@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../../constants/app_colors.dart';
 import '../../utils/custom_textfield.dart';
+import '../../providers/auth_provider.dart';
 import '../home/home_page.dart';
+import 'register_page.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -280,85 +283,105 @@ class _LoginPageState extends State<LoginPage> {
                                       const SizedBox(height: 32),
 
                                       // Gradient Sign In Button
-                                      Container(
-                                        width: double.infinity,
-                                        height: 56,
-                                        decoration: BoxDecoration(
-                                          gradient: const LinearGradient(
-                                            colors: [
-                                              AppColors.primaryGradientStart,
-                                              AppColors.primaryGradientEnd,
-                                            ],
-                                            begin: Alignment.centerLeft,
-                                            end: Alignment.centerRight,
-                                          ),
-                                          borderRadius:
-                                              BorderRadius.circular(16),
-                                          boxShadow: [
-                                            BoxShadow(
-                                              color: AppColors
-                                                  .primaryGradientStart
-                                                  .withAlpha(76),
-                                              blurRadius: 16,
-                                              offset: const Offset(0, 8),
-                                            ),
-                                          ],
-                                        ),
-                                        child: ElevatedButton(
-                                          onPressed: () {
-                                            if (_formKey.currentState!
-                                                .validate()) {
-                                              ScaffoldMessenger.of(context)
-                                                  .showSnackBar(
-                                                const SnackBar(
-                                                  content:
-                                                      Text('Signing in...'),
-                                                  backgroundColor: AppColors
-                                                      .primaryGradientStart,
-                                                ),
-                                              );
-                                              
-                                              // Store navigator reference before the async gap to satisfy lints
-                                              final navigator = Navigator.of(context);
-                                              
-                                              // Smooth transition to the dashboard
-                                              Future.delayed(const Duration(milliseconds: 600), () {
-                                                if (mounted) {
-                                                  navigator.pushReplacement(
-                                                    PageRouteBuilder(
-                                                      pageBuilder: (context, animation, secondaryAnimation) =>
-                                                          const HomePage(),
-                                                      transitionsBuilder: (context, animation, secondaryAnimation, child) {
-                                                        return FadeTransition(
-                                                          opacity: animation,
-                                                          child: child,
-                                                        );
-                                                      },
-                                                      transitionDuration: const Duration(milliseconds: 500),
-                                                    ),
-                                                  );
-                                                }
-                                              });
-                                            }
-                                          },
-                                          style: ElevatedButton.styleFrom(
-                                            backgroundColor: Colors.transparent,
-                                            shadowColor: Colors.transparent,
-                                            shape: RoundedRectangleBorder(
+                                      Consumer<AuthProvider>(
+                                        builder: (context, authProvider, child) {
+                                          return Container(
+                                            width: double.infinity,
+                                            height: 56,
+                                            decoration: BoxDecoration(
+                                              gradient: const LinearGradient(
+                                                colors: [
+                                                  AppColors.primaryGradientStart,
+                                                  AppColors.primaryGradientEnd,
+                                                ],
+                                                begin: Alignment.centerLeft,
+                                                end: Alignment.centerRight,
+                                              ),
                                               borderRadius:
                                                   BorderRadius.circular(16),
+                                              boxShadow: [
+                                                BoxShadow(
+                                                  color: AppColors
+                                                      .primaryGradientStart
+                                                      .withAlpha(76),
+                                                  blurRadius: 16,
+                                                  offset: const Offset(0, 8),
+                                                ),
+                                              ],
                                             ),
-                                          ),
-                                          child: const Text(
-                                            'Sign In',
-                                            style: TextStyle(
-                                              fontSize: 16,
-                                              fontWeight: FontWeight.w800,
-                                              color: Colors.white,
-                                              letterSpacing: 0.2,
+                                            child: ElevatedButton(
+                                              onPressed: authProvider.isLoading
+                                                  ? null
+                                                  : () async {
+                                                      if (_formKey.currentState!.validate()) {
+                                                        final navigator = Navigator.of(context);
+                                                        final scaffoldMessenger = ScaffoldMessenger.of(context);
+
+                                                        final success = await authProvider.signIn(
+                                                          email: _emailController.text,
+                                                          password: _passwordController.text,
+                                                        );
+
+                                                        if (success) {
+                                                          scaffoldMessenger.showSnackBar(
+                                                            const SnackBar(
+                                                              content: Text('Login berhasil!'),
+                                                              backgroundColor: Colors.green,
+                                                            ),
+                                                          );
+
+                                                          navigator.pushReplacement(
+                                                            PageRouteBuilder(
+                                                              pageBuilder: (context, animation, secondaryAnimation) =>
+                                                                  const HomePage(),
+                                                              transitionsBuilder: (context, animation, secondaryAnimation, child) {
+                                                                return FadeTransition(
+                                                                  opacity: animation,
+                                                                  child: child,
+                                                                );
+                                                              },
+                                                              transitionDuration: const Duration(milliseconds: 500),
+                                                            ),
+                                                          );
+                                                        } else {
+                                                          scaffoldMessenger.showSnackBar(
+                                                            SnackBar(
+                                                              content: Text(authProvider.errorMessage ?? 'Login gagal.'),
+                                                              backgroundColor: Colors.redAccent,
+                                                            ),
+                                                          );
+                                                        }
+                                                      }
+                                                    },
+                                              style: ElevatedButton.styleFrom(
+                                                backgroundColor: Colors.transparent,
+                                                shadowColor: Colors.transparent,
+                                                shape: RoundedRectangleBorder(
+                                                  borderRadius:
+                                                      BorderRadius.circular(16),
+                                                ),
+                                              ),
+                                              child: authProvider.isLoading
+                                                  ? const SizedBox(
+                                                      width: 24,
+                                                      height: 24,
+                                                      child: CircularProgressIndicator(
+                                                        color: Colors.white,
+                                                        strokeWidth: 2.5,
+                                                      ),
+                                                    )
+                                                  : const Text(
+                                                      'Sign In',
+                                                      style: TextStyle(
+                                                        fontSize: 16,
+                                                        fontWeight: FontWeight.w800,
+                                                        color: Colors.white,
+                                                        letterSpacing: 0.2,
+                                                      ),
+                                                    ),
                                             ),
-                                          ),
-                                        ),
+                                          );
+                                        },
                                       ),
                                       const SizedBox(height: 24),
 
@@ -376,7 +399,11 @@ class _LoginPageState extends State<LoginPage> {
                                           ),
                                           GestureDetector(
                                             onTap: () {
-                                              // Handle navigation to Register Page
+                                              Navigator.of(context).push(
+                                                MaterialPageRoute(
+                                                  builder: (context) => const RegisterPage(),
+                                                ),
+                                              );
                                             },
                                             child: const Text(
                                               'Sign Up',
