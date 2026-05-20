@@ -947,6 +947,20 @@ class _HomePageState extends State<HomePage> {
                             Icons.insights_rounded,
                             Colors.orange,
                           ),
+                          _buildStatGridCard(
+                            'Kuis Selesai',
+                            '${statsProvider.totalQuizTaken}',
+                            'Total Kuis',
+                            Icons.quiz_rounded,
+                            const Color(0xFFE91E63),
+                          ),
+                          _buildStatGridCard(
+                            'Rata-rata Skor',
+                            '${statsProvider.averageQuizScore}',
+                            'Skor Kuis',
+                            Icons.score_rounded,
+                            const Color(0xFF009688),
+                          ),
                         ],
                       ),
 

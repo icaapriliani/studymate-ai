@@ -5,6 +5,7 @@ import '../../models/material_model.dart';
 import '../../providers/ai_chat_provider.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/statistics_provider.dart';
+import '../quiz/quiz_session_list_page.dart';
 
 class MaterialDetailPage extends StatefulWidget {
   final MaterialModel material;
@@ -699,31 +700,77 @@ class _MaterialDetailPageState extends State<MaterialDetailPage> {
                     child: InkWell(
                       borderRadius: BorderRadius.circular(16),
                       onTap: () {
-                        // Prefill prompt in AIChatProvider and configure auto-send with custom title
                         final prompt = 'Jelaskan kembali materi ${mat.title} dengan bahasa sederhana';
                         Provider.of<AIChatProvider>(context, listen: false).setPrefilledPrompt(
                           prompt,
                           title: mat.title,
                           autoSend: true,
                         );
-
-                        // Navigates back with 'tanya_ai' code so home_page can automatically switch tab
                         Navigator.of(context).pop('tanya_ai');
                       },
                       child: const Center(
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Icon(
-                              Icons.auto_awesome_rounded,
-                              color: Colors.white,
-                              size: 18,
-                            ),
+                            Icon(Icons.auto_awesome_rounded, color: Colors.white, size: 18),
                             SizedBox(width: 8),
                             Text(
-                              'Tanya AI tentang materi ini',
+                              'Tanya AI',
                               style: TextStyle(
                                 color: Colors.white,
+                                fontWeight: FontWeight.w900,
+                                fontSize: 14,
+                                letterSpacing: 0.1,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Container(
+                  height: 52,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(16),
+                    color: Colors.white,
+                    border: Border.all(color: AppColors.primaryGradientStart, width: 2),
+                    boxShadow: [
+                      BoxShadow(
+                        color: AppColors.primaryGradientStart.withAlpha(20),
+                        blurRadius: 8,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
+                  ),
+                  child: Material(
+                    color: Colors.transparent,
+                    child: InkWell(
+                      borderRadius: BorderRadius.circular(14),
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => QuizSessionListPage(
+                              materialId: mat.id,
+                              materialTitle: mat.title,
+                            ),
+                          ),
+                        );
+                      },
+                      child: const Center(
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(Icons.quiz_rounded, color: AppColors.primaryGradientStart, size: 18),
+                            SizedBox(width: 8),
+                            Text(
+                              'Mulai Kuis',
+                              style: TextStyle(
+                                color: AppColors.primaryGradientStart,
                                 fontWeight: FontWeight.w900,
                                 fontSize: 14,
                                 letterSpacing: 0.1,

@@ -27,6 +27,33 @@ class GeminiRepositoryImpl implements GeminiRepository {
     }
   }
 
+  @override
+  Future<String> generateQuizQuestions(String materialTitle) async {
+    final prompt = '''
+Buatkan 5 soal pilihan ganda bahasa Indonesia tentang materi "$materialTitle".
+Setiap soal harus memiliki 4 pilihan (options), satu jawaban benar (correctAnswer), dan penjelasan singkat (explanation).
+Output WAJIB berupa JSON array valid persis seperti format berikut tanpa tambahan teks apapun di luar array JSON:
+
+[
+  {
+    "question": "pertanyaan",
+    "options": ["opsi 1", "opsi 2", "opsi 3", "opsi 4"],
+    "correctAnswer": "opsi benar",
+    "explanation": "penjelasan singkat"
+  }
+]
+''';
+
+    try {
+      final response = await _geminiService.generateResponse(prompt);
+      return response;
+    } catch (e, stackTrace) {
+      debugPrint('[StudyMate AI Debug] Error generating quiz questions: $e');
+      final friendlyMessage = _mapErrorToUserFriendlyMessage(e);
+      throw Exception('$friendlyMessage (Detail Galat Asli: $e)');
+    }
+  }
+
   /// Maps low-level exceptions to descriptive Indonesian error messages.
   String _mapErrorToUserFriendlyMessage(dynamic error) {
     final errorString = error.toString().toLowerCase();

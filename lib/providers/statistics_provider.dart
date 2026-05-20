@@ -4,25 +4,32 @@ import '../domain/repositories/chat_repository.dart';
 import '../domain/repositories/activity_repository.dart';
 import '../models/activity_model.dart';
 import '../models/conversation_model.dart';
+import '../domain/repositories/quiz_repository.dart';
+import '../models/quiz_session_model.dart';
 
 class StatisticsProvider extends ChangeNotifier {
   final ActivityRepository _activityRepository;
   final ChatRepository _chatRepository;
+  final QuizRepository _quizRepository;
 
   StatisticsProvider({
     required ActivityRepository activityRepository,
     required ChatRepository chatRepository,
+    required QuizRepository quizRepository,
   })  : _activityRepository = activityRepository,
-        _chatRepository = chatRepository;
+        _chatRepository = chatRepository,
+        _quizRepository = quizRepository;
 
   List<ActivityModel> _activities = [];
   List<ConversationModel> _conversations = [];
+  List<QuizSessionModel> _quizResults = [];
   bool _isLoading = false;
   String? _errorMessage;
   StreamSubscription? _activitiesSubscription;
 
   List<ActivityModel> get activities => _activities;
   List<ConversationModel> get conversations => _conversations;
+  List<QuizSessionModel> get quizResults => _quizResults;
   bool get isLoading => _isLoading;
   String? get errorMessage => _errorMessage;
 
@@ -30,6 +37,13 @@ class StatisticsProvider extends ChangeNotifier {
   int get totalConversations => _conversations.length;
   int get totalMateriDibuka => _activities.where((a) => a.type == 'material').length;
   int get totalPesan => _activities.where((a) => a.type == 'chat').length * 2; // User + AI messages
+  int get totalQuizTaken => _quizResults.where((q) => q.completed).length;
+  int get averageQuizScore {
+    final completedQuizzes = _quizResults.where((q) => q.completed).toList();
+    if (completedQuizzes.isEmpty) return 0;
+    int totalScore = completedQuizzes.fold(0, (sum, item) => sum + item.score);
+    return (totalScore / completedQuizzes.length).round();
+  }
 
   /// Saves a new user activity dynamically (chat or material).
   Future<void> saveActivity(String uid, String type, String title) async {
@@ -62,6 +76,16 @@ class StatisticsProvider extends ChangeNotifier {
       notifyListeners();
     });
 
+    // Fetch quiz results asynchronously
+    _quizRepository.getUserQuizSessions(uid).then((results) {
+      _quizResults = results;
+      notifyListeners();
+    }).catchError((e) {
+      debugPrint('[StatisticsProvider] Gagal memuat kuis: $e');
+      _errorMessage = e.toString().replaceFirst('Exception: ', '');
+      notifyListeners();
+    });
+
     // 2. Subscribe to real-time activities stream
     _activitiesSubscription = _activityRepository.listenToActivities(uid).listen(
       (activityList) {
@@ -89,6 +113,7 @@ class StatisticsProvider extends ChangeNotifier {
 
       _conversations = await _chatRepository.getConversations(uid);
       _activities = await _activityRepository.getActivities(uid);
+      _quizResults = await _quizRepository.getUserQuizSessions(uid);
     } catch (e) {
       _errorMessage = e.toString().replaceFirst('Exception: ', '');
     } finally {

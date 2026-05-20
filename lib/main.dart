@@ -20,6 +20,10 @@ import 'providers/statistics_provider.dart';
 import 'services/activity_service.dart';
 import 'repositories/activity_repository_impl.dart';
 
+import 'services/firestore_quiz_service.dart';
+import 'repositories/quiz_repository_impl.dart';
+import 'providers/quiz_provider.dart';
+
 // Screens
 import 'screens/splash/splash_page.dart';
 
@@ -50,6 +54,7 @@ class StudyMateAI extends StatelessWidget {
     final firestoreService = FirestoreService();
     final geminiService = GeminiService();
     final activityService = ActivityService();
+    final firestoreQuizService = FirestoreQuizService();
 
     // Instantiate repositories (Data Layer Orchestrator)
     final authRepository = AuthRepositoryImpl(
@@ -64,6 +69,9 @@ class StudyMateAI extends StatelessWidget {
     );
     final activityRepository = ActivityRepositoryImpl(
       activityService: activityService,
+    );
+    final quizRepository = QuizRepositoryImpl(
+      firestoreQuizService: firestoreQuizService,
     );
 
     return MultiProvider(
@@ -81,6 +89,13 @@ class StudyMateAI extends StatelessWidget {
           create: (_) => StatisticsProvider(
             activityRepository: activityRepository,
             chatRepository: chatRepository,
+            quizRepository: quizRepository,
+          ),
+        ),
+        ChangeNotifierProvider<QuizProvider>(
+          create: (_) => QuizProvider(
+            quizRepository: quizRepository,
+            geminiRepository: geminiRepository,
           ),
         ),
       ],

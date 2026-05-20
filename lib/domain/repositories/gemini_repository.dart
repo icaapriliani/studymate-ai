@@ -5,4 +5,7 @@ abstract class GeminiRepository {
   ///
   /// Returns the generated text or throws a user-friendly exception.
   Future<String> getAIResponse(String prompt);
+
+  /// Generates a dynamic quiz from Gemini AI, returning a raw JSON string.
+  Future<String> generateQuizQuestions(String materialTitle);
 }
