@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import '../domain/entities/user_entity.dart';
 import '../domain/repositories/auth_repository.dart';
-
 class AuthProvider extends ChangeNotifier {
   final AuthRepository _authRepository;
 
@@ -99,6 +98,55 @@ class AuthProvider extends ChangeNotifier {
     } finally {
       _isLoading = false;
       notifyListeners();
+    }
+  }
+
+  // Update User Profile
+  Future<bool> updateUserProfile({
+    String? displayName,
+    String? nim,
+    String? major,
+    int? studyTargetHours,
+  }) async {
+    _setLoading(true);
+    _clearErrorOnly();
+    try {
+      _currentUser = await _authRepository.updateProfile(
+        displayName: displayName,
+        nim: nim,
+        major: major,
+        studyTargetHours: studyTargetHours,
+      );
+      _setLoading(false);
+      return true;
+    } catch (e) {
+      _setLoading(false);
+      _errorMessage = _parseException(e);
+      notifyListeners();
+      return false;
+    }
+  }
+
+  // Update Last Active (Fire and Forget)
+  Future<void> updateLastActive() async {
+    try {
+      await _authRepository.updateLastActive();
+    } catch (_) {}
+  }
+
+  // Reset Password via Email
+  Future<bool> resetPassword(String email) async {
+    _setLoading(true);
+    _clearErrorOnly();
+    try {
+      await _authRepository.sendPasswordResetEmail(email);
+      _setLoading(false);
+      return true;
+    } catch (e) {
+      _setLoading(false);
+      _errorMessage = _parseException(e);
+      notifyListeners();
+      return false;
     }
   }
 

@@ -17,4 +17,15 @@ abstract class AuthRepository {
   Future<void> signOut();
 
   Future<UserEntity> getCurrentUser();
+
+  Future<UserEntity> updateProfile({
+    String? displayName,
+    String? nim,
+    String? major,
+    int? studyTargetHours,
+  });
+
+  Future<void> updateLastActive();
+
+  Future<void> sendPasswordResetEmail(String email);
 }

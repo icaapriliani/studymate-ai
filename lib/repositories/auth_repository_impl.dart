@@ -1,10 +1,10 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart' as fb;
 import '../domain/entities/user_entity.dart';
 import '../domain/repositories/auth_repository.dart';
 import '../models/user_model.dart';
 import '../services/firebase_auth_service.dart';
 import '../services/firestore_service.dart';
-
 class AuthRepositoryImpl implements AuthRepository {
   final FirebaseAuthService _authService;
   final FirestoreService _firestoreService;
@@ -115,5 +115,72 @@ class AuthRepositoryImpl implements AuthRepository {
     }
     
     return _mapFirebaseUserToEntity(fbUser);
+  }
+
+  @override
+  Future<UserEntity> updateProfile({
+    String? displayName,
+    String? nim,
+    String? major,
+    int? studyTargetHours,
+  }) async {
+    try {
+      final fbUser = _authService.currentUser;
+      if (fbUser == null) {
+        throw Exception('User is not logged in.');
+      }
+
+      // Upload photo disabled temporarily
+
+
+      // 2. Update display name in Firebase Auth if provided
+      if (displayName != null && displayName.isNotEmpty && displayName != fbUser.displayName) {
+        await fbUser.updateDisplayName(displayName);
+      }
+
+      // 3. Update Firestore Document
+      final docRef = FirebaseFirestore.instance.collection('users').doc(fbUser.uid);
+      
+      final updateData = <String, dynamic>{
+        if (displayName != null && displayName.isNotEmpty) 'displayName': displayName,
+        if (nim != null) 'nim': nim,
+        if (major != null) 'major': major,
+        if (studyTargetHours != null) 'studyTargetHours': studyTargetHours,
+        'lastActive': FieldValue.serverTimestamp(),
+      };
+
+      if (updateData.isNotEmpty) {
+        await docRef.set(updateData, SetOptions(merge: true));
+      }
+
+      // 4. Return updated entity
+      final updatedDbUser = await _firestoreService.getUserProfile(fbUser.uid);
+      if (updatedDbUser != null) {
+        return updatedDbUser;
+      }
+      
+      // Fallback
+      return _mapFirebaseUserToEntity(fbUser);
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  @override
+  Future<void> updateLastActive() async {
+    final fbUser = _authService.currentUser;
+    if (fbUser != null) {
+      try {
+        await FirebaseFirestore.instance
+            .collection('users')
+            .doc(fbUser.uid)
+            .set({'lastActive': FieldValue.serverTimestamp()}, SetOptions(merge: true));
+      } catch (_) {}
+    }
+  }
+
+  @override
+  Future<void> sendPasswordResetEmail(String email) async {
+    await fb.FirebaseAuth.instance.sendPasswordResetEmail(email: email);
   }
 }
