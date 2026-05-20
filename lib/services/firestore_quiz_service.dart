@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import '../models/quiz_session_model.dart';
 import '../models/quiz_question_model.dart';
+import '../models/learning_target_model.dart';
 
 class FirestoreQuizService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -130,6 +131,54 @@ class FirestoreQuizService {
       await batch.commit();
     } catch (e) {
       throw Exception('Failed to submit quiz session: $e');
+    }
+  }
+
+  /// Listens to quiz sessions real-time stream
+  Stream<List<QuizSessionModel>> listenToUserQuizSessions(String uid) {
+    return _firestore
+        .collection('users')
+        .doc(uid)
+        .collection('quiz_sessions')
+        .orderBy('createdAt', descending: true)
+        .snapshots()
+        .map((snapshot) {
+      return snapshot.docs.map((doc) {
+        return QuizSessionModel.fromFirestore(doc.data(), doc.id);
+      }).toList();
+    });
+  }
+
+  /// Listens to learning target real-time stream
+  Stream<LearningTargetModel> listenToLearningTarget(String uid) {
+    return _firestore
+        .collection('users')
+        .doc(uid)
+        .collection('learning_target')
+        .doc('target_doc')
+        .snapshots()
+        .map((snapshot) {
+      if (snapshot.exists && snapshot.data() != null) {
+        return LearningTargetModel.fromFirestore(snapshot.data()!);
+      }
+      return LearningTargetModel.defaultTarget();
+    });
+  }
+
+  /// Saves or updates the user's learning target
+  Future<void> updateLearningTarget(String uid, int target) async {
+    try {
+      await _firestore
+          .collection('users')
+          .doc(uid)
+          .collection('learning_target')
+          .doc('target_doc')
+          .set({
+        'weeklyQuizTarget': target,
+        'updatedAt': FieldValue.serverTimestamp(),
+      }, SetOptions(merge: true));
+    } catch (e) {
+      throw Exception('Failed to update learning target: $e');
     }
   }
 }

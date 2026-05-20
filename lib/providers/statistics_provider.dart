@@ -6,6 +6,7 @@ import '../models/activity_model.dart';
 import '../models/conversation_model.dart';
 import '../domain/repositories/quiz_repository.dart';
 import '../models/quiz_session_model.dart';
+import '../models/learning_target_model.dart';
 
 class StatisticsProvider extends ChangeNotifier {
   final ActivityRepository _activityRepository;
@@ -23,13 +24,19 @@ class StatisticsProvider extends ChangeNotifier {
   List<ActivityModel> _activities = [];
   List<ConversationModel> _conversations = [];
   List<QuizSessionModel> _quizResults = [];
+  LearningTargetModel? _learningTarget;
+
   bool _isLoading = false;
   String? _errorMessage;
+
   StreamSubscription? _activitiesSubscription;
+  StreamSubscription? _quizzesSubscription;
+  StreamSubscription? _targetSubscription;
 
   List<ActivityModel> get activities => _activities;
   List<ConversationModel> get conversations => _conversations;
   List<QuizSessionModel> get quizResults => _quizResults;
+  LearningTargetModel? get learningTarget => _learningTarget;
   bool get isLoading => _isLoading;
   String? get errorMessage => _errorMessage;
 
@@ -38,11 +45,74 @@ class StatisticsProvider extends ChangeNotifier {
   int get totalMateriDibuka => _activities.where((a) => a.type == 'material').length;
   int get totalPesan => _activities.where((a) => a.type == 'chat').length * 2; // User + AI messages
   int get totalQuizTaken => _quizResults.where((q) => q.completed).length;
+
+  int get weeklyQuizTarget => _learningTarget?.weeklyQuizTarget ?? 5;
+
+  int get quizzesCompletedThisWeek {
+    final now = DateTime.now();
+    final startOfWeek = _getStartOfWeek(now);
+    final endOfWeek = startOfWeek.add(const Duration(days: 7));
+    return _quizResults.where((q) {
+      return q.completed && q.createdAt.isAfter(startOfWeek) && q.createdAt.isBefore(endOfWeek);
+    }).length;
+  }
+
   int get averageQuizScore {
     final completedQuizzes = _quizResults.where((q) => q.completed).toList();
     if (completedQuizzes.isEmpty) return 0;
     int totalScore = completedQuizzes.fold(0, (sum, item) => sum + item.score);
     return (totalScore / completedQuizzes.length).round();
+  }
+
+  int get totalAIChats {
+    return _activities.where((a) => a.type == 'chat').length;
+  }
+
+  int get learningProgressPercentage {
+    final target = weeklyQuizTarget;
+    if (target <= 0) return 0;
+    return ((quizzesCompletedThisWeek / target) * 100).clamp(0, 100).round();
+  }
+
+  int get learningStreak {
+    final Set<DateTime> activeDates = {};
+
+    for (final activity in _activities) {
+      final date = DateTime(activity.timestamp.year, activity.timestamp.month, activity.timestamp.day);
+      activeDates.add(date);
+    }
+
+    for (final quiz in _quizResults) {
+      final date = DateTime(quiz.createdAt.year, quiz.createdAt.month, quiz.createdAt.day);
+      activeDates.add(date);
+    }
+
+    if (activeDates.isEmpty) return 0;
+
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+    final yesterday = today.subtract(const Duration(days: 1));
+
+    int streak = 0;
+    DateTime checkDate = today;
+
+    // If there was no activity today, check if there was activity yesterday.
+    // If not even yesterday, streak is broken.
+    if (!activeDates.contains(today)) {
+      if (activeDates.contains(yesterday)) {
+        checkDate = yesterday;
+      } else {
+        return 0;
+      }
+    }
+
+    // Count backwards consecutively
+    while (activeDates.contains(checkDate)) {
+      streak++;
+      checkDate = checkDate.subtract(const Duration(days: 1));
+    }
+
+    return streak;
   }
 
   /// Saves a new user activity dynamically (chat or material).
@@ -56,15 +126,30 @@ class StatisticsProvider extends ChangeNotifier {
     }
   }
 
-  /// Listens to real-time activities and loads conversations from Firestore.
+  /// Updates the user's weekly quiz target in Firestore.
+  Future<void> updateWeeklyTarget(String uid, int target) async {
+    if (uid.isEmpty) return;
+    try {
+      await _quizRepository.updateLearningTarget(uid, target);
+      debugPrint('[StatisticsProvider] Berhasil memperbarui target mingguan menjadi $target');
+    } catch (e) {
+      debugPrint('[StatisticsProvider] Gagal memperbarui target mingguan: $e');
+      _errorMessage = 'Gagal memperbarui target: ${e.toString().replaceFirst('Exception: ', '')}';
+      notifyListeners();
+    }
+  }
+
+  /// Listens to real-time activities, quiz sessions, and learning targets from Firestore.
   void initStatistics(String uid) {
     if (uid.isEmpty) return;
 
     _isLoading = true;
     _errorMessage = null;
-    // Do not notifyListeners() during build sequence
 
+    // Cancel old subscriptions
     _activitiesSubscription?.cancel();
+    _quizzesSubscription?.cancel();
+    _targetSubscription?.cancel();
 
     // 1. Fetch conversations asynchronously
     _chatRepository.getConversations(uid).then((convList) {
@@ -72,17 +157,7 @@ class StatisticsProvider extends ChangeNotifier {
       notifyListeners();
     }).catchError((e) {
       debugPrint('[StatisticsProvider] Gagal memuat percakapan: $e');
-      _errorMessage = e.toString().replaceFirst('Exception: ', '');
-      notifyListeners();
-    });
-
-    // Fetch quiz results asynchronously
-    _quizRepository.getUserQuizSessions(uid).then((results) {
-      _quizResults = results;
-      notifyListeners();
-    }).catchError((e) {
-      debugPrint('[StatisticsProvider] Gagal memuat kuis: $e');
-      _errorMessage = e.toString().replaceFirst('Exception: ', '');
+      _errorMessage = 'Gagal memuat obrolan: ${e.toString().replaceFirst('Exception: ', '')}';
       notifyListeners();
     });
 
@@ -96,7 +171,39 @@ class StatisticsProvider extends ChangeNotifier {
       },
       onError: (error) {
         debugPrint('[StatisticsProvider] Error pada aliran aktivitas: $error');
-        _errorMessage = error.toString().replaceFirst('Exception: ', '');
+        _errorMessage = 'Gagal sinkronisasi aktivitas: ${error.toString().replaceFirst('Exception: ', '')}';
+        _isLoading = false;
+        notifyListeners();
+      },
+    );
+
+    // 3. Subscribe to real-time quiz sessions stream
+    _quizzesSubscription = _quizRepository.listenToUserQuizSessions(uid).listen(
+      (quizList) {
+        _quizResults = quizList;
+        _isLoading = false;
+        _errorMessage = null;
+        notifyListeners();
+      },
+      onError: (error) {
+        debugPrint('[StatisticsProvider] Error pada aliran kuis: $error');
+        _errorMessage = 'Gagal sinkronisasi kuis: ${error.toString().replaceFirst('Exception: ', '')}';
+        _isLoading = false;
+        notifyListeners();
+      },
+    );
+
+    // 4. Subscribe to real-time learning target stream
+    _targetSubscription = _quizRepository.listenToLearningTarget(uid).listen(
+      (target) {
+        _learningTarget = target;
+        _isLoading = false;
+        _errorMessage = null;
+        notifyListeners();
+      },
+      onError: (error) {
+        debugPrint('[StatisticsProvider] Error pada aliran target belajar: $error');
+        _errorMessage = 'Gagal sinkronisasi target belajar: ${error.toString().replaceFirst('Exception: ', '')}';
         _isLoading = false;
         notifyListeners();
       },
@@ -115,7 +222,7 @@ class StatisticsProvider extends ChangeNotifier {
       _activities = await _activityRepository.getActivities(uid);
       _quizResults = await _quizRepository.getUserQuizSessions(uid);
     } catch (e) {
-      _errorMessage = e.toString().replaceFirst('Exception: ', '');
+      _errorMessage = 'Gagal memuat ulang data: ${e.toString().replaceFirst('Exception: ', '')}';
     } finally {
       _isLoading = false;
       notifyListeners();
@@ -158,6 +265,8 @@ class StatisticsProvider extends ChangeNotifier {
   @override
   void dispose() {
     _activitiesSubscription?.cancel();
+    _quizzesSubscription?.cancel();
+    _targetSubscription?.cancel();
     super.dispose();
   }
 }

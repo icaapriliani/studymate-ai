@@ -1,6 +1,7 @@
 import '../domain/repositories/quiz_repository.dart';
 import '../models/quiz_session_model.dart';
 import '../models/quiz_question_model.dart';
+import '../models/learning_target_model.dart';
 import '../services/firestore_quiz_service.dart';
 
 class QuizRepositoryImpl implements QuizRepository {
@@ -33,5 +34,20 @@ class QuizRepositoryImpl implements QuizRepository {
   @override
   Future<void> submitQuizSession(QuizSessionModel session, List<QuizQuestionModel> questions) async {
     return await _firestoreQuizService.submitQuizSession(session, questions);
+  }
+
+  @override
+  Stream<List<QuizSessionModel>> listenToUserQuizSessions(String uid) {
+    return _firestoreQuizService.listenToUserQuizSessions(uid);
+  }
+
+  @override
+  Stream<LearningTargetModel> listenToLearningTarget(String uid) {
+    return _firestoreQuizService.listenToLearningTarget(uid);
+  }
+
+  @override
+  Future<void> updateLearningTarget(String uid, int target) async {
+    return await _firestoreQuizService.updateLearningTarget(uid, target);
   }
 }
