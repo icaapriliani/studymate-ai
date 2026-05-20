@@ -5,6 +5,7 @@ import '../../constants/app_colors.dart';
 import '../../providers/auth_provider.dart';
 import '../auth/login_page.dart';
 import '../ai_tutor/ai_tutor_page.dart';
+import '../materials/materials_page.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -58,35 +59,6 @@ class _HomePageState extends State<HomePage> {
     {'day': 'M', 'done': false}, // Minggu
   ];
 
-
-  // Mock materials for Library tab
-  final List<Map<String, dynamic>> _materials = [
-    {
-      'title': 'Sistem Manajemen Basis Data',
-      'modules': '12 Modul • 4 Bab Selesai',
-      'progress': 0.45,
-      'color': const Color(0xFF1E58C1),
-    },
-    {
-      'title': 'Kecerdasan Buatan & Logika Fuzzy',
-      'modules': '18 Modul • 6 Bab Selesai',
-      'progress': 0.68,
-      'color': const Color(0xFF6B3BC7),
-    },
-    {
-      'title': 'Bahasa Inggris Akademik',
-      'modules': '8 Modul • 2 Bab Selesai',
-      'progress': 0.25,
-      'color': const Color(0xFF2E7D32),
-    },
-    {
-      'title': 'Statistika & Probabilitas',
-      'modules': '14 Modul • 0 Bab Selesai',
-      'progress': 0.0,
-      'color': Colors.grey,
-    }
-  ];
-
   @override
   Widget build(BuildContext context) {
     final screenSize = MediaQuery.of(context).size;
@@ -116,7 +88,13 @@ class _HomePageState extends State<HomePage> {
                   index: _currentIndex,
                   children: [
                     _buildBeranda(context, isTablet),
-                    _buildMateri(context, isTablet),
+                    MaterialsPage(
+                      onTanyaAI: () {
+                        setState(() {
+                          _currentIndex = 2; // Switch to AI Tutor
+                        });
+                      },
+                    ),
                     const AITutorPage(showBackButton: false, bottomPadding: 80.0),
                     _buildStatistik(context, isTablet),
                     _buildProfil(context, isTablet),
@@ -753,209 +731,6 @@ class _HomePageState extends State<HomePage> {
       },
     );
   }
-
-  // --- SCREEN 2: MATERI ---
-  Widget _buildMateri(BuildContext context, bool isTablet) {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        return SingleChildScrollView(
-          physics: const BouncingScrollPhysics(),
-          child: Center(
-            child: Container(
-              constraints: const BoxConstraints(maxWidth: 600),
-              padding: const EdgeInsets.symmetric(
-                horizontal: 20.0,
-                vertical: 16.0,
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    'Materi Belajar',
-                    style: TextStyle(
-                      fontSize: 22,
-                      fontWeight: FontWeight.w900,
-                      color: AppColors.textPrimary,
-                      letterSpacing: -0.5,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  const Text(
-                    'Temukan modul kuliah dan bahan belajarmu',
-                    style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w500,
-                      color: AppColors.textSecondary,
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-
-                  // Search Bar
-                  Container(
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(16),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withAlpha(5),
-                          blurRadius: 10,
-                          offset: const Offset(0, 4),
-                        ),
-                      ],
-                    ),
-                    child: const TextField(
-                      style: TextStyle(fontSize: 14, color: AppColors.textPrimary),
-                      decoration: InputDecoration(
-                        prefixIcon: Icon(Icons.search_rounded, color: AppColors.textLight, size: 20),
-                        hintText: 'Cari modul atau materi kuliah...',
-                        hintStyle: TextStyle(color: AppColors.textLight, fontSize: 14),
-                        border: InputBorder.none,
-                        contentPadding: EdgeInsets.symmetric(vertical: 15),
-                      ),
-                    ),
-                  ),
-
-                  const SizedBox(height: 20),
-
-                  // Filter Categories Shelf
-                  SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
-                    physics: const BouncingScrollPhysics(),
-                    child: Row(
-                      children: [
-                        _buildFilterPill('Semua', true),
-                        _buildFilterPill('Ilmu Komputer', false),
-                        _buildFilterPill('Kecerdasan Buatan', false),
-                        _buildFilterPill('Bahasa', false),
-                      ],
-                    ),
-                  ),
-
-                  const SizedBox(height: 20),
-
-                  // Materials List
-                  Column(
-                    children: _materials.map((mat) {
-                      return Container(
-                        margin: const EdgeInsets.only(bottom: 16),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(24),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withAlpha(5),
-                              blurRadius: 15,
-                              offset: const Offset(0, 6),
-                            ),
-                          ],
-                        ),
-                        child: Padding(
-                          padding: const EdgeInsets.all(20.0),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Expanded(
-                                    child: Text(
-                                      mat['title'],
-                                      style: const TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.w800,
-                                        color: AppColors.textPrimary,
-                                      ),
-                                    ),
-                                  ),
-                                  Icon(Icons.more_vert_rounded, color: AppColors.textLight.withAlpha(150)),
-                                ],
-                              ),
-                              const SizedBox(height: 6),
-                              Text(
-                                mat['modules'],
-                                style: const TextStyle(
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.w600,
-                                  color: AppColors.textSecondary,
-                                ),
-                              ),
-                              const SizedBox(height: 16),
-                              Row(
-                                children: [
-                                  Expanded(
-                                    child: Container(
-                                      height: 6,
-                                      decoration: BoxDecoration(
-                                        color: AppColors.progressTrack,
-                                        borderRadius: BorderRadius.circular(100),
-                                      ),
-                                      child: ClipRRect(
-                                        borderRadius: BorderRadius.circular(100),
-                                        child: LinearProgressIndicator(
-                                          value: mat['progress'],
-                                          backgroundColor: Colors.transparent,
-                                          valueColor: AlwaysStoppedAnimation<Color>(
-                                            mat['color'],
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                  const SizedBox(width: 12),
-                                  Text(
-                                    '${(mat['progress'] * 100).round()}%',
-                                    style: TextStyle(
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.w900,
-                                      color: mat['color'],
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-                        ),
-                      );
-                    }).toList(),
-                  ),
-                  const SizedBox(height: 85),
-                ],
-              ),
-            ),
-          ),
-        );
-      },
-    );
-  }
-
-  Widget _buildFilterPill(String label, bool isSelected) {
-    return Container(
-      margin: const EdgeInsets.only(right: 8),
-      child: Material(
-        color: isSelected ? AppColors.primaryGradientStart : Colors.white,
-        borderRadius: BorderRadius.circular(100),
-        elevation: isSelected ? 4 : 1,
-        shadowColor: isSelected ? AppColors.primaryGradientStart.withAlpha(80) : Colors.black12,
-        child: InkWell(
-          borderRadius: BorderRadius.circular(100),
-          onTap: () {},
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-            child: Text(
-              label,
-              style: TextStyle(
-                fontSize: 12,
-                fontWeight: isSelected ? FontWeight.w900 : FontWeight.w700,
-                color: isSelected ? Colors.white : AppColors.textSecondary,
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-
 
   // --- SCREEN 4: STATISTIK ---
   Widget _buildStatistik(BuildContext context, bool isTablet) {

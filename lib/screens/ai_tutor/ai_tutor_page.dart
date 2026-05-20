@@ -111,6 +111,21 @@ class _AITutorPageState extends State<AITutorPage> {
     final chatProvider = Provider.of<AIChatProvider>(context);
     final isTablet = MediaQuery.of(context).size.shortestSide > 600;
 
+    // Prefilled prompt integration from other features (deep-link)
+    if (chatProvider.prefilledPrompt != null) {
+      final prompt = chatProvider.prefilledPrompt;
+      final autoSend = chatProvider.shouldAutoSendMessage;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted && prompt != null) {
+          _messageController.text = prompt;
+          chatProvider.clearPrefilledPrompt();
+          if (autoSend) {
+            _handleSendMessage();
+          }
+        }
+      });
+    }
+
     return Scaffold(
       key: _scaffoldKey,
       drawer: _buildHistoryDrawer(context, chatProvider),

@@ -41,6 +41,41 @@ class AIChatProvider extends ChangeNotifier {
   /// Holds the current user-friendly error message in Indonesian, if any.
   String? get errorMessage => _errorMessage;
 
+  String? _prefilledPrompt;
+  String? _prefilledConversationTitle;
+  bool _shouldAutoSendMessage = false;
+
+  /// Temporary prefilled prompt for deep-linking from other pages (e.g. Material Detail Page).
+  String? get prefilledPrompt => _prefilledPrompt;
+
+  /// Temporary prefilled conversation title.
+  String? get prefilledConversationTitle => _prefilledConversationTitle;
+
+  /// Flag indicating whether the prefilled prompt should be sent automatically.
+  bool get shouldAutoSendMessage => _shouldAutoSendMessage;
+
+  /// Sets a temporary prefilled prompt and notifies listeners.
+  void setPrefilledPrompt(String? prompt, {String? title, bool autoSend = false}) {
+    _prefilledPrompt = prompt;
+    _prefilledConversationTitle = title;
+    _shouldAutoSendMessage = autoSend;
+    if (prompt != null) {
+      // Clear active conversation to ensure a new one is created
+      _activeConversationId = null;
+      _messages.clear();
+      _errorMessage = null;
+    }
+    notifyListeners();
+  }
+
+  /// Clears the temporary prefilled prompt and notifies listeners.
+  void clearPrefilledPrompt() {
+    _prefilledPrompt = null;
+    _prefilledConversationTitle = null;
+    _shouldAutoSendMessage = false;
+    notifyListeners();
+  }
+
   /// Loads all conversation documents for the user from Firestore.
   Future<void> loadConversations(String uid) async {
     if (uid.isEmpty) return;
@@ -164,10 +199,12 @@ class AIChatProvider extends ChangeNotifier {
     try {
       // 1. If no active conversation exists, lazily create one in Firestore first
       if (_activeConversationId == null && uid.isNotEmpty) {
-        final title = cleanedPrompt.length > 30 ? '${cleanedPrompt.substring(0, 30)}...' : cleanedPrompt;
+        final title = _prefilledConversationTitle ??
+            (cleanedPrompt.length > 30 ? '${cleanedPrompt.substring(0, 30)}...' : cleanedPrompt);
         debugPrint('[StudyMate AI Provider] Membuat percakapan baru di Firestore dengan judul: "$title"');
         final newConversationId = await _chatRepository.createConversation(uid, title);
         _activeConversationId = newConversationId;
+        _prefilledConversationTitle = null; // Clear after use
         
         // Refresh conversations list asynchronously so drawer has the new item
         _chatRepository.getConversations(uid).then((list) {
