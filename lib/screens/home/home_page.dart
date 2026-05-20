@@ -6,6 +6,7 @@ import '../../providers/auth_provider.dart';
 import '../auth/login_page.dart';
 import '../ai_tutor/ai_tutor_page.dart';
 import '../materials/materials_page.dart';
+import '../../providers/statistics_provider.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -16,6 +17,21 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   int _currentIndex = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        final authProvider = Provider.of<AuthProvider>(context, listen: false);
+        final statsProvider = Provider.of<StatisticsProvider>(context, listen: false);
+        final uid = authProvider.currentUser.uid;
+        if (uid.isNotEmpty) {
+          statsProvider.initStatistics(uid);
+        }
+      }
+    });
+  }
 
   // Mock course data
   final List<Map<String, dynamic>> _courses = [
@@ -734,109 +750,195 @@ class _HomePageState extends State<HomePage> {
 
   // --- SCREEN 4: STATISTIK ---
   Widget _buildStatistik(BuildContext context, bool isTablet) {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        return SingleChildScrollView(
-          physics: const BouncingScrollPhysics(),
-          child: Center(
-            child: Container(
-              constraints: const BoxConstraints(maxWidth: 600),
-              padding: const EdgeInsets.symmetric(
-                horizontal: 20.0,
-                vertical: 16.0,
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    'Statistik Belajar',
-                    style: TextStyle(
-                      fontSize: 22,
-                      fontWeight: FontWeight.w900,
-                      color: AppColors.textPrimary,
-                      letterSpacing: -0.5,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  const Text(
-                    'Pantau performa dan jam belajar mingguanmu',
-                    style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w500,
-                      color: AppColors.textSecondary,
-                    ),
-                  ),
-                  const SizedBox(height: 24),
+    final authProvider = Provider.of<AuthProvider>(context);
+    final uid = authProvider.currentUser.uid;
 
-                  // Mini Status Grid Cards
-                  GridView.count(
-                    crossAxisCount: 2,
-                    shrinkWrap: true,
-                    crossAxisSpacing: 16,
-                    mainAxisSpacing: 16,
-                    childAspectRatio: 1.4,
-                    physics: const NeverScrollableScrollPhysics(),
+    return Consumer<StatisticsProvider>(
+      builder: (context, statsProvider, child) {
+        // If loading and no data exists yet, show a clean, modern progress indicator
+        if (statsProvider.isLoading && statsProvider.activities.isEmpty) {
+          return const Center(
+            child: CircularProgressIndicator(
+              valueColor: AlwaysStoppedAnimation<Color>(AppColors.primaryGradientStart),
+            ),
+          );
+        }
+
+        // If there's an error and no data, show a beautiful error card with a retry button
+        if (statsProvider.errorMessage != null && statsProvider.activities.isEmpty) {
+          return Center(
+            child: Padding(
+              padding: const EdgeInsets.all(24.0),
+              child: Card(
+                elevation: 4,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+                child: Padding(
+                  padding: const EdgeInsets.all(24.0),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
                     children: [
-                      _buildStatGridCard('Total Jam', '38 Jam', '+12% minggu ini', Icons.schedule_rounded, const Color(0xFF1E58C1)),
-                      _buildStatGridCard('Rata-rata', '4.2 Jam', 'Sangat Produktif', Icons.insights_rounded, const Color(0xFF6B3BC7)),
-                      _buildStatGridCard('Selesai', '80%', '12 dari 15 target', Icons.check_circle_rounded, const Color(0xFF2E7D32)),
-                      _buildStatGridCard('Poin XP', '2,450 XP', 'Level 5 Pelajar', Icons.stars_rounded, Colors.orange),
+                      const Icon(Icons.error_outline_rounded, color: Colors.redAccent, size: 48),
+                      const SizedBox(height: 16),
+                      Text(
+                        statsProvider.errorMessage!,
+                        textAlign: TextAlign.center,
+                        style: const TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.textPrimary,
+                        ),
+                      ),
+                      const SizedBox(height: 20),
+                      ElevatedButton.icon(
+                        onPressed: () => statsProvider.refreshStatistics(uid),
+                        icon: const Icon(Icons.refresh_rounded),
+                        label: const Text('Coba Lagi'),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppColors.primaryGradientStart,
+                          foregroundColor: Colors.white,
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                        ),
+                      ),
                     ],
                   ),
+                ),
+              ),
+            ),
+          );
+        }
 
-                  const SizedBox(height: 28),
+        final weeklyCounts = statsProvider.getWeeklyActivityCounts();
+        final maxCount = weeklyCounts.reduce((max, element) => element > max ? element : max);
 
-                  // Visual Activity Bar Chart Container
-                  Container(
-                    width: double.infinity,
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(32),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withAlpha(5),
-                          blurRadius: 20,
-                          offset: const Offset(0, 8),
+        return LayoutBuilder(
+          builder: (context, constraints) {
+            return SingleChildScrollView(
+              physics: const BouncingScrollPhysics(),
+              child: Center(
+                child: Container(
+                  constraints: const BoxConstraints(maxWidth: 600),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 20.0,
+                    vertical: 16.0,
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        'Statistik Belajar',
+                        style: TextStyle(
+                          fontSize: 22,
+                          fontWeight: FontWeight.w900,
+                          color: AppColors.textPrimary,
+                          letterSpacing: -0.5,
                         ),
-                      ],
-                    ),
-                    child: Padding(
-                      padding: const EdgeInsets.all(24.0),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                      ),
+                      const SizedBox(height: 4),
+                      const Text(
+                        'Pantau performa dan jam belajar mingguanmu',
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w500,
+                          color: AppColors.textSecondary,
+                        ),
+                      ),
+                      const SizedBox(height: 24),
+
+                      // Mini Status Grid Cards
+                      GridView.count(
+                        crossAxisCount: 2,
+                        shrinkWrap: true,
+                        crossAxisSpacing: 16,
+                        mainAxisSpacing: 16,
+                        childAspectRatio: 1.4,
+                        physics: const NeverScrollableScrollPhysics(),
                         children: [
-                          const Text(
-                            'Aktivitas Belajar (Menit)',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w800,
-                              color: AppColors.textPrimary,
-                            ),
+                          _buildStatGridCard(
+                            'Percakapan AI',
+                            '${statsProvider.totalConversations}',
+                            'Obrolan Tutor AI',
+                            Icons.forum_rounded,
+                            const Color(0xFF1E58C1),
                           ),
-                          const SizedBox(height: 24),
-                          // Custom Painted/Drawn Vertical Bars
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            crossAxisAlignment: CrossAxisAlignment.end,
-                            children: [
-                              _buildBarChartColumn('Sen', 120, 0.5),
-                              _buildBarChartColumn('Sel', 180, 0.75),
-                              _buildBarChartColumn('Rab', 240, 1.0),
-                              _buildBarChartColumn('Kam', 150, 0.6),
-                              _buildBarChartColumn('Jum', 90, 0.35),
-                              _buildBarChartColumn('Sab', 45, 0.18),
-                              _buildBarChartColumn('Min', 0, 0.0),
-                            ],
+                          _buildStatGridCard(
+                            'Total Pesan',
+                            '${statsProvider.totalPesan}',
+                            'Tanya & Jawab AI',
+                            Icons.question_answer_rounded,
+                            const Color(0xFF6B3BC7),
+                          ),
+                          _buildStatGridCard(
+                            'Materi Dibuka',
+                            '${statsProvider.totalMateriDibuka}',
+                            'Materi Pelajaran',
+                            Icons.menu_book_rounded,
+                            const Color(0xFF2E7D32),
+                          ),
+                          _buildStatGridCard(
+                            'Total Aktivitas',
+                            '${statsProvider.activities.length}',
+                            'Aktivitas Belajar',
+                            Icons.insights_rounded,
+                            Colors.orange,
                           ),
                         ],
                       ),
-                    ),
+
+                      const SizedBox(height: 28),
+
+                      // Visual Activity Bar Chart Container
+                      Container(
+                        width: double.infinity,
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(32),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withAlpha(5),
+                              blurRadius: 20,
+                              offset: const Offset(0, 8),
+                            ),
+                          ],
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.all(24.0),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Text(
+                                'Aktivitas Belajar (Frekuensi)',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w800,
+                                  color: AppColors.textPrimary,
+                                ),
+                              ),
+                              const SizedBox(height: 24),
+                              // Custom Painted/Drawn Vertical Bars
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                crossAxisAlignment: CrossAxisAlignment.end,
+                                children: [
+                                  _buildBarChartColumn('Sen', weeklyCounts[0], maxCount > 0 ? weeklyCounts[0] / maxCount : 0.0),
+                                  _buildBarChartColumn('Sel', weeklyCounts[1], maxCount > 0 ? weeklyCounts[1] / maxCount : 0.0),
+                                  _buildBarChartColumn('Rab', weeklyCounts[2], maxCount > 0 ? weeklyCounts[2] / maxCount : 0.0),
+                                  _buildBarChartColumn('Kam', weeklyCounts[3], maxCount > 0 ? weeklyCounts[3] / maxCount : 0.0),
+                                  _buildBarChartColumn('Jum', weeklyCounts[4], maxCount > 0 ? weeklyCounts[4] / maxCount : 0.0),
+                                  _buildBarChartColumn('Sab', weeklyCounts[5], maxCount > 0 ? weeklyCounts[5] / maxCount : 0.0),
+                                  _buildBarChartColumn('Min', weeklyCounts[6], maxCount > 0 ? weeklyCounts[6] / maxCount : 0.0),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 85),
+                    ],
                   ),
-                  const SizedBox(height: 85),
-                ],
+                ),
               ),
-            ),
-          ),
+            );
+          },
         );
       },
     );

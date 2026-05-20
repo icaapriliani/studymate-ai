@@ -6,6 +6,7 @@ import '../../constants/app_colors.dart';
 import '../../models/chat_model.dart';
 import '../../providers/ai_chat_provider.dart';
 import '../../providers/auth_provider.dart';
+import '../../providers/statistics_provider.dart';
 
 class AITutorPage extends StatefulWidget {
   final bool showBackButton;
@@ -88,6 +89,15 @@ class _AITutorPageState extends State<AITutorPage> {
     WidgetsBinding.instance.addPostFrameCallback((_) => _scrollToBottom());
 
     await chatProvider.sendMessage(text, uid);
+
+    // Record "chat" activity dynamically
+    if (uid.isNotEmpty) {
+      Provider.of<StatisticsProvider>(context, listen: false).saveActivity(
+        uid,
+        'chat',
+        text,
+      );
+    }
 
     // Smooth scroll down when AI message arrives or error occurs
     WidgetsBinding.instance.addPostFrameCallback((_) => _scrollToBottom());

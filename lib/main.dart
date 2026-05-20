@@ -14,6 +14,11 @@ import 'repositories/chat_repository_impl.dart';
 // Providers
 import 'providers/auth_provider.dart';
 import 'providers/ai_chat_provider.dart';
+import 'providers/statistics_provider.dart';
+
+// Services & Repositories additions
+import 'services/activity_service.dart';
+import 'repositories/activity_repository_impl.dart';
 
 // Screens
 import 'screens/splash/splash_page.dart';
@@ -44,6 +49,7 @@ class StudyMateAI extends StatelessWidget {
     final authService = FirebaseAuthService();
     final firestoreService = FirestoreService();
     final geminiService = GeminiService();
+    final activityService = ActivityService();
 
     // Instantiate repositories (Data Layer Orchestrator)
     final authRepository = AuthRepositoryImpl(
@@ -56,6 +62,9 @@ class StudyMateAI extends StatelessWidget {
     final chatRepository = ChatRepositoryImpl(
       firestoreService: firestoreService,
     );
+    final activityRepository = ActivityRepositoryImpl(
+      activityService: activityService,
+    );
 
     return MultiProvider(
       providers: [
@@ -65,6 +74,12 @@ class StudyMateAI extends StatelessWidget {
         ChangeNotifierProvider<AIChatProvider>(
           create: (_) => AIChatProvider(
             geminiRepository: geminiRepository,
+            chatRepository: chatRepository,
+          ),
+        ),
+        ChangeNotifierProvider<StatisticsProvider>(
+          create: (_) => StatisticsProvider(
+            activityRepository: activityRepository,
             chatRepository: chatRepository,
           ),
         ),

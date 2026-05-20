@@ -3,6 +3,8 @@ import 'package:provider/provider.dart';
 import '../../constants/app_colors.dart';
 import '../../models/material_model.dart';
 import '../../providers/ai_chat_provider.dart';
+import '../../providers/auth_provider.dart';
+import '../../providers/statistics_provider.dart';
 
 class MaterialDetailPage extends StatefulWidget {
   final MaterialModel material;
@@ -27,6 +29,18 @@ class _MaterialDetailPageState extends State<MaterialDetailPage> {
     for (int i = 0; i < widget.material.sampleQuestions.length; i++) {
       _expandedQuestions[i] = false;
     }
+
+    // Record "material" opened activity dynamically
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        final authProvider = Provider.of<AuthProvider>(context, listen: false);
+        final statsProvider = Provider.of<StatisticsProvider>(context, listen: false);
+        final uid = authProvider.currentUser.uid;
+        if (uid.isNotEmpty) {
+          statsProvider.saveActivity(uid, 'material', widget.material.title);
+        }
+      }
+    });
   }
 
   @override
