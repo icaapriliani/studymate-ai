@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import '../../constants/app_colors.dart';
 import '../../providers/auth_provider.dart';
 import '../auth/login_page.dart';
+import '../ai_tutor/ai_tutor_page.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -57,24 +58,6 @@ class _HomePageState extends State<HomePage> {
     {'day': 'M', 'done': false}, // Minggu
   ];
 
-  // Mock chat messages for AI Tutor
-  final List<Map<String, dynamic>> _chatMessages = [
-    {
-      'isSender': false,
-      'text': 'Halo Alex! Ada materi yang ingin kamu diskusikan hari ini? Aku bisa membantumu meringkas bab, menjelaskan konsep sulit, atau membuat kuis.',
-      'time': '08:30',
-    },
-    {
-      'isSender': true,
-      'text': 'Tolong jelaskan perbedaan mendasar antara SQL dan NoSQL.',
-      'time': '08:32',
-    },
-    {
-      'isSender': false,
-      'text': 'Tentu! Perbedaan utama terletak pada model data & skalabilitas:\n\n1. **SQL (Relasional)**: Menggunakan tabel kaku (baris/kolom) dan skema tetap. Sangat cocok untuk transaksi kompleks yang butuh konsistensi tinggi.\n2. **NoSQL (Non-Relasional)**: Menggunakan struktur fleksibel (seperti dokumen JSON, graf, atau key-value). Sangat ideal untuk skala data raksasa dan struktur yang cepat berubah.',
-      'time': '08:33',
-    }
-  ];
 
   // Mock materials for Library tab
   final List<Map<String, dynamic>> _materials = [
@@ -134,7 +117,7 @@ class _HomePageState extends State<HomePage> {
                   children: [
                     _buildBeranda(context, isTablet),
                     _buildMateri(context, isTablet),
-                    _buildAITutor(context, isTablet),
+                    const AITutorPage(showBackButton: false, bottomPadding: 80.0),
                     _buildStatistik(context, isTablet),
                     _buildProfil(context, isTablet),
                   ],
@@ -972,223 +955,7 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  // --- SCREEN 3: AI TUTOR ---
-  Widget _buildAITutor(BuildContext context, bool isTablet) {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        return Center(
-          child: Container(
-            constraints: const BoxConstraints(maxWidth: 600),
-            child: Column(
-              children: [
-                // Chat Header
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 16.0),
-                  child: Row(
-                    children: [
-                      // Glowing green status avatar
-                      Stack(
-                        children: [
-                          Container(
-                            width: 44,
-                            height: 44,
-                            decoration: const BoxDecoration(
-                              gradient: LinearGradient(
-                                colors: [
-                                  AppColors.primaryGradientStart,
-                                  AppColors.primaryGradientEnd,
-                                ],
-                              ),
-                              shape: BoxShape.circle,
-                            ),
-                            child: const Center(
-                              child: Icon(
-                                Icons.auto_awesome_rounded,
-                                color: Colors.white,
-                                size: 20,
-                              ),
-                            ),
-                          ),
-                          Positioned(
-                            bottom: 0,
-                            right: 0,
-                            child: Container(
-                              width: 12,
-                              height: 12,
-                              decoration: BoxDecoration(
-                                color: Colors.greenAccent,
-                                shape: BoxShape.circle,
-                                border: Border.all(color: Colors.white, width: 2),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(width: 14),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: const [
-                          Text(
-                            'Tutor AI StudyMate',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w900,
-                              color: AppColors.textPrimary,
-                            ),
-                          ),
-                          SizedBox(height: 2),
-                          Text(
-                            'Aktif Sekarang',
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: Colors.green,
-                              fontWeight: FontWeight.w700,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
 
-                // Conversation Box
-                Expanded(
-                  child: Container(
-                    decoration: const BoxDecoration(
-                      color: Colors.white70,
-                      borderRadius: BorderRadius.only(
-                        topLeft: Radius.circular(36),
-                        topRight: Radius.circular(36),
-                      ),
-                    ),
-                    child: ClipRRect(
-                      borderRadius: const BorderRadius.only(
-                        topLeft: Radius.circular(36),
-                        topRight: Radius.circular(36),
-                      ),
-                      child: ListView.builder(
-                        physics: const BouncingScrollPhysics(),
-                        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
-                        itemCount: _chatMessages.length,
-                        itemBuilder: (context, index) {
-                          final msg = _chatMessages[index];
-                          final isSender = msg['isSender'];
-                          return Align(
-                            alignment: isSender ? Alignment.centerRight : Alignment.centerLeft,
-                            child: Container(
-                              margin: const EdgeInsets.only(bottom: 16),
-                              constraints: BoxConstraints(
-                                maxWidth: constraints.maxWidth * 0.75,
-                              ),
-                              decoration: BoxDecoration(
-                                color: isSender ? AppColors.primaryGradientStart : Colors.white,
-                                borderRadius: BorderRadius.only(
-                                  topLeft: const Radius.circular(20),
-                                  topRight: const Radius.circular(20),
-                                  bottomLeft: Radius.circular(isSender ? 20 : 4),
-                                  bottomRight: Radius.circular(isSender ? 4 : 20),
-                                ),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.black.withAlpha(4),
-                                    blurRadius: 10,
-                                    offset: const Offset(0, 4),
-                                  ),
-                                ],
-                              ),
-                              child: Padding(
-                                padding: const EdgeInsets.all(16.0),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      msg['text'],
-                                      style: TextStyle(
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.w500,
-                                        color: isSender ? Colors.white : AppColors.textPrimary,
-                                        height: 1.4,
-                                      ),
-                                    ),
-                                    const SizedBox(height: 6),
-                                    Align(
-                                      alignment: Alignment.bottomRight,
-                                      child: Text(
-                                        msg['time'],
-                                        style: TextStyle(
-                                          fontSize: 10,
-                                          fontWeight: FontWeight.w600,
-                                          color: isSender ? Colors.white70 : AppColors.textLight,
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          );
-                        },
-                      ),
-                    ),
-                  ),
-                ),
-
-                // Typing Panel Input Box
-                Container(
-                  color: Colors.white,
-                  padding: const EdgeInsets.only(
-                    left: 20,
-                    right: 20,
-                    top: 12,
-                    bottom: 85,
-                  ),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: Container(
-                          decoration: BoxDecoration(
-                            color: AppColors.progressTrack,
-                            borderRadius: BorderRadius.circular(100),
-                          ),
-                          child: const TextField(
-                            style: TextStyle(fontSize: 14, color: AppColors.textPrimary),
-                            decoration: InputDecoration(
-                              hintText: 'Tanya StudyMate AI...',
-                              hintStyle: TextStyle(color: AppColors.textLight, fontSize: 14),
-                              border: InputBorder.none,
-                              contentPadding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                            ),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      Container(
-                        width: 44,
-                        height: 44,
-                        decoration: const BoxDecoration(
-                          gradient: LinearGradient(
-                            colors: [
-                              AppColors.primaryGradientStart,
-                              AppColors.primaryGradientEnd,
-                            ],
-                          ),
-                          shape: BoxShape.circle,
-                        ),
-                        child: IconButton(
-                          icon: const Icon(Icons.send_rounded, color: Colors.white, size: 18),
-                          onPressed: () {},
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-        );
-      },
-    );
-  }
 
   // --- SCREEN 4: STATISTIK ---
   Widget _buildStatistik(BuildContext context, bool isTablet) {
