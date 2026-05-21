@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import '../domain/repositories/chat_repository.dart';
 import '../domain/repositories/activity_repository.dart';
 import '../models/activity_model.dart';
@@ -168,6 +169,11 @@ class StatisticsProvider extends ChangeNotifier {
         _isLoading = false;
         _errorMessage = null;
         notifyListeners();
+        
+        final streak = learningStreak;
+        if (streak > 0) {
+          _triggerStreakNotificationIfNeeded(uid, streak);
+        }
       },
       onError: (error) {
         debugPrint('[StatisticsProvider] Error pada aliran aktivitas: $error');
@@ -184,6 +190,11 @@ class StatisticsProvider extends ChangeNotifier {
         _isLoading = false;
         _errorMessage = null;
         notifyListeners();
+        
+        final streak = learningStreak;
+        if (streak > 0) {
+          _triggerStreakNotificationIfNeeded(uid, streak);
+        }
       },
       onError: (error) {
         debugPrint('[StatisticsProvider] Error pada aliran kuis: $error');
@@ -260,6 +271,39 @@ class StatisticsProvider extends ChangeNotifier {
   DateTime _getStartOfWeek(DateTime date) {
     int daysToSubtract = date.weekday - 1;
     return DateTime(date.year, date.month, date.day).subtract(Duration(days: daysToSubtract));
+  }
+
+  /// Checks and triggers a learning streak notification if it hasn't been sent.
+  Future<void> _triggerStreakNotificationIfNeeded(String uid, int streak) async {
+    if (uid.isEmpty || streak <= 0) return;
+    try {
+      final streakMessage = '🔥 Kamu belajar $streak hari berturut-turut!';
+      
+      final querySnapshot = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(uid)
+          .collection('notifications')
+          .where('type', isEqualTo: 'streak')
+          .where('message', isEqualTo: streakMessage)
+          .get();
+
+      if (querySnapshot.docs.isEmpty) {
+        await FirebaseFirestore.instance
+            .collection('users')
+            .doc(uid)
+            .collection('notifications')
+            .add({
+          'title': '🔥 Streak Belajar!',
+          'message': streakMessage,
+          'type': 'streak',
+          'isRead': false,
+          'createdAt': FieldValue.serverTimestamp(),
+        });
+        debugPrint('[StatisticsProvider] Berhasil memicu notifikasi streak $streak hari.');
+      }
+    } catch (e) {
+      debugPrint('[StatisticsProvider] Gagal memicu notifikasi streak: $e');
+    }
   }
 
   @override

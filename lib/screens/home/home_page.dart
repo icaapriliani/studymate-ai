@@ -10,6 +10,8 @@ import '../materials/material_detail_page.dart';
 import '../profile/edit_profile_page.dart';
 import '../../models/material_model.dart';
 import '../../providers/statistics_provider.dart';
+import '../../providers/notification_provider.dart';
+import '../notification/notification_page.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -28,9 +30,11 @@ class _HomePageState extends State<HomePage> {
       if (mounted) {
         final authProvider = Provider.of<AuthProvider>(context, listen: false);
         final statsProvider = Provider.of<StatisticsProvider>(context, listen: false);
+        final notificationProvider = Provider.of<NotificationProvider>(context, listen: false);
         final uid = authProvider.currentUser.uid;
         if (uid.isNotEmpty) {
           statsProvider.initStatistics(uid);
+          notificationProvider.initNotifications(uid);
         }
       }
     });
@@ -182,6 +186,7 @@ class _HomePageState extends State<HomePage> {
   // --- SCREEN 1: BERANDA ---
   Widget _buildBeranda(BuildContext context, bool isTablet) {
     final authProvider = Provider.of<AuthProvider>(context);
+    final notificationProvider = Provider.of<NotificationProvider>(context);
     final user = authProvider.currentUser;
 
     return Consumer<StatisticsProvider>(
@@ -355,7 +360,12 @@ class _HomePageState extends State<HomePage> {
                           const SizedBox(width: 16),
                           // Glassmorphic Notification Button
                           GestureDetector(
-                            onTap: () => _showNotificationDialog(context),
+                            onTap: () => Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const NotificationPage(),
+                              ),
+                            ),
                             child: Container(
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(16),
@@ -393,18 +403,33 @@ class _HomePageState extends State<HomePage> {
                                           color: AppColors.textPrimary,
                                           size: 22,
                                         ),
-                                        Positioned(
-                                          top: 14,
-                                          right: 14,
-                                          child: Container(
-                                            width: 7,
-                                            height: 7,
-                                            decoration: const BoxDecoration(
-                                              color: Colors.redAccent,
-                                              shape: BoxShape.circle,
+                                        if (notificationProvider.unreadCount > 0)
+                                          Positioned(
+                                            top: 6,
+                                            right: 6,
+                                            child: Container(
+                                              padding: const EdgeInsets.all(3),
+                                              decoration: const BoxDecoration(
+                                                color: Colors.redAccent,
+                                                shape: BoxShape.circle,
+                                              ),
+                                              constraints: const BoxConstraints(
+                                                minWidth: 16,
+                                                minHeight: 16,
+                                              ),
+                                              child: Center(
+                                                child: Text(
+                                                  '${notificationProvider.unreadCount}',
+                                                  style: const TextStyle(
+                                                    color: Colors.white,
+                                                    fontSize: 8,
+                                                    fontWeight: FontWeight.w900,
+                                                  ),
+                                                  textAlign: TextAlign.center,
+                                                ),
+                                              ),
                                             ),
                                           ),
-                                        ),
                                       ],
                                     ),
                                   ),
@@ -1510,171 +1535,7 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  void _showNotificationDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (context) {
-        return Center(
-          child: Container(
-            margin: const EdgeInsets.symmetric(horizontal: 24),
-            constraints: const BoxConstraints(maxWidth: 400),
-            decoration: BoxDecoration(
-              color: Colors.white.withAlpha(235),
-              borderRadius: BorderRadius.circular(32),
-              border: Border.all(color: Colors.white, width: 2),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withAlpha(20),
-                  blurRadius: 30,
-                  offset: const Offset(0, 15),
-                ),
-              ],
-            ),
-            child: Material(
-              color: Colors.transparent,
-              child: Padding(
-                padding: const EdgeInsets.all(24.0),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Row(
-                          children: const [
-                            Icon(Icons.notifications_active_rounded, color: AppColors.primaryGradientStart, size: 24),
-                            SizedBox(width: 10),
-                            Text(
-                              'Notifikasi',
-                              style: TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.w900,
-                                color: AppColors.textPrimary,
-                              ),
-                            ),
-                          ],
-                        ),
-                        IconButton(
-                          icon: const Icon(Icons.close_rounded, color: AppColors.textLight),
-                          onPressed: () => Navigator.of(context).pop(),
-                        ),
-                      ],
-                    ),
-                    const Divider(height: 24, thickness: 1),
-                    _buildNotifItem(
-                      icon: Icons.auto_awesome_rounded,
-                      color: const Color(0xFF6B3BC7),
-                      title: 'Jawaban Tutor AI Baru!',
-                      desc: 'Tutor AI baru saja merespons pertanyaan Anda tentang DBMS.',
-                      time: 'Baru saja',
-                    ),
-                    const SizedBox(height: 12),
-                    _buildNotifItem(
-                      icon: Icons.stars_rounded,
-                      color: Colors.orange,
-                      title: 'Prestasi Baru Diraih!',
-                      desc: 'Selamat! Anda telah konsisten belajar selama 3 hari berturut-turut.',
-                      time: '2 jam yang lalu',
-                    ),
-                    const SizedBox(height: 12),
-                    _buildNotifItem(
-                      icon: Icons.quiz_rounded,
-                      color: const Color(0xFF2E7D32),
-                      title: 'Kuis Mingguan Tersedia',
-                      desc: 'Uji pemahaman Anda tentang Basis Data dengan kuis terbaru.',
-                      time: '1 hari yang lalu',
-                    ),
-                    const SizedBox(height: 24),
-                    SizedBox(
-                      width: double.infinity,
-                      child: ElevatedButton(
-                        onPressed: () => Navigator.of(context).pop(),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: AppColors.primaryGradientStart,
-                          foregroundColor: Colors.white,
-                          elevation: 0,
-                          padding: const EdgeInsets.symmetric(vertical: 14),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(16),
-                          ),
-                        ),
-                        child: const Text(
-                          'Tutup',
-                          style: TextStyle(
-                            fontSize: 14,
-                            fontWeight: FontWeight.w900,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-        );
-      },
-    );
-  }
 
-  Widget _buildNotifItem({
-    required IconData icon,
-    required Color color,
-    required String title,
-    required String desc,
-    required String time,
-  }) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Container(
-          width: 40,
-          height: 40,
-          decoration: BoxDecoration(
-            color: color.withAlpha(25),
-            shape: BoxShape.circle,
-          ),
-          child: Icon(icon, color: color, size: 20),
-        ),
-        const SizedBox(width: 14),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                title,
-                style: const TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w800,
-                  color: AppColors.textPrimary,
-                ),
-              ),
-              const SizedBox(height: 4),
-              Text(
-                desc,
-                style: const TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w500,
-                  color: AppColors.textSecondary,
-                  height: 1.3,
-                ),
-              ),
-              const SizedBox(height: 4),
-              Text(
-                time,
-                style: const TextStyle(
-                  fontSize: 10,
-                  fontWeight: FontWeight.w600,
-                  color: AppColors.textLight,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
 
 
   void _showTargetSettingsDialog(BuildContext context, String uid, StatisticsProvider statsProvider) {

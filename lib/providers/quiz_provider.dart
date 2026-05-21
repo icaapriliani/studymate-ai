@@ -1,19 +1,26 @@
 import 'dart:convert';
 import 'package:flutter/foundation.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import '../domain/repositories/gemini_repository.dart';
 import '../domain/repositories/quiz_repository.dart';
+import '../domain/repositories/notification_repository.dart';
 import '../models/quiz_session_model.dart';
 import '../models/quiz_question_model.dart';
+import '../models/notification_model.dart';
 
 class QuizProvider extends ChangeNotifier {
   final QuizRepository _quizRepository;
   final GeminiRepository _geminiRepository;
+  final NotificationRepository _notificationRepository;
 
   QuizProvider({
     required QuizRepository quizRepository,
     required GeminiRepository geminiRepository,
+    required NotificationRepository notificationRepository,
   })  : _quizRepository = quizRepository,
-        _geminiRepository = geminiRepository;
+        _geminiRepository = geminiRepository,
+        _notificationRepository = notificationRepository;
 
   List<QuizSessionModel> _sessions = [];
   List<QuizSessionModel> get sessions => _sessions;
@@ -301,6 +308,79 @@ Berikan feedback evaluasi belajar singkat, membangun, dan menyemangati (sekitar 
       final index = _sessions.indexWhere((s) => s.id == _currentSession!.id);
       if (index != -1) {
         _sessions[index] = _currentSession!;
+      }
+
+      // Auto-Trigger Notifications
+      try {
+        final uid = FirebaseAuth.instance.currentUser?.uid;
+        if (uid != null && uid.isNotEmpty) {
+          // 1. Quiz Selesai Notification
+          await _notificationRepository.sendNotification(
+            uid,
+            NotificationModel(
+              id: '',
+              title: '🎉 Kuis Selesai!',
+              message: 'Skor kamu mencapai $score% di kuis "${_currentSession!.materialTitle}".',
+              type: NotificationModel.typeQuizCompleted,
+              isRead: false,
+              createdAt: DateTime.now(),
+            ),
+          );
+
+          // 2. AI Feedback Positif (Skor >= 80)
+          if (score >= 80) {
+            await _notificationRepository.sendNotification(
+              uid,
+              NotificationModel(
+                id: '',
+                title: '✨ Feedback AI Positif!',
+                message: 'Kinerja luar biasa! Skor kamu $score%. Tutor AI sangat terkesan.',
+                type: NotificationModel.typeAiFeedback,
+                isRead: false,
+                createdAt: DateTime.now(),
+              ),
+            );
+          }
+
+          // 3. Target Belajar Tercapai
+          final sessionsList = await _quizRepository.getUserQuizSessions(uid);
+          final targetDoc = await FirebaseFirestore.instance
+              .collection('users')
+              .doc(uid)
+              .collection('learning_target')
+              .doc('target_doc')
+              .get();
+              
+          int target = 5; // default target
+          if (targetDoc.exists && targetDoc.data() != null) {
+            target = targetDoc.data()!['weeklyQuizTarget'] as int? ?? 5;
+          }
+
+          final now = DateTime.now();
+          int daysToSubtract = now.weekday - 1;
+          final startOfWeek = DateTime(now.year, now.month, now.day).subtract(Duration(days: daysToSubtract));
+          final endOfWeek = startOfWeek.add(const Duration(days: 7));
+
+          final completedThisWeek = sessionsList.where((q) {
+            return q.completed && q.createdAt.isAfter(startOfWeek) && q.createdAt.isBefore(endOfWeek);
+          }).length;
+
+          if (completedThisWeek == target) {
+            await _notificationRepository.sendNotification(
+              uid,
+              NotificationModel(
+                id: '',
+                title: '🎯 Target Tercapai!',
+                message: 'Luar biasa! Target belajar mingguan tercapai ($target kuis diselesaikan).',
+                type: NotificationModel.typeLearningTarget,
+                isRead: false,
+                createdAt: DateTime.now(),
+              ),
+            );
+          }
+        }
+      } catch (notifErr) {
+        debugPrint('[QuizProvider] Gagal memproses auto-trigger notifikasi: $notifErr');
       }
 
       return true;
