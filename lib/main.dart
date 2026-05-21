@@ -28,6 +28,10 @@ import 'services/notification_service.dart';
 import 'repositories/notification_repository_impl.dart';
 import 'providers/notification_provider.dart';
 
+import 'services/learning_service.dart';
+import 'repositories/learning_repository_impl.dart';
+import 'providers/learning_provider.dart';
+
 // Screens
 import 'screens/splash/splash_page.dart';
 
@@ -60,6 +64,7 @@ class StudyMateAI extends StatelessWidget {
     final activityService = ActivityService();
     final firestoreQuizService = FirestoreQuizService();
     final notificationService = NotificationService();
+    final learningService = LearningService();
 
     // Instantiate repositories (Data Layer Orchestrator)
     final authRepository = AuthRepositoryImpl(
@@ -80,6 +85,9 @@ class StudyMateAI extends StatelessWidget {
     );
     final notificationRepository = NotificationRepositoryImpl(
       notificationService: notificationService,
+    );
+    final learningRepository = LearningRepositoryImpl(
+      learningService: learningService,
     );
 
     return MultiProvider(
@@ -110,6 +118,11 @@ class StudyMateAI extends StatelessWidget {
         ChangeNotifierProvider<NotificationProvider>(
           create: (_) => NotificationProvider(
             notificationRepository: notificationRepository,
+          ),
+        ),
+        ChangeNotifierProvider<LearningProvider>(
+          create: (_) => LearningProvider(
+            learningRepository: learningRepository,
           ),
         ),
       ],

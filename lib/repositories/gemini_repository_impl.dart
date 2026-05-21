@@ -49,6 +49,7 @@ Output WAJIB berupa JSON array valid persis seperti format berikut tanpa tambaha
       return response;
     } catch (e, stackTrace) {
       debugPrint('[StudyMate AI Debug] Error generating quiz questions: $e');
+      debugPrint('[StudyMate AI Debug] StackTrace:\n$stackTrace');
       final friendlyMessage = _mapErrorToUserFriendlyMessage(e);
       throw Exception('$friendlyMessage (Detail Galat Asli: $e)');
     }

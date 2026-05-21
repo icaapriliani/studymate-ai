@@ -11,6 +11,7 @@ import '../profile/edit_profile_page.dart';
 import '../../models/material_model.dart';
 import '../../providers/statistics_provider.dart';
 import '../../providers/notification_provider.dart';
+import '../../providers/learning_provider.dart';
 import '../notification/notification_page.dart';
 
 class HomePage extends StatefulWidget {
@@ -31,10 +32,12 @@ class _HomePageState extends State<HomePage> {
         final authProvider = Provider.of<AuthProvider>(context, listen: false);
         final statsProvider = Provider.of<StatisticsProvider>(context, listen: false);
         final notificationProvider = Provider.of<NotificationProvider>(context, listen: false);
+        final learningProvider = Provider.of<LearningProvider>(context, listen: false);
         final uid = authProvider.currentUser.uid;
         if (uid.isNotEmpty) {
           statsProvider.initStatistics(uid);
           notificationProvider.initNotifications(uid);
+          learningProvider.initLearning(uid);
         }
       }
     });
@@ -187,6 +190,7 @@ class _HomePageState extends State<HomePage> {
   Widget _buildBeranda(BuildContext context, bool isTablet) {
     final authProvider = Provider.of<AuthProvider>(context);
     final notificationProvider = Provider.of<NotificationProvider>(context);
+    final learningProvider = Provider.of<LearningProvider>(context);
     final user = authProvider.currentUser;
 
     return Consumer<StatisticsProvider>(
@@ -268,7 +272,7 @@ class _HomePageState extends State<HomePage> {
         final Set<String> addedTitles = {};
 
         for (final act in materialActivities) {
-          final match = MaterialModel.dummyMaterials.firstWhere(
+          final match = learningProvider.materials.firstWhere(
             (mat) => mat.title.trim().toLowerCase() == act.title.trim().toLowerCase(),
             orElse: () => const MaterialModel(
               id: '',
@@ -289,10 +293,12 @@ class _HomePageState extends State<HomePage> {
           }
         }
 
-        // Fallback to top 3 dummy materials if empty
+        // Fallback to top 3 dynamic materials if empty
         final displayList = recentlyOpened.isNotEmpty
             ? recentlyOpened.take(3).toList()
-            : MaterialModel.dummyMaterials.take(3).toList();
+            : (learningProvider.materials.isNotEmpty 
+                ? learningProvider.materials.take(3).toList()
+                : MaterialModel.dummyMaterials.take(3).toList());
 
         IconData getIconForCategory(String category) {
           switch (category.toLowerCase()) {
@@ -1251,7 +1257,7 @@ class _HomePageState extends State<HomePage> {
         ? user.displayName
             .trim()
             .split(' ')
-            .where((e) => e.isNotEmpty)
+            .where((String e) => e.isNotEmpty)
             .map((e) => e[0])
             .take(2)
             .join()

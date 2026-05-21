@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import '../../constants/app_colors.dart';
 import '../../models/material_model.dart';
+import '../../models/module_model.dart';
 import '../../providers/ai_chat_provider.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/statistics_provider.dart';
+import '../../providers/learning_provider.dart';
 import '../quiz/quiz_session_list_page.dart';
+import 'module_detail_page.dart';
 
 class MaterialDetailPage extends StatefulWidget {
   final MaterialModel material;
@@ -46,7 +50,17 @@ class _MaterialDetailPageState extends State<MaterialDetailPage> {
 
   @override
   Widget build(BuildContext context) {
-    final mat = widget.material;
+    final learningProvider = Provider.of<LearningProvider>(context);
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    final uid = authProvider.currentUser.uid;
+    
+    // Find the latest state of this material from provider to ensure perfectly synced progress ratios.
+    final mat = learningProvider.materials.firstWhere(
+      (m) => m.id == widget.material.id,
+      orElse: () => widget.material,
+    );
+
+    final modules = learningProvider.allModules[mat.id] ?? [];
     final screenSize = MediaQuery.of(context).size;
     final isTablet = screenSize.shortestSide > 600;
 
@@ -96,6 +110,20 @@ class _MaterialDetailPageState extends State<MaterialDetailPage> {
                           _buildSectionTitle('Deskripsi Materi'),
                           const SizedBox(height: 10),
                           _buildDescriptionCard(mat),
+                          const SizedBox(height: 24),
+
+                          // 2c-2. Modul Pembelajaran Checklist
+                          _buildSectionTitle('Daftar Modul Pembelajaran'),
+                          const SizedBox(height: 10),
+                          if (modules.isEmpty)
+                            _buildEmptyModulesCard(mat, learningProvider.isLoading, uid)
+                          else
+                            Column(
+                              children: modules.map((mod) {
+                                final isCompleted = learningProvider.isModuleCompleted(mod.id);
+                                return _buildModuleTile(context, mat, mod, isCompleted);
+                              }).toList(),
+                            ),
                           const SizedBox(height: 24),
 
                           // 2d. Key Points Summary Panel
@@ -784,6 +812,340 @@ class _MaterialDetailPageState extends State<MaterialDetailPage> {
                 ),
               ),
             ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildEmptyModulesCard(MaterialModel mat, bool isLoading, String uid) {
+    final learningProvider = Provider.of<LearningProvider>(context, listen: false);
+    final errorMessage = learningProvider.errorMessage;
+
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 28.0),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(
+          color: isLoading ? mat.color.withAlpha(20) : Colors.amber.withAlpha(50),
+          width: 1.5,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withAlpha(5),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Column(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: isLoading ? mat.color.withAlpha(12) : Colors.amber.withAlpha(12),
+              shape: BoxShape.circle,
+            ),
+            child: isLoading
+                ? SizedBox(
+                    width: 28,
+                    height: 28,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 3.0,
+                      valueColor: AlwaysStoppedAnimation<Color>(mat.color),
+                    ),
+                  )
+                : const Icon(
+                    Icons.warning_amber_rounded,
+                    color: Colors.amber,
+                    size: 32,
+                  ),
+          ),
+          const SizedBox(height: 16),
+          Text(
+            isLoading ? 'Menghubungkan Database' : 'Modul Belum Tersedia',
+            style: const TextStyle(
+              fontSize: 15,
+              fontWeight: FontWeight.w900,
+              color: AppColors.textPrimary,
+              letterSpacing: -0.2,
+            ),
+          ),
+          const SizedBox(height: 6),
+          Text(
+            isLoading
+                ? 'Harap tunggu sebentar, modul akademik sedang disinkronisasikan ke Firestore...'
+                : 'Peta pembelajaran modular untuk materi ini belum terdaftar di database.',
+            textAlign: TextAlign.center,
+            style: const TextStyle(
+              fontSize: 12,
+              color: AppColors.textSecondary,
+              height: 1.4,
+            ),
+          ),
+          if (errorMessage != null && !isLoading) ...[
+            const SizedBox(height: 12),
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: Colors.red.withAlpha(10),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: Colors.red.withAlpha(30), width: 1),
+              ),
+              child: SelectableText(
+                'Detail Error Database:\n$errorMessage',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 10,
+                  fontFamily: 'monospace',
+                  color: Colors.red.shade800,
+                  height: 1.4,
+                ),
+              ),
+            ),
+          ],
+          if (!isLoading) ...[
+            const SizedBox(height: 20),
+            ElevatedButton.icon(
+              onPressed: () async {
+                await HapticFeedback.mediumImpact();
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Row(
+                        children: [
+                          const SizedBox(
+                            width: 16,
+                            height: 16,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2.0,
+                              valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          const Expanded(
+                            child: Text(
+                              'Menjalankan uji koneksi & sinkronisasi database...',
+                              style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.white),
+                            ),
+                          ),
+                        ],
+                      ),
+                      backgroundColor: mat.color,
+                      behavior: SnackBarBehavior.floating,
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      duration: const Duration(seconds: 3),
+                    ),
+                  );
+
+                  try {
+                    debugPrint('[UI] Memulai seeder test sederhana dari tombol UI...');
+                    await learningProvider.runSimpleSeederTest();
+                    debugPrint('[UI] Seeder test sederhana BERHASIL! Memulai pembersihan data dummy...');
+                    await learningProvider.cleanupLegacyDummyData(uid);
+                    debugPrint('[UI] Pembersihan database selesai! Melanjutkan inisialisasi learning stream...');
+                    await learningProvider.initLearning(uid);
+                    
+                    if (context.mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: const Text(
+                            'Database berhasil disinkronkan & modul telah dimuat!',
+                            style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.white),
+                          ),
+                          backgroundColor: Colors.green,
+                          behavior: SnackBarBehavior.floating,
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        ),
+                      );
+                    }
+                  } catch (e) {
+                    debugPrint('[UI] Kegagalan tombol sinkronisasi: $e');
+                    if (context.mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text(
+                            'Gagal sinkron: ${e.toString().replaceFirst('Exception: ', '')}',
+                            style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.white),
+                          ),
+                          backgroundColor: Colors.red,
+                          behavior: SnackBarBehavior.floating,
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        ),
+                      );
+                    }
+                  }
+                }
+              },
+              icon: const Icon(Icons.sync_rounded, size: 16, color: Colors.white),
+              label: const Text(
+                'Sinkronkan Ulang Database',
+                style: TextStyle(fontSize: 12, fontWeight: FontWeight.w800, color: Colors.white),
+              ),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: mat.color,
+                elevation: 0,
+                padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+              ),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+
+  Widget _buildModuleTile(BuildContext context, MaterialModel mat, ModuleModel module, bool isCompleted) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(
+          color: isCompleted ? mat.color.withAlpha(80) : Colors.transparent,
+          width: 1.5,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withAlpha(5),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(20),
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => ModuleDetailPage(
+                  material: mat,
+                  module: module,
+                ),
+              ),
+            );
+          },
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Row(
+              children: [
+                // Custom checkbox / checkmark with custom decoration
+                GestureDetector(
+                  onTap: () async {
+                    // Trigger haptic feedback satisfying tap
+                    await HapticFeedback.lightImpact();
+                    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+                    final learningProvider = Provider.of<LearningProvider>(context, listen: false);
+                    final uid = authProvider.currentUser.uid;
+                    if (uid.isNotEmpty) {
+                      final newStatus = !isCompleted;
+                      await learningProvider.markModuleAsCompleted(
+                        uid: uid,
+                        materialId: mat.id,
+                        moduleId: module.id,
+                        completed: newStatus,
+                      );
+                      
+                      // Show nice message
+                      ScaffoldMessenger.of(context).clearSnackBars();
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Row(
+                            children: [
+                              Icon(
+                                newStatus ? Icons.check_circle_rounded : Icons.info_outline_rounded,
+                                color: Colors.white,
+                              ),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: Text(
+                                  newStatus 
+                                      ? '🎉 Modul "${module.title}" ditandai selesai!' 
+                                      : 'Modul "${module.title}" dibatalkan selesai.',
+                                  style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
+                                ),
+                              ),
+                            ],
+                          ),
+                          backgroundColor: newStatus ? Colors.green.shade600 : Colors.grey.shade800,
+                          behavior: SnackBarBehavior.floating,
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                        ),
+                      );
+
+                      // Also trigger statistics saving if completed
+                      if (newStatus) {
+                        final statsProvider = Provider.of<StatisticsProvider>(context, listen: false);
+                        await statsProvider.saveActivity(uid, 'material', mat.title);
+                      }
+                    }
+                  },
+                  child: Container(
+                    width: 28,
+                    height: 28,
+                    decoration: BoxDecoration(
+                      color: isCompleted ? mat.color : Colors.transparent,
+                      borderRadius: BorderRadius.circular(8),
+                      border: Border.all(
+                        color: isCompleted ? mat.color : AppColors.textLight.withAlpha(100),
+                        width: 2,
+                      ),
+                    ),
+                    child: isCompleted
+                        ? const Icon(Icons.check_rounded, color: Colors.white, size: 18)
+                        : null,
+                  ),
+                ),
+                const SizedBox(width: 16),
+
+                // Title and duration details
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        module.title,
+                        style: const TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w800,
+                          color: AppColors.textPrimary,
+                          height: 1.3,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Row(
+                        children: [
+                          Icon(Icons.schedule_rounded, color: AppColors.textLight.withAlpha(150), size: 12),
+                          const SizedBox(width: 4),
+                          Text(
+                            '${module.estimatedMinutes} Menit',
+                            style: const TextStyle(
+                              fontSize: 11,
+                              fontWeight: FontWeight.w600,
+                              color: AppColors.textLight,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(width: 8),
+
+                // Arrow icon styled to go to reader
+                Icon(
+                  Icons.arrow_forward_ios_rounded,
+                  color: AppColors.textLight.withAlpha(100),
+                  size: 14,
+                ),
+              ],
+            ),
           ),
         ),
       ),

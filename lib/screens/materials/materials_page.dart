@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../../constants/app_colors.dart';
 import '../../models/material_model.dart';
+import '../../providers/learning_provider.dart';
 import 'material_detail_page.dart';
 
 class MaterialsPage extends StatefulWidget {
@@ -28,8 +30,25 @@ class _MaterialsPageState extends State<MaterialsPage> {
 
   @override
   Widget build(BuildContext context) {
+    final learningProvider = Provider.of<LearningProvider>(context);
+
+    if (learningProvider.isLoading && learningProvider.materials.isEmpty) {
+      return const Center(
+        child: Padding(
+          padding: EdgeInsets.all(40.0),
+          child: CircularProgressIndicator(
+            valueColor: AlwaysStoppedAnimation<Color>(AppColors.primaryGradientStart),
+          ),
+        ),
+      );
+    }
+
+    final materialsList = learningProvider.materials.isNotEmpty
+        ? learningProvider.materials
+        : MaterialModel.dummyMaterials;
+
     // Filter materials based on category and search query
-    final filteredMaterials = MaterialModel.dummyMaterials.where((mat) {
+    final filteredMaterials = materialsList.where((MaterialModel mat) {
       final matchesCategory = _selectedCategory == 'Semua' || mat.category == _selectedCategory;
       final matchesSearch = mat.title.toLowerCase().contains(_searchQuery.toLowerCase()) ||
           mat.description.toLowerCase().contains(_searchQuery.toLowerCase());

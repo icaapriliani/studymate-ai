@@ -114,7 +114,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
         ? user.displayName
             .trim()
             .split(' ')
-            .where((e) => e.isNotEmpty)
+            .where((String e) => e.isNotEmpty)
             .map((e) => e[0])
             .take(2)
             .join()

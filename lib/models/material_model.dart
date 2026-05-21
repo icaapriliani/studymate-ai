@@ -25,6 +25,84 @@ class MaterialModel {
     required this.category,
   });
 
+  factory MaterialModel.fromFirestore(
+    Map<String, dynamic> data, 
+    String id, {
+    double progress = 0.0, 
+    int totalModulesCount = 0, 
+    int completedModulesCount = 0,
+    int? overrideMinutes,
+  }) {
+    final hexColor = data['thumbnailColor'] ?? '9E9E9E';
+    final minutes = overrideMinutes ?? data['estimatedMinutes'] ?? 0;
+    
+    // Formatting estimatedMinutes into "X Jam Y Menit"
+    String estimatedTimeStr = '';
+    if (minutes >= 60) {
+      final hours = minutes ~/ 60;
+      final remainingMinutes = minutes % 60;
+      if (remainingMinutes > 0) {
+        estimatedTimeStr = '$hours Jam $remainingMinutes Menit';
+      } else {
+        estimatedTimeStr = '$hours Jam';
+      }
+    } else {
+      estimatedTimeStr = '$minutes Menit';
+    }
+
+    final categoryStr = data['category'] ?? 'Ilmu Komputer';
+
+    final questionsList = (data['sampleQuestions'] as List?) ?? [];
+    final List<SampleQuestionModel> parsedQuestions = questionsList.map((q) {
+      if (q is Map<String, dynamic>) {
+        return SampleQuestionModel.fromMap(q);
+      } else if (q is Map) {
+        return SampleQuestionModel.fromMap(Map<String, dynamic>.from(q));
+      }
+      return const SampleQuestionModel(question: '', answer: '', explanation: '');
+    }).whereType<SampleQuestionModel>().where((SampleQuestionModel q) => q.question.isNotEmpty).toList();
+
+    return MaterialModel(
+      id: id,
+      title: data['title'] ?? '',
+      modules: '$totalModulesCount Modul • $completedModulesCount Selesai',
+      description: data['description'] ?? '',
+      keyPoints: List<String>.from(data['keyPoints'] ?? []),
+      sampleQuestions: parsedQuestions,
+      progress: progress,
+      estimatedTime: estimatedTimeStr,
+      color: Color(int.parse('0xFF$hexColor')),
+      category: categoryStr,
+    );
+  }
+
+  Map<String, dynamic> toFirestore() {
+    final hexColor = color.toARGB32().toRadixString(16).padLeft(8, '0').substring(2).toUpperCase();
+    
+    // Reverse estimatedTime parsing to estimate minutes
+    int minutes = 0;
+    if (estimatedTime.contains('Jam')) {
+      final parts = estimatedTime.split(' Jam');
+      minutes += (int.tryParse(parts.first.trim()) ?? 0) * 60;
+      if (parts.last.contains('Menit')) {
+        final minPart = parts.last.replaceAll('Menit', '').trim();
+        minutes += int.tryParse(minPart) ?? 0;
+      }
+    } else if (estimatedTime.contains('Menit')) {
+      minutes += int.tryParse(estimatedTime.replaceAll('Menit', '').trim()) ?? 0;
+    }
+
+    return {
+      'title': title,
+      'description': description,
+      'category': category,
+      'thumbnailColor': hexColor,
+      'estimatedMinutes': minutes,
+      'keyPoints': keyPoints,
+      'sampleQuestions': sampleQuestions.map((q) => q.toMap()).toList(),
+    };
+  }
+
   static final List<MaterialModel> dummyMaterials = [
     MaterialModel(
       id: 'db_systems',
@@ -140,4 +218,20 @@ class SampleQuestionModel {
     required this.answer,
     required this.explanation,
   });
+
+  factory SampleQuestionModel.fromMap(Map<String, dynamic> map) {
+    return SampleQuestionModel(
+      question: map['question'] ?? '',
+      answer: map['answer'] ?? '',
+      explanation: map['explanation'] ?? '',
+    );
+  }
+
+  Map<String, dynamic> toMap() {
+    return {
+      'question': question,
+      'answer': answer,
+      'explanation': explanation,
+    };
+  }
 }

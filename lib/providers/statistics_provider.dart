@@ -43,9 +43,9 @@ class StatisticsProvider extends ChangeNotifier {
 
   // Real-time calculated properties
   int get totalConversations => _conversations.length;
-  int get totalMateriDibuka => _activities.where((a) => a.type == 'material').length;
-  int get totalPesan => _activities.where((a) => a.type == 'chat').length * 2; // User + AI messages
-  int get totalQuizTaken => _quizResults.where((q) => q.completed).length;
+  int get totalMateriDibuka => _activities.where((ActivityModel a) => a.type == 'material').length;
+  int get totalPesan => _activities.where((ActivityModel a) => a.type == 'chat').length * 2; // User + AI messages
+  int get totalQuizTaken => _quizResults.where((QuizSessionModel q) => q.completed).length;
 
   int get weeklyQuizTarget => _learningTarget?.weeklyQuizTarget ?? 5;
 
@@ -53,20 +53,20 @@ class StatisticsProvider extends ChangeNotifier {
     final now = DateTime.now();
     final startOfWeek = _getStartOfWeek(now);
     final endOfWeek = startOfWeek.add(const Duration(days: 7));
-    return _quizResults.where((q) {
+    return _quizResults.where((QuizSessionModel q) {
       return q.completed && q.createdAt.isAfter(startOfWeek) && q.createdAt.isBefore(endOfWeek);
     }).length;
   }
 
   int get averageQuizScore {
-    final completedQuizzes = _quizResults.where((q) => q.completed).toList();
+    final completedQuizzes = _quizResults.where((QuizSessionModel q) => q.completed).toList();
     if (completedQuizzes.isEmpty) return 0;
-    int totalScore = completedQuizzes.fold(0, (sum, item) => sum + item.score);
+    int totalScore = completedQuizzes.fold(0, (acc, item) => acc + item.score);
     return (totalScore / completedQuizzes.length).round();
   }
 
   int get totalAIChats {
-    return _activities.where((a) => a.type == 'chat').length;
+    return _activities.where((ActivityModel a) => a.type == 'chat').length;
   }
 
   int get learningProgressPercentage {
@@ -247,7 +247,7 @@ class StatisticsProvider extends ChangeNotifier {
     final endOfWeek = startOfWeek.add(const Duration(days: 7)); // Next Monday 00:00:00
 
     // Filter activities belonging to the current calendar week
-    final weeklyActivities = _activities.where((a) {
+    final weeklyActivities = _activities.where((ActivityModel a) {
       return a.timestamp.isAfter(startOfWeek) && a.timestamp.isBefore(endOfWeek);
     }).toList();
 

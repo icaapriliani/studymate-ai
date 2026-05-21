@@ -18,7 +18,7 @@ class NotificationProvider extends ChangeNotifier {
   bool get isLoading => _isLoading;
   String? get errorMessage => _errorMessage;
 
-  int get unreadCount => _notifications.where((n) => !n.isRead).length;
+  int get unreadCount => _notifications.where((NotificationModel n) => !n.isRead).length;
 
   /// Initializes real-time notifications for the given user.
   void initNotifications(String uid) {

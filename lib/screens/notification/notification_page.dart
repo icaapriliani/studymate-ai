@@ -32,7 +32,7 @@ class _NotificationPageState extends State<NotificationPage> {
     final uid = user.uid;
 
     // Filter notifications based on selected filter
-    final filteredNotifications = notificationProvider.notifications.where((n) {
+    final filteredNotifications = notificationProvider.notifications.where((NotificationModel n) {
       if (_selectedFilter == 'all') return true;
       return n.type == _selectedFilter;
     }).toList();
