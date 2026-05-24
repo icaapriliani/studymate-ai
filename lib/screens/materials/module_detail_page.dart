@@ -8,6 +8,7 @@ import '../../models/module_model.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/learning_provider.dart';
 import '../../providers/statistics_provider.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class ModuleDetailPage extends StatefulWidget {
   final MaterialModel material;
@@ -64,6 +65,283 @@ class _ModuleDetailPageState extends State<ModuleDetailPage> {
   void dispose() {
     _scrollController.dispose();
     super.dispose();
+  }
+
+  Future<void> _launchYouTubeVideo(BuildContext context, String url) async {
+    debugPrint('[YouTube Video Card] Tapped. URL: $url');
+    bool launched = false;
+
+    try {
+      final Uri uri = Uri.parse(url);
+      debugPrint('[YouTube Video Card] Uri parsed successfully: $uri');
+
+      // 1. Try launching in external application (native YouTube app)
+      try {
+        launched = await launchUrl(
+          uri,
+          mode: LaunchMode.externalApplication,
+        );
+        debugPrint('[YouTube Video Card] Launch native app result: $launched');
+      } catch (e) {
+        debugPrint('[YouTube Video Card] Gagal membuka via aplikasi YouTube eksternal: $e');
+      }
+
+      // 2. If native launching failed/threw, try default browser fallback
+      if (!launched) {
+        try {
+          launched = await launchUrl(
+            uri,
+            mode: LaunchMode.platformDefault,
+          );
+          debugPrint('[YouTube Video Card] Launch fallback browser result: $launched');
+        } catch (e) {
+          debugPrint('[YouTube Video Card] Gagal membuka via browser default: $e');
+        }
+      }
+    } catch (e) {
+      debugPrint('[YouTube Video Card] Uri parsing error: $e');
+    }
+
+    // 3. If both failed, show elegant Indonesian SnackBar error message
+    if (!launched && context.mounted) {
+      debugPrint('[YouTube Video Card] Video launch failed completely. Displaying SnackBar.');
+      ScaffoldMessenger.of(context).clearSnackBars();
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: const Row(
+            children: [
+              Icon(Icons.error_outline_rounded, color: Colors.white),
+              SizedBox(width: 12),
+              Expanded(
+                child: Text(
+                  'Video pembelajaran tidak tersedia.',
+                  style: TextStyle(fontWeight: FontWeight.w700, fontSize: 13),
+                ),
+              ),
+            ],
+          ),
+          backgroundColor: Colors.red.shade600,
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        ),
+      );
+    }
+  }
+
+  bool _isValidYouTubeUrl(String url) {
+    try {
+      final uri = Uri.tryParse(url);
+      if (uri == null) return false;
+      
+      final host = uri.host.toLowerCase();
+      if (host != 'youtube.com' && host != 'www.youtube.com' && host != 'youtu.be') {
+        return false;
+      }
+      
+      if (host == 'youtu.be') {
+        return uri.path.replaceAll('/', '').trim().isNotEmpty;
+      } else {
+        final videoId = uri.queryParameters['v'];
+        return videoId != null && videoId.trim().isNotEmpty;
+      }
+    } catch (_) {
+      return false;
+    }
+  }
+
+  Widget _buildYouTubeErrorCard(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(24),
+        color: Colors.red.shade50.withAlpha(150),
+        border: Border.all(
+          color: Colors.red.shade200,
+          width: 1.5,
+        ),
+      ),
+      padding: const EdgeInsets.all(20.0),
+      child: Row(
+        children: [
+          Container(
+            width: 48,
+            height: 48,
+            decoration: BoxDecoration(
+              color: Colors.red.shade100,
+              shape: BoxShape.circle,
+            ),
+            child: Icon(
+              Icons.error_outline_rounded,
+              color: Colors.red.shade700,
+              size: 24,
+            ),
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Video Tidak Tersedia',
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w900,
+                    color: Colors.red.shade900,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                const Text(
+                  'Video pembelajaran tidak tersedia saat ini.',
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.textSecondary,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildYouTubeVideoCard(BuildContext context, Color accentColor, String url, String? title) {
+    final videoTitle = title ?? 'Video Pembelajaran Pendukung';
+    return Container(
+      width: double.infinity,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(24),
+        gradient: LinearGradient(
+          colors: [
+            accentColor.withAlpha(20),
+            accentColor.withAlpha(5),
+          ],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        border: Border.all(
+          color: accentColor.withAlpha(30),
+          width: 1.5,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: accentColor.withAlpha(10),
+            blurRadius: 20,
+            offset: const Offset(0, 8),
+          ),
+        ],
+      ),
+      clipBehavior: Clip.antiAlias,
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          onTap: () async {
+            await HapticFeedback.lightImpact();
+            if (mounted) {
+              await _launchYouTubeVideo(context, url);
+            }
+          },
+          child: Padding(
+            padding: const EdgeInsets.all(20.0),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Premium play button container with modern glow
+                Container(
+                  width: 52,
+                  height: 52,
+                  decoration: BoxDecoration(
+                    color: Colors.red.shade600,
+                    shape: BoxShape.circle,
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.red.shade600.withAlpha(100),
+                        blurRadius: 12,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
+                  ),
+                  child: const Center(
+                    child: Icon(
+                      Icons.play_arrow_rounded,
+                      color: Colors.white,
+                      size: 32,
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Badge
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                        decoration: BoxDecoration(
+                          color: Colors.red.shade50,
+                          borderRadius: BorderRadius.circular(6),
+                        ),
+                        child: Text(
+                          '🎥 VIDEO PEMBELAJARAN',
+                          style: TextStyle(
+                            fontSize: 9,
+                            fontWeight: FontWeight.w900,
+                            color: Colors.red.shade700,
+                            letterSpacing: 0.5,
+                          ),
+                        ),
+                      ),
+                      // Video title
+                      Text(
+                        videoTitle,
+                        style: const TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w800,
+                          color: AppColors.textPrimary,
+                          height: 1.35,
+                        ),
+                      ),
+                      if (widget.module.youtubeChannel != null && widget.module.youtubeChannel!.isNotEmpty) ...[
+                        const SizedBox(height: 4),
+                        Text(
+                          'by ${widget.module.youtubeChannel}',
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w600,
+                            color: AppColors.textSecondary.withAlpha(200),
+                          ),
+                        ),
+                      ],
+                      const SizedBox(height: 6),
+                      // Action link
+                      Row(
+                        children: [
+                          Text(
+                            'Tonton Sekarang',
+                            style: TextStyle(
+                              fontSize: 13,
+                              fontWeight: FontWeight.w800,
+                              color: accentColor,
+                            ),
+                          ),
+                          const SizedBox(width: 4),
+                          Icon(
+                            Icons.arrow_forward_rounded,
+                            size: 14,
+                            color: accentColor,
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
   }
 
   @override
@@ -156,6 +434,14 @@ class _ModuleDetailPageState extends State<ModuleDetailPage> {
 
                           // Custom Premium Academic Markdown Text Parser
                           _buildContentRenderer(mod.content, mat.color),
+
+                          if (mod.youtubeUrl != null && mod.youtubeUrl!.isNotEmpty) ...[
+                            const SizedBox(height: 32),
+                            if (_isValidYouTubeUrl(mod.youtubeUrl!))
+                              _buildYouTubeVideoCard(context, mat.color, mod.youtubeUrl!, mod.youtubeTitle)
+                            else
+                              _buildYouTubeErrorCard(context),
+                          ],
 
                           const SizedBox(height: 120), // Padding to avoid overlap with floating bottom bar
                         ],

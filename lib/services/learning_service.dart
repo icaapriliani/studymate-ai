@@ -140,7 +140,19 @@ class LearningService {
           debugPrint('[LearningService] Deteksi DATA LAMA (subkoleksi modules kosong). Menjalankan migrasi database...');
           needsSeeding = true;
         } else {
-          debugPrint('[LearningService] Subkoleksi modules tidak kosong. Seeding dilewati.');
+          // Check if representative module 'db_systems_m1' has the updated high-quality video URL to trigger migration if not
+          final testDoc = await _modulesCollection('db_systems').doc('db_systems_m1').get();
+          if (testDoc.exists) {
+            final testUrl = testDoc.data()?['youtubeUrl'] as String?;
+            if (testUrl != 'https://www.youtube.com/watch?v=fxe6qev-bno') {
+              debugPrint('[LearningService] Deteksi DATA LAMA/KADALUARSA (URL video tidak cocok). Menjalankan migrasi database...');
+              needsSeeding = true;
+            } else {
+              debugPrint('[LearningService] Subkoleksi modules tidak kosong dan skema data mutakhir. Seeding dilewati.');
+            }
+          } else {
+            needsSeeding = true;
+          }
         }
       }
 
@@ -233,6 +245,9 @@ Bayangkan sebuah sistem akademik kampus. Mahasiswa hanya dapat melihat Kartu Has
 ## Mini Rangkuman
 DBMS adalah fondasi utama teknologi informasi modern yang bertugas mengelola data secara efisien dan aman. Melalui arsitektur tiga level abstraksi data, DBMS berhasil memisahkan kompleksitas penyimpanan fisik dari kebutuhan praktis pengguna akhir, menciptakan kemandirian data yang tangguh dan mudah dirawat.''',
         'orderIndex': 0,
+        'youtubeUrl': 'https://www.youtube.com/watch?v=fxe6qev-bno',
+        'youtubeTitle': 'DATABASE #1 : PENGENALAN DATABASE',
+        'youtubeChannel': 'Web Programming UNPAS',
         'createdAt': now,
       });
 
@@ -361,6 +376,9 @@ Jika di tengah jalan server mati tepat setelah saldo Budi berkurang namun sebelu
 ## Mini Rangkuman
 SQL adalah instrumen utama untuk mengendalikan database relasional. Dengan menguasai pembagian kerja DDL untuk merancang tabel, DML untuk memanipulasi baris data, serta TCL untuk mengamankan keutuhan transaksi melalui mekanisme commit-rollback, kita dapat membangun sistem backend aplikasi yang kokoh dan tangguh.''',
         'orderIndex': 3,
+        'youtubeUrl': 'https://www.youtube.com/watch?v=xYBclb-sYQ4',
+        'youtubeTitle': 'Tutorial MySQL Database (Bahasa Indonesia)',
+        'youtubeChannel': 'Programmer Zaman Now',
         'createdAt': now,
       });
 
@@ -431,6 +449,9 @@ Robot akan memutuskan untuk berbelok jika sensor inframerahnya mendeteksi kaki m
 ## Mini Rangkuman
 Kecerdasan Buatan dibangun di atas paradigma Agen Cerdas yang bertindak rasional untuk memaksimalkan kinerja di lingkungannya. Kerangka kerja PEAS memandu kita memetakan komponen sensor, aktuator, kondisi lingkungan, dan metrik performa secara presisi guna merancang kecerdasan buatan yang berdaya guna tinggi.''',
         'orderIndex': 0,
+        'youtubeUrl': 'https://www.youtube.com/watch?v=aO20B5g42Vw',
+        'youtubeTitle': 'Pengenalan Machine Learning & Supervised Learning',
+        'youtubeChannel': 'Kelas Terbuka',
         'createdAt': now,
       });
 
@@ -512,6 +533,9 @@ Jika sensor mendeteksi suhu ruangan riil sebesar 26°C, maka nilai tersebut bera
 ## Mini Rangkuman
 Logika Fuzzy memetakan ambiguitas dunia nyata menjadi nilai derajat keanggotaan kontinu dalam rentang [0, 1] melalui fungsi keanggotaan kurva. Dengan memanfaatkan variabel linguistik, sistem fuzzy mampu memproses ketidakpastian informasi secara logis dan menghasilkan keputusan yang lebih luwes mendekati penalaran kognitif manusia.''',
         'orderIndex': 2,
+        'youtubeUrl': 'https://www.youtube.com/watch?v=6szqrV9u9k8',
+        'youtubeTitle': 'Pengenalan Logika Fuzzy | Konsep & Aplikasi',
+        'youtubeChannel': 'Sekolah Koding',
         'createdAt': now,
       });
 
@@ -632,6 +656,9 @@ Mari kita tinjau data pendapatan bulanan 5 warga di sebuah gang: Rp2 juta, Rp2 j
 ## Mini Rangkuman
 Statistika Deskriptif merangkum kompleksitas data melalui ukuran pemusatan (mean, median, modus) dan sebaran (varians, deviasi standar). Pemilihan indikator statistik yang tepat sangat vital agar kesimpulan ringkasan data yang disajikan tidak bias dan mencerminkan kebenaran populasi.''',
         'orderIndex': 0,
+        'youtubeUrl': 'https://www.youtube.com/watch?v=el7Ezn9PpWU',
+        'youtubeTitle': 'Statistika 01 | Pengantar Belajar Statistika Dasar',
+        'youtubeChannel': 'Indonesia Belajar',
         'createdAt': now,
       });
 
@@ -682,6 +709,9 @@ Meskipun tes mendeteksi positif dengan akurasi tinggi, peluang nyata pasien saki
 ## Mini Rangkuman
 Teorema Bayes adalah hukum probabilitas yang sangat kuat untuk memperbarui estimasi peluang prior berdasarkan bukti empiris baru untuk menghasilkan peluang posterior yang akurat. Konsep ini mendominasi teori pengambilan keputusan modern, kedokteran, hingga pengembangan sistem kecerdasan buatan.''',
         'orderIndex': 1,
+        'youtubeUrl': 'https://www.youtube.com/watch?v=kKMg-iOD7bQ',
+        'youtubeTitle': 'Konsep dan Contoh Kasus Teorema Bayes',
+        'youtubeChannel': 'Statistika Indonesia',
         'createdAt': now,
       });
 
@@ -859,6 +889,9 @@ Kalimat kedua sangat kuat karena secara eksplisit menyatakan posisi penulis (mem
 ## Mini Rangkuman
 *Thesis Statement* adalah pilar pengendali fokus dan kekuatan esai akademik. Dengan merumuskan kalimat tesis yang argumantatif, spesifik, dan memuat batas argumen pendukung secara jelas, mahasiswa dapat menyusun tulisan ilmiah yang terstruktur, logis, dan persuasif bagi pembaca akademis.''',
         'orderIndex': 1,
+        'youtubeUrl': 'https://www.youtube.com/watch?v=k2_2H3qT9q0',
+        'youtubeTitle': 'Belajar Bahasa Inggris Grammar Dasar',
+        'youtubeChannel': 'Kampung Inggris LC',
         'createdAt': now,
       });
 
@@ -948,6 +981,9 @@ Di sini Anda mengubah kata-kata secara kreatif namun tetap menghargai Setiawan s
 ## Mini Rangkuman
 Etika sitasi ilmiah gaya APA Edisi ke-7 dan pencegahan plagiarisme adalah fondasi utama integritas akademik. Dengan mematuhi aturan in-text citation yang akurat, melakukan teknik paraphrase secara kreatif, serta menyusun daftar pustaka teratur di akhir tulisan, kita dapat menghasilkan karya ilmiah yang kredibel, orisinal, dan terhormat di mata komunitas akademik.''',
         'orderIndex': 3,
+        'youtubeUrl': 'https://www.youtube.com/watch?v=vVBAmlFcQuE',
+        'youtubeTitle': 'Tips Presentasi Bahasa Inggris yang Baik dan Benar',
+        'youtubeChannel': 'Kampung Inggris LC',
         'createdAt': now,
       });
 

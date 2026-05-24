@@ -7,6 +7,9 @@ class ModuleModel {
   final int orderIndex;
   final int estimatedMinutes;
   final DateTime createdAt;
+  final String? youtubeUrl;
+  final String? youtubeTitle;
+  final String? youtubeChannel;
 
   const ModuleModel({
     required this.id,
@@ -15,6 +18,9 @@ class ModuleModel {
     required this.orderIndex,
     required this.estimatedMinutes,
     required this.createdAt,
+    this.youtubeUrl,
+    this.youtubeTitle,
+    this.youtubeChannel,
   });
 
   factory ModuleModel.fromFirestore(Map<String, dynamic> data, String id) {
@@ -45,6 +51,9 @@ class ModuleModel {
       orderIndex: data['orderIndex'] ?? 0,
       estimatedMinutes: estimated > 0 ? estimated : (data['estimatedMinutes'] ?? 0),
       createdAt: createdAtDate,
+      youtubeUrl: data['youtubeUrl'] as String?,
+      youtubeTitle: data['youtubeTitle'] as String?,
+      youtubeChannel: data['youtubeChannel'] as String?,
     );
   }
 
@@ -55,6 +64,9 @@ class ModuleModel {
       'orderIndex': orderIndex,
       'estimatedMinutes': estimatedMinutes,
       'createdAt': Timestamp.fromDate(createdAt),
+      if (youtubeUrl != null) 'youtubeUrl': youtubeUrl,
+      if (youtubeTitle != null) 'youtubeTitle': youtubeTitle,
+      if (youtubeChannel != null) 'youtubeChannel': youtubeChannel,
     };
   }
 }
