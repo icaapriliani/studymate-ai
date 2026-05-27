@@ -1,8 +1,9 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../../constants/app_colors.dart';
 import '../../providers/auth_provider.dart';
+import '../../providers/theme_provider.dart';
+import '../../utils/theme_context.dart';
 import '../auth/login_page.dart';
 import '../ai_tutor/ai_tutor_page.dart';
 import '../materials/materials_page.dart';
@@ -43,7 +44,6 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
-
   @override
   Widget build(BuildContext context) {
     final screenSize = MediaQuery.of(context).size;
@@ -53,11 +53,11 @@ class _HomePageState extends State<HomePage> {
       body: Container(
         width: double.infinity,
         height: double.infinity,
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           gradient: LinearGradient(
             colors: [
-              AppColors.bgGradientStart,
-              AppColors.bgGradientEnd,
+              context.colors.bgGradientStart,
+              context.colors.bgGradientEnd,
             ],
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
@@ -118,10 +118,10 @@ class _HomePageState extends State<HomePage> {
                         child: Container(
                           height: 68,
                           decoration: BoxDecoration(
-                            color: Colors.white.withAlpha(204), // 80% white
+                            color: context.colors.glassBg,
                             borderRadius: BorderRadius.circular(24),
                             border: Border.all(
-                              color: Colors.white.withAlpha(150),
+                              color: context.colors.glassBorder,
                               width: 1.5,
                             ),
                           ),
@@ -152,8 +152,8 @@ class _HomePageState extends State<HomePage> {
   Widget _buildNavItem(int index, IconData icon, String label) {
     final bool isSelected = _currentIndex == index;
     final Color itemColor = isSelected
-        ? AppColors.primaryGradientStart
-        : AppColors.textLight.withAlpha(180);
+        ? context.colors.primaryGradientStart
+        : context.colors.textLight.withAlpha(180);
 
     return GestureDetector(
       onTap: () {
@@ -171,7 +171,7 @@ class _HomePageState extends State<HomePage> {
             color: itemColor,
             size: isSelected ? 24 : 22,
           ),
-          const SizedBox(height: 4),
+          SizedBox(height: 4),
           Text(
             label,
             style: TextStyle(
@@ -197,9 +197,9 @@ class _HomePageState extends State<HomePage> {
       builder: (context, statsProvider, child) {
         // Handle loading state gracefully
         if (statsProvider.isLoading && statsProvider.activities.isEmpty) {
-          return const Center(
+          return Center(
             child: CircularProgressIndicator(
-              valueColor: AlwaysStoppedAnimation<Color>(AppColors.primaryGradientStart),
+              valueColor: AlwaysStoppedAnimation<Color>(context.colors.primaryGradientStart),
             ),
           );
         }
@@ -217,24 +217,24 @@ class _HomePageState extends State<HomePage> {
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      const Icon(Icons.error_outline_rounded, color: Colors.redAccent, size: 48),
-                      const SizedBox(height: 16),
+                      Icon(Icons.error_outline_rounded, color: Colors.redAccent, size: 48),
+                      SizedBox(height: 16),
                       Text(
                         statsProvider.errorMessage!,
                         textAlign: TextAlign.center,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.w600,
-                          color: AppColors.textPrimary,
+                          color: context.colors.textPrimary,
                         ),
                       ),
-                      const SizedBox(height: 20),
+                      SizedBox(height: 20),
                       ElevatedButton.icon(
                         onPressed: () => statsProvider.refreshStatistics(user.uid),
-                        icon: const Icon(Icons.refresh_rounded),
-                        label: const Text('Coba Lagi'),
+                        icon: Icon(Icons.refresh_rounded),
+                        label: Text('Coba Lagi'),
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: AppColors.primaryGradientStart,
+                          backgroundColor: context.colors.primaryGradientStart,
                           foregroundColor: Colors.white,
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                         ),
@@ -340,22 +340,22 @@ class _HomePageState extends State<HomePage> {
                                   user.displayName.isNotEmpty
                                       ? 'Hai, ${user.displayName} 👋'
                                       : 'Hai, Alex Rivers 👋',
-                                  style: const TextStyle(
+                                  style: TextStyle(
                                     fontSize: 22,
                                     fontWeight: FontWeight.w900,
-                                    color: AppColors.textPrimary,
+                                    color: context.colors.textPrimary,
                                     letterSpacing: -0.5,
                                   ),
                                   overflow: TextOverflow.ellipsis,
                                   maxLines: 1,
                                 ),
-                                const SizedBox(height: 4),
-                                const Text(
+                                SizedBox(height: 4),
+                                Text(
                                   "Mari jelajahi belajarmu hari ini",
                                   style: TextStyle(
                                     fontSize: 14,
                                     fontWeight: FontWeight.w500,
-                                    color: AppColors.textSecondary,
+                                    color: context.colors.textSecondary,
                                   ),
                                   overflow: TextOverflow.ellipsis,
                                   maxLines: 1,
@@ -363,7 +363,7 @@ class _HomePageState extends State<HomePage> {
                               ],
                             ),
                           ),
-                          const SizedBox(width: 16),
+                          SizedBox(width: 16),
                           // Glassmorphic Notification Button
                           GestureDetector(
                             onTap: () => Navigator.push(
@@ -394,19 +394,19 @@ class _HomePageState extends State<HomePage> {
                                     width: 48,
                                     height: 48,
                                     decoration: BoxDecoration(
-                                      color: AppColors.glassBg,
+                                      color: context.colors.glassBg,
                                       borderRadius: BorderRadius.circular(16),
                                       border: Border.all(
-                                        color: AppColors.glassBorder,
+                                        color: context.colors.glassBorder,
                                         width: 1.5,
                                       ),
                                     ),
                                     child: Stack(
                                       alignment: Alignment.center,
                                       children: [
-                                        const Icon(
+                                        Icon(
                                           Icons.notifications_none_outlined,
-                                          color: AppColors.textPrimary,
+                                          color: context.colors.textPrimary,
                                           size: 22,
                                         ),
                                         if (notificationProvider.unreadCount > 0)
@@ -415,7 +415,7 @@ class _HomePageState extends State<HomePage> {
                                             right: 6,
                                             child: Container(
                                               padding: const EdgeInsets.all(3),
-                                              decoration: const BoxDecoration(
+                                              decoration: BoxDecoration(
                                                 color: Colors.redAccent,
                                                 shape: BoxShape.circle,
                                               ),
@@ -426,7 +426,7 @@ class _HomePageState extends State<HomePage> {
                                               child: Center(
                                                 child: Text(
                                                   '${notificationProvider.unreadCount}',
-                                                  style: const TextStyle(
+                                                  style: TextStyle(
                                                     color: Colors.white,
                                                     fontSize: 8,
                                                     fontWeight: FontWeight.w900,
@@ -446,14 +446,14 @@ class _HomePageState extends State<HomePage> {
                         ],
                       ),
 
-                      const SizedBox(height: 24),
+                      SizedBox(height: 24),
 
                       // 2. Weekly Progress Card (Interactive!)
                       GestureDetector(
                         onTap: () => _showTargetSettingsDialog(context, user.uid, statsProvider),
                         child: Container(
                           decoration: BoxDecoration(
-                            color: Colors.white,
+                            color: context.colors.cardBg,
                             borderRadius: BorderRadius.circular(32),
                             boxShadow: [
                               BoxShadow(
@@ -476,44 +476,44 @@ class _HomePageState extends State<HomePage> {
                                         children: [
                                           Row(
                                             children: [
-                                              const Expanded(
+                                              Expanded(
                                                 child: Text(
                                                   'Progres Target Mingguan',
                                                   style: TextStyle(
                                                     fontSize: 16,
                                                     fontWeight: FontWeight.w800,
-                                                    color: AppColors.textPrimary,
+                                                    color: context.colors.textPrimary,
                                                   ),
                                                   overflow: TextOverflow.ellipsis,
                                                 ),
                                               ),
-                                              const SizedBox(width: 6),
-                                              const Icon(Icons.edit_rounded, size: 14, color: AppColors.primaryGradientStart),
+                                              SizedBox(width: 6),
+                                              Icon(Icons.edit_rounded, size: 14, color: context.colors.primaryGradientStart),
                                             ],
                                           ),
-                                          const SizedBox(height: 6),
-                                          const Text(
+                                          SizedBox(height: 6),
+                                          Text(
                                             "Ketuk untuk menyesuaikan target mingguan kuis kamu.",
                                             style: TextStyle(
                                               fontSize: 13,
                                               fontWeight: FontWeight.w500,
-                                              color: AppColors.textSecondary,
+                                              color: context.colors.textSecondary,
                                               height: 1.3,
                                             ),
                                           ),
-                                          const SizedBox(height: 12),
+                                          SizedBox(height: 12),
                                           Text(
                                             '${statsProvider.quizzesCompletedThisWeek} kuis / ${statsProvider.weeklyQuizTarget} kuis selesai',
-                                            style: const TextStyle(
+                                            style: TextStyle(
                                               fontSize: 14,
                                               fontWeight: FontWeight.w800,
-                                              color: AppColors.primaryGradientStart,
+                                              color: context.colors.primaryGradientStart,
                                             ),
                                           ),
                                         ],
                                       ),
                                     ),
-                                    const SizedBox(width: 16),
+                                    SizedBox(width: 16),
                                     Stack(
                                       alignment: Alignment.center,
                                       children: [
@@ -523,25 +523,25 @@ class _HomePageState extends State<HomePage> {
                                           child: CircularProgressIndicator(
                                             value: quizProgress,
                                             strokeWidth: 8,
-                                            backgroundColor: AppColors.progressTrack,
-                                            valueColor: const AlwaysStoppedAnimation<Color>(
-                                              AppColors.primaryGradientStart,
+                                            backgroundColor: context.colors.progressTrack,
+                                            valueColor: AlwaysStoppedAnimation<Color>(
+                                              context.colors.primaryGradientStart,
                                             ),
                                           ),
                                         ),
                                         Text(
                                           '${statsProvider.learningProgressPercentage}%',
-                                          style: const TextStyle(
+                                          style: TextStyle(
                                             fontSize: 15,
                                             fontWeight: FontWeight.w900,
-                                            color: AppColors.textPrimary,
+                                            color: context.colors.textPrimary,
                                           ),
                                         ),
                                       ],
                                     )
                                   ],
                                 ),
-                                const SizedBox(height: 20),
+                                SizedBox(height: 20),
                                 FittedBox(
                                   fit: BoxFit.scaleDown,
                                   alignment: Alignment.center,
@@ -560,14 +560,14 @@ class _HomePageState extends State<HomePage> {
                                               decoration: BoxDecoration(
                                                 shape: BoxShape.circle,
                                                 gradient: done
-                                                    ? const LinearGradient(
+                                                    ? LinearGradient(
                                                         colors: [
-                                                          AppColors.primaryGradientStart,
-                                                          AppColors.primaryGradientEnd,
+                                                          context.colors.primaryGradientStart,
+                                                          context.colors.primaryGradientEnd,
                                                         ],
                                                       )
                                                     : null,
-                                                color: done ? null : AppColors.progressTrack,
+                                                color: done ? null : context.colors.progressTrack,
                                               ),
                                               child: Center(
                                                 child: Icon(
@@ -577,15 +577,15 @@ class _HomePageState extends State<HomePage> {
                                                 ),
                                               ),
                                             ),
-                                            const SizedBox(height: 6),
+                                            SizedBox(height: 6),
                                             Text(
                                               dayData['day'] as String,
                                               style: TextStyle(
                                                 fontSize: 11,
                                                 fontWeight: FontWeight.w800,
                                                 color: done
-                                                    ? AppColors.primaryGradientStart
-                                                    : AppColors.textLight,
+                                                    ? context.colors.primaryGradientStart
+                                                    : context.colors.textLight,
                                               ),
                                             )
                                           ],
@@ -600,16 +600,16 @@ class _HomePageState extends State<HomePage> {
                         ),
                       ),
 
-                      const SizedBox(height: 28),
+                      SizedBox(height: 28),
 
                       // 3. AI Tutor CTA Card
                       Container(
                         width: double.infinity,
                         decoration: BoxDecoration(
-                          gradient: const LinearGradient(
+                          gradient: LinearGradient(
                             colors: [
-                              AppColors.primaryGradientStart,
-                              AppColors.primaryGradientEnd,
+                              context.colors.primaryGradientStart,
+                              context.colors.primaryGradientEnd,
                             ],
                             begin: Alignment.topLeft,
                             end: Alignment.bottomRight,
@@ -617,7 +617,7 @@ class _HomePageState extends State<HomePage> {
                           borderRadius: BorderRadius.circular(32),
                           boxShadow: [
                             BoxShadow(
-                              color: AppColors.primaryGradientStart.withAlpha(76),
+                              color: context.colors.primaryGradientStart.withAlpha(76),
                               blurRadius: 25,
                               offset: const Offset(0, 10),
                             ),
@@ -667,8 +667,8 @@ class _HomePageState extends State<HomePage> {
                                       ),
                                     ],
                                   ),
-                                  const SizedBox(height: 12),
-                                  const Text(
+                                  SizedBox(height: 12),
+                                  Text(
                                     'Tanya StudyMate AI',
                                     style: TextStyle(
                                       fontSize: 22,
@@ -677,7 +677,7 @@ class _HomePageState extends State<HomePage> {
                                       letterSpacing: -0.2,
                                     ),
                                   ),
-                                  const SizedBox(height: 8),
+                                  SizedBox(height: 8),
                                   Text(
                                     'Tanyakan apa saja, ringkas materi, atau buat kuis secara instan!',
                                     style: TextStyle(
@@ -687,7 +687,7 @@ class _HomePageState extends State<HomePage> {
                                       height: 1.4,
                                     ),
                                   ),
-                                  const SizedBox(height: 24),
+                                  SizedBox(height: 24),
                                   ElevatedButton(
                                     onPressed: () {
                                       // Switch to AI Tutor Tab (Index 2)
@@ -697,7 +697,7 @@ class _HomePageState extends State<HomePage> {
                                     },
                                     style: ElevatedButton.styleFrom(
                                       backgroundColor: Colors.white,
-                                      foregroundColor: AppColors.primaryGradientStart,
+                                      foregroundColor: context.colors.primaryGradientStart,
                                       elevation: 4,
                                       padding: const EdgeInsets.symmetric(
                                         horizontal: 32,
@@ -707,7 +707,7 @@ class _HomePageState extends State<HomePage> {
                                         borderRadius: BorderRadius.circular(100),
                                       ),
                                     ),
-                                    child: const Text(
+                                    child: Text(
                                       'Tanya Sekarang',
                                       style: TextStyle(
                                         fontSize: 14,
@@ -723,25 +723,25 @@ class _HomePageState extends State<HomePage> {
                         ),
                       ),
 
-                      const SizedBox(height: 28),
+                      SizedBox(height: 28),
 
                       // 4. Lanjutkan Belajar Header
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          const Expanded(
+                          Expanded(
                             child: Text(
                               'Lanjutkan Belajar',
                               style: TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.w800,
-                                color: AppColors.textPrimary,
+                                color: context.colors.textPrimary,
                                 letterSpacing: -0.2,
                               ),
                               overflow: TextOverflow.ellipsis,
                             ),
                           ),
-                          const SizedBox(width: 16),
+                          SizedBox(width: 16),
                           GestureDetector(
                             onTap: () {
                               // Switch to Materi Tab (Index 1)
@@ -749,19 +749,19 @@ class _HomePageState extends State<HomePage> {
                                 _currentIndex = 1;
                               });
                             },
-                            child: const Text(
+                            child: Text(
                               'Lihat Semua',
                               style: TextStyle(
                                 fontSize: 13,
                                 fontWeight: FontWeight.w800,
-                                color: AppColors.primaryGradientStart,
+                                color: context.colors.primaryGradientStart,
                               ),
                             ),
                           ),
                         ],
                       ),
 
-                      const SizedBox(height: 16),
+                      SizedBox(height: 16),
 
                       // 5. Course Shelf (Horizontal ListView)
                       SizedBox(
@@ -802,7 +802,7 @@ class _HomePageState extends State<HomePage> {
                                   bottom: 12,
                                 ),
                                 decoration: BoxDecoration(
-                                  color: Colors.white,
+                                  color: context.colors.cardBg,
                                   borderRadius: BorderRadius.circular(24),
                                   boxShadow: [
                                     BoxShadow(
@@ -832,38 +832,38 @@ class _HomePageState extends State<HomePage> {
                                               size: 20,
                                             ),
                                           ),
-                                          const SizedBox(width: 12),
+                                          SizedBox(width: 12),
                                           Expanded(
                                             child: Text(
                                               material.category,
-                                              style: const TextStyle(
+                                              style: TextStyle(
                                                 fontSize: 11,
                                                 fontWeight: FontWeight.w800,
-                                                color: AppColors.textSecondary,
+                                                color: context.colors.textSecondary,
                                               ),
                                               overflow: TextOverflow.ellipsis,
                                             ),
                                           ),
                                         ],
                                       ),
-                                      const SizedBox(height: 16),
+                                      SizedBox(height: 16),
                                       Text(
                                         material.title,
-                                        style: const TextStyle(
+                                        style: TextStyle(
                                           fontSize: 15,
                                           fontWeight: FontWeight.w800,
-                                          color: AppColors.textPrimary,
+                                          color: context.colors.textPrimary,
                                         ),
                                         maxLines: 1,
                                         overflow: TextOverflow.ellipsis,
                                       ),
-                                      const SizedBox(height: 6),
+                                      SizedBox(height: 6),
                                       Text(
                                         material.modules,
-                                        style: const TextStyle(
+                                        style: TextStyle(
                                           fontSize: 12,
                                           fontWeight: FontWeight.w600,
-                                          color: AppColors.textLight,
+                                          color: context.colors.textLight,
                                         ),
                                       ),
                                       const Spacer(),
@@ -873,7 +873,7 @@ class _HomePageState extends State<HomePage> {
                                             child: Container(
                                               height: 6,
                                               decoration: BoxDecoration(
-                                                color: AppColors.progressTrack,
+                                                color: context.colors.progressTrack,
                                                 borderRadius: BorderRadius.circular(100),
                                               ),
                                               child: ClipRRect(
@@ -888,7 +888,7 @@ class _HomePageState extends State<HomePage> {
                                               ),
                                             ),
                                           ),
-                                          const SizedBox(width: 10),
+                                          SizedBox(width: 10),
                                           Text(
                                             '${(material.progress * 100).round()}%',
                                             style: TextStyle(
@@ -907,7 +907,7 @@ class _HomePageState extends State<HomePage> {
                           },
                         ),
                       ),
-                      const SizedBox(height: 85),
+                      SizedBox(height: 85),
                     ],
                   ),
                 ),
@@ -928,9 +928,9 @@ class _HomePageState extends State<HomePage> {
       builder: (context, statsProvider, child) {
         // If loading and no data exists yet, show a clean, modern progress indicator
         if (statsProvider.isLoading && statsProvider.activities.isEmpty) {
-          return const Center(
+          return Center(
             child: CircularProgressIndicator(
-              valueColor: AlwaysStoppedAnimation<Color>(AppColors.primaryGradientStart),
+              valueColor: AlwaysStoppedAnimation<Color>(context.colors.primaryGradientStart),
             ),
           );
         }
@@ -948,24 +948,24 @@ class _HomePageState extends State<HomePage> {
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      const Icon(Icons.error_outline_rounded, color: Colors.redAccent, size: 48),
-                      const SizedBox(height: 16),
+                      Icon(Icons.error_outline_rounded, color: Colors.redAccent, size: 48),
+                      SizedBox(height: 16),
                       Text(
                         statsProvider.errorMessage!,
                         textAlign: TextAlign.center,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.w600,
-                          color: AppColors.textPrimary,
+                          color: context.colors.textPrimary,
                         ),
                       ),
-                      const SizedBox(height: 20),
+                      SizedBox(height: 20),
                       ElevatedButton.icon(
                         onPressed: () => statsProvider.refreshStatistics(uid),
-                        icon: const Icon(Icons.refresh_rounded),
-                        label: const Text('Coba Lagi'),
+                        icon: Icon(Icons.refresh_rounded),
+                        label: Text('Coba Lagi'),
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: AppColors.primaryGradientStart,
+                          backgroundColor: context.colors.primaryGradientStart,
                           foregroundColor: Colors.white,
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                         ),
@@ -995,25 +995,25 @@ class _HomePageState extends State<HomePage> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text(
+                      Text(
                         'Statistik Belajar',
                         style: TextStyle(
                           fontSize: 22,
                           fontWeight: FontWeight.w900,
-                          color: AppColors.textPrimary,
+                          color: context.colors.textPrimary,
                           letterSpacing: -0.5,
                         ),
                       ),
-                      const SizedBox(height: 4),
-                      const Text(
+                      SizedBox(height: 4),
+                      Text(
                         'Pantau performa dan jam belajar mingguanmu',
                         style: TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.w500,
-                          color: AppColors.textSecondary,
+                          color: context.colors.textSecondary,
                         ),
                       ),
-                      const SizedBox(height: 24),
+                      SizedBox(height: 24),
 
                       // Mini Status Grid Cards
                       GridView.count(
@@ -1069,13 +1069,13 @@ class _HomePageState extends State<HomePage> {
                         ],
                       ),
 
-                      const SizedBox(height: 28),
+                      SizedBox(height: 28),
 
                       // Visual Activity Bar Chart Container
                       Container(
                         width: double.infinity,
                         decoration: BoxDecoration(
-                          color: Colors.white,
+                          color: context.colors.cardBg,
                           borderRadius: BorderRadius.circular(32),
                           boxShadow: [
                             BoxShadow(
@@ -1090,15 +1090,15 @@ class _HomePageState extends State<HomePage> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              const Text(
+                              Text(
                                 'Aktivitas Belajar (Frekuensi)',
                                 style: TextStyle(
                                   fontSize: 16,
                                   fontWeight: FontWeight.w800,
-                                  color: AppColors.textPrimary,
+                                  color: context.colors.textPrimary,
                                 ),
                               ),
-                              const SizedBox(height: 24),
+                              SizedBox(height: 24),
                               // Custom Painted/Drawn Vertical Bars
                               Row(
                                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -1117,7 +1117,7 @@ class _HomePageState extends State<HomePage> {
                           ),
                         ),
                       ),
-                      const SizedBox(height: 85),
+                      SizedBox(height: 85),
                     ],
                   ),
                 ),
@@ -1132,7 +1132,7 @@ class _HomePageState extends State<HomePage> {
   Widget _buildStatGridCard(String title, String val, String sub, IconData icon, Color color) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: context.colors.cardBg,
         borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
@@ -1154,19 +1154,19 @@ class _HomePageState extends State<HomePage> {
                 Expanded(
                   child: Text(
                     title,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 12,
                       fontWeight: FontWeight.w800,
-                      color: AppColors.textSecondary,
+                      color: context.colors.textSecondary,
                     ),
                     overflow: TextOverflow.ellipsis,
                   ),
                 ),
-                const SizedBox(width: 4),
+                SizedBox(width: 4),
                 Icon(icon, color: color, size: 20),
               ],
             ),
-            const SizedBox(height: 4),
+            SizedBox(height: 4),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -1177,23 +1177,23 @@ class _HomePageState extends State<HomePage> {
                     alignment: Alignment.centerLeft,
                     child: Text(
                       val,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.w900,
-                        color: AppColors.textPrimary,
+                        color: context.colors.textPrimary,
                       ),
                     ),
                   ),
-                  const SizedBox(height: 2),
+                  SizedBox(height: 2),
                   FittedBox(
                     fit: BoxFit.scaleDown,
                     alignment: Alignment.centerLeft,
                     child: Text(
                       sub,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 10,
                         fontWeight: FontWeight.w700,
-                        color: AppColors.textLight,
+                        color: context.colors.textLight,
                       ),
                     ),
                   ),
@@ -1211,38 +1211,38 @@ class _HomePageState extends State<HomePage> {
       children: [
         Text(
           val > 0 ? '$val' : '-',
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 10,
             fontWeight: FontWeight.w800,
-            color: AppColors.textSecondary,
+            color: context.colors.textSecondary,
           ),
         ),
-        const SizedBox(height: 8),
+        SizedBox(height: 8),
         Container(
           width: 14,
           height: 120 * ratio + 8, // scale height dynamically
           decoration: BoxDecoration(
             gradient: ratio > 0
-                ? const LinearGradient(
+                ? LinearGradient(
                     colors: [
-                      AppColors.primaryGradientStart,
-                      AppColors.primaryGradientEnd,
+                      context.colors.primaryGradientStart,
+                      context.colors.primaryGradientEnd,
                     ],
                     begin: Alignment.bottomCenter,
                     end: Alignment.topCenter,
                   )
                 : null,
-            color: ratio > 0 ? null : AppColors.progressTrack,
+            color: ratio > 0 ? null : context.colors.progressTrack,
             borderRadius: BorderRadius.circular(100),
           ),
         ),
-        const SizedBox(height: 8),
+        SizedBox(height: 8),
         Text(
           day,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 11,
             fontWeight: FontWeight.w800,
-            color: AppColors.textLight,
+            color: context.colors.textLight,
           ),
         ),
       ],
@@ -1252,6 +1252,7 @@ class _HomePageState extends State<HomePage> {
   // --- SCREEN 5: PROFIL ---
   Widget _buildProfil(BuildContext context, bool isTablet) {
     final authProvider = Provider.of<AuthProvider>(context);
+    final themeProvider = Provider.of<ThemeProvider>(context);
     final user = authProvider.currentUser;
     final String initials = user.displayName.isNotEmpty
         ? user.displayName
@@ -1263,6 +1264,13 @@ class _HomePageState extends State<HomePage> {
             .join()
             .toUpperCase()
         : 'U';
+
+    String themeName = 'Sistem';
+    if (themeProvider.themeMode == ThemeMode.light) {
+      themeName = 'Terang';
+    } else if (themeProvider.themeMode == ThemeMode.dark) {
+      themeName = 'Gelap';
+    }
 
     return LayoutBuilder(
       builder: (context, constraints) {
@@ -1278,25 +1286,25 @@ class _HomePageState extends State<HomePage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  const Align(
+                  Align(
                     alignment: Alignment.centerLeft,
                     child: Text(
                       'Profil Saya',
                       style: TextStyle(
                         fontSize: 22,
                         fontWeight: FontWeight.w900,
-                        color: AppColors.textPrimary,
+                        color: context.colors.textPrimary,
                         letterSpacing: -0.5,
                       ),
                     ),
                   ),
-                  const SizedBox(height: 24),
+                  SizedBox(height: 24),
 
                   // Avatar & Credentials Card
                   Container(
                     width: double.infinity,
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: context.colors.cardBg,
                       borderRadius: BorderRadius.circular(32),
                       boxShadow: [
                         BoxShadow(
@@ -1316,15 +1324,15 @@ class _HomePageState extends State<HomePage> {
                             height: 80,
                             decoration: BoxDecoration(
                               shape: BoxShape.circle,
-                              gradient: const LinearGradient(
+                              gradient: LinearGradient(
                                 colors: [
-                                  AppColors.primaryGradientStart,
-                                  AppColors.primaryGradientEnd,
+                                  context.colors.primaryGradientStart,
+                                  context.colors.primaryGradientEnd,
                                 ],
                               ),
                               boxShadow: [
                                 BoxShadow(
-                                  color: AppColors.primaryGradientStart.withAlpha(60),
+                                  color: context.colors.primaryGradientStart.withAlpha(60),
                                   blurRadius: 15,
                                   offset: const Offset(0, 6),
                                 ),
@@ -1333,7 +1341,7 @@ class _HomePageState extends State<HomePage> {
                             child: Center(
                               child: Text(
                                 initials,
-                                style: const TextStyle(
+                                style: TextStyle(
                                   fontSize: 28,
                                   fontWeight: FontWeight.w900,
                                   color: Colors.white,
@@ -1342,38 +1350,38 @@ class _HomePageState extends State<HomePage> {
                               ),
                             ),
                           ),
-                          const SizedBox(height: 16),
+                          SizedBox(height: 16),
                           Text(
                             user.displayName.isNotEmpty ? user.displayName : 'Tanpa Nama',
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 20,
                               fontWeight: FontWeight.w900,
-                              color: AppColors.textPrimary,
+                              color: context.colors.textPrimary,
                             ),
                           ),
-                          const SizedBox(height: 4),
+                          SizedBox(height: 4),
                           Text(
                             user.email.isNotEmpty ? user.email : 'Email tidak tersedia',
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 13,
                               fontWeight: FontWeight.w600,
-                              color: AppColors.textSecondary,
+                              color: context.colors.textSecondary,
                             ),
                           ),
-                          const SizedBox(height: 8),
+                          SizedBox(height: 8),
                           if (user.nim != null || user.major != null)
                             Container(
                               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
                               decoration: BoxDecoration(
-                                color: const Color(0xFFE2EDF9),
+                                color: context.colors.primaryGradientStart.withAlpha(30),
                                 borderRadius: BorderRadius.circular(100),
                               ),
                               child: Text(
                                 '${user.nim != null ? "NIM ${user.nim}" : ""} ${(user.nim != null && user.major != null) ? "•" : ""} ${user.major ?? ""}',
-                                style: const TextStyle(
+                                style: TextStyle(
                                   fontSize: 11,
                                   fontWeight: FontWeight.w900,
-                                  color: AppColors.primaryGradientStart,
+                                  color: context.colors.primaryGradientStart,
                                 ),
                               ),
                             ),
@@ -1382,12 +1390,12 @@ class _HomePageState extends State<HomePage> {
                     ),
                   ),
 
-                  const SizedBox(height: 24),
+                  SizedBox(height: 24),
 
                   // Option Settings List
                   Container(
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: context.colors.cardBg,
                       borderRadius: BorderRadius.circular(32),
                       boxShadow: [
                         BoxShadow(
@@ -1407,9 +1415,9 @@ class _HomePageState extends State<HomePage> {
                             subtitle: 'Edit biodata dan nim mahasiswa',
                             onTap: () {
                               Navigator.push(
-                                context,
-                                MaterialPageRoute(builder: (context) => const EditProfilePage()),
-                              );
+                                  context,
+                                  MaterialPageRoute(builder: (context) => const EditProfilePage()),
+                                );
                             }
                           ),
                           _buildProfileOption(
@@ -1422,6 +1430,12 @@ class _HomePageState extends State<HomePage> {
                                 MaterialPageRoute(builder: (context) => const EditProfilePage()),
                               );
                             }
+                          ),
+                          _buildProfileOption(
+                            icon: Icons.dark_mode_outlined,
+                            title: 'Tema Aplikasi',
+                            subtitle: themeName,
+                            onTap: () => _showThemeSelector(context),
                           ),
                           _buildProfileOption(
                             icon: Icons.security_rounded, 
@@ -1452,7 +1466,7 @@ class _HomePageState extends State<HomePage> {
                     ),
                   ),
 
-                  const SizedBox(height: 24),
+                  SizedBox(height: 24),
 
                   // Functional Log Out Button
                   SizedBox(
@@ -1480,10 +1494,10 @@ class _HomePageState extends State<HomePage> {
                         backgroundColor: Colors.red.withAlpha(15),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(16),
-                          side: const BorderSide(color: Colors.redAccent, width: 1.5),
+                          side: BorderSide(color: Colors.redAccent, width: 1.5),
                         ),
                       ),
-                      child: const Text(
+                      child: Text(
                         'Keluar dari Akun',
                         style: TextStyle(
                           fontSize: 14,
@@ -1493,7 +1507,7 @@ class _HomePageState extends State<HomePage> {
                       ),
                     ),
                   ),
-                  const SizedBox(height: 100),
+                  SizedBox(height: 100),
                 ],
               ),
             ),
@@ -1513,36 +1527,197 @@ class _HomePageState extends State<HomePage> {
       leading: Container(
         width: 36,
         height: 36,
-        decoration: const BoxDecoration(
-          color: AppColors.progressTrack,
+        decoration: BoxDecoration(
+          color: context.colors.progressTrack,
           shape: BoxShape.circle,
         ),
-        child: Icon(icon, color: AppColors.primaryGradientStart, size: 18),
+        child: Icon(icon, color: context.colors.primaryGradientStart, size: 18),
       ),
       title: Text(
         title,
-        style: const TextStyle(
+        style: TextStyle(
           fontSize: 14,
           fontWeight: FontWeight.w800,
-          color: AppColors.textPrimary,
+          color: context.colors.textPrimary,
         ),
       ),
       subtitle: Text(
         subtitle,
-        style: const TextStyle(
+        style: TextStyle(
           fontSize: 11,
           fontWeight: FontWeight.w500,
-          color: AppColors.textLight,
+          color: context.colors.textLight,
         ),
       ),
-      trailing: const Icon(Icons.chevron_right_rounded, color: AppColors.textLight, size: 20),
+      trailing: Icon(Icons.chevron_right_rounded, color: context.colors.textLight, size: 20),
       contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
       onTap: onTap,
     );
   }
 
+  void _showThemeSelector(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      isScrollControlled: true,
+      builder: (context) {
+        return Consumer<ThemeProvider>(
+          builder: (context, themeProvider, child) {
+            return Container(
+              decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.surface,
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(32),
+                  topRight: Radius.circular(32),
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withAlpha(20),
+                    blurRadius: 40,
+                    offset: const Offset(0, -10),
+                  ),
+                ],
+              ),
+              padding: const EdgeInsets.only(
+                top: 16,
+                left: 24,
+                right: 24,
+                bottom: 40,
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // HandleBar drag indicator
+                  Container(
+                    width: 48,
+                    height: 5,
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).brightness == Brightness.dark
+                          ? Colors.white.withAlpha(50)
+                          : Colors.black.withAlpha(30),
+                      borderRadius: BorderRadius.circular(100),
+                    ),
+                  ),
+                  SizedBox(height: 24),
+                  Text(
+                    'Pilih Tema Aplikasi',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w900,
+                      color: context.colors.textPrimary,
+                      letterSpacing: -0.2,
+                    ),
+                  ),
+                  SizedBox(height: 8),
+                  Text(
+                    'Pilih tampilan yang paling nyaman untuk matamu.',
+                    style: TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w500,
+                      color: context.colors.textSecondary,
+                    ),
+                  ),
+                  SizedBox(height: 24),
+                  
+                  // Options
+                  _buildThemeOptionTile(
+                    context: context,
+                    icon: Icons.light_mode_rounded,
+                    title: 'Terang (Light)',
+                    isSelected: themeProvider.themeMode == ThemeMode.light,
+                    onTap: () {
+                      themeProvider.setThemeMode(ThemeMode.light);
+                      Navigator.pop(context);
+                    },
+                  ),
+                  SizedBox(height: 12),
+                  _buildThemeOptionTile(
+                    context: context,
+                    icon: Icons.dark_mode_rounded,
+                    title: 'Gelap (Dark)',
+                    isSelected: themeProvider.themeMode == ThemeMode.dark,
+                    onTap: () {
+                      themeProvider.setThemeMode(ThemeMode.dark);
+                      Navigator.pop(context);
+                    },
+                  ),
+                  SizedBox(height: 12),
+                  _buildThemeOptionTile(
+                    context: context,
+                    icon: Icons.settings_brightness_rounded,
+                    title: 'Sistem (System)',
+                    isSelected: themeProvider.themeMode == ThemeMode.system,
+                    onTap: () {
+                      themeProvider.setThemeMode(ThemeMode.system);
+                      Navigator.pop(context);
+                    },
+                  ),
+                ],
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
 
-
+  Widget _buildThemeOptionTile({
+    required BuildContext context,
+    required IconData icon,
+    required String title,
+    required bool isSelected,
+    required VoidCallback onTap,
+  }) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(20),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+        decoration: BoxDecoration(
+          color: isSelected
+              ? context.colors.primaryGradientStart.withAlpha(20)
+              : Colors.transparent,
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(
+            color: isSelected
+                ? context.colors.primaryGradientStart
+                : Colors.transparent,
+            width: 1.5,
+          ),
+        ),
+        child: Row(
+          children: [
+            Icon(
+              icon,
+              color: isSelected
+                  ? context.colors.primaryGradientStart
+                  : context.colors.textPrimary,
+              size: 22,
+            ),
+            SizedBox(width: 16),
+            Expanded(
+              child: Text(
+                title,
+                style: TextStyle(
+                  fontSize: 14.5,
+                  fontWeight: isSelected ? FontWeight.w900 : FontWeight.w700,
+                  color: isSelected
+                      ? context.colors.primaryGradientStart
+                      : context.colors.textPrimary,
+                ),
+              ),
+            ),
+            if (isSelected)
+              Icon(
+                Icons.check_circle_rounded,
+                color: context.colors.primaryGradientStart,
+                size: 22,
+              ),
+          ],
+        ),
+      ),
+    );
+  }
 
   void _showTargetSettingsDialog(BuildContext context, String uid, StatisticsProvider statsProvider) {
     int tempTarget = statsProvider.weeklyQuizTarget;
@@ -1557,9 +1732,9 @@ class _HomePageState extends State<HomePage> {
                 margin: const EdgeInsets.symmetric(horizontal: 24),
                 constraints: const BoxConstraints(maxWidth: 400),
                 decoration: BoxDecoration(
-                  color: Colors.white.withAlpha(240),
+                  color: context.colors.cardBg.withAlpha(240),
                   borderRadius: BorderRadius.circular(32),
-                  border: Border.all(color: Colors.white, width: 2),
+                  border: Border.all(color: context.colors.glassBorder, width: 2),
                   boxShadow: [
                     BoxShadow(
                       color: Colors.black.withAlpha(15),
@@ -1578,32 +1753,32 @@ class _HomePageState extends State<HomePage> {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            const Text(
+                            Text(
                               'Atur Target Belajar',
                               style: TextStyle(
                                 fontSize: 20,
                                 fontWeight: FontWeight.w900,
-                                color: AppColors.textPrimary,
+                                color: context.colors.textPrimary,
                               ),
                             ),
                             IconButton(
-                              icon: const Icon(Icons.close_rounded, color: AppColors.textLight),
+                              icon: Icon(Icons.close_rounded, color: context.colors.textLight),
                               onPressed: () => Navigator.of(context).pop(),
                             ),
                           ],
                         ),
-                        const Divider(height: 24),
-                        const Text(
+                        Divider(height: 24),
+                        Text(
                           'Tentukan berapa banyak kuis yang ingin kamu selesaikan setiap minggunya untuk tetap konsisten belajar.',
                           style: TextStyle(
                             fontSize: 13,
                             fontWeight: FontWeight.w500,
-                            color: AppColors.textSecondary,
+                            color: context.colors.textSecondary,
                             height: 1.4,
                           ),
                           textAlign: TextAlign.center,
                         ),
-                        const SizedBox(height: 24),
+                        SizedBox(height: 24),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
@@ -1618,23 +1793,23 @@ class _HomePageState extends State<HomePage> {
                               child: Container(
                                 width: 48,
                                 height: 48,
-                                decoration: const BoxDecoration(
-                                  color: AppColors.progressTrack,
+                                decoration: BoxDecoration(
+                                  color: context.colors.progressTrack,
                                   shape: BoxShape.circle,
                                 ),
-                                child: const Icon(Icons.remove_rounded, color: AppColors.primaryGradientStart, size: 24),
+                                child: Icon(Icons.remove_rounded, color: context.colors.primaryGradientStart, size: 24),
                               ),
                             ),
-                            const SizedBox(width: 24),
+                            SizedBox(width: 24),
                             Text(
                               '$tempTarget',
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: 36,
                                 fontWeight: FontWeight.w900,
-                                color: AppColors.textPrimary,
+                                color: context.colors.textPrimary,
                               ),
                             ),
-                            const SizedBox(width: 24),
+                            SizedBox(width: 24),
                             GestureDetector(
                               onTap: () {
                                 if (tempTarget < 50) {
@@ -1646,25 +1821,25 @@ class _HomePageState extends State<HomePage> {
                               child: Container(
                                 width: 48,
                                 height: 48,
-                                decoration: const BoxDecoration(
-                                  color: AppColors.progressTrack,
+                                decoration: BoxDecoration(
+                                  color: context.colors.progressTrack,
                                   shape: BoxShape.circle,
                                 ),
-                                child: const Icon(Icons.add_rounded, color: AppColors.primaryGradientStart, size: 24),
+                                child: Icon(Icons.add_rounded, color: context.colors.primaryGradientStart, size: 24),
                               ),
                             ),
                           ],
                         ),
-                        const SizedBox(height: 12),
-                        const Text(
+                        SizedBox(height: 12),
+                        Text(
                           'Kuis per minggu',
                           style: TextStyle(
                             fontSize: 12,
                             fontWeight: FontWeight.w700,
-                            color: AppColors.textLight,
+                            color: context.colors.textLight,
                           ),
                         ),
-                        const SizedBox(height: 32),
+                        SizedBox(height: 32),
                         SizedBox(
                           width: double.infinity,
                           height: 50,
@@ -1683,14 +1858,14 @@ class _HomePageState extends State<HomePage> {
                               }
                             },
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: AppColors.primaryGradientStart,
+                              backgroundColor: context.colors.primaryGradientStart,
                               foregroundColor: Colors.white,
                               elevation: 0,
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(16),
                               ),
                             ),
-                            child: const Text(
+                            child: Text(
                               'Simpan Target',
                               style: TextStyle(
                                 fontSize: 14,

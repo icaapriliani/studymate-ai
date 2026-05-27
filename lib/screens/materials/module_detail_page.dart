@@ -1,8 +1,8 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import '../../utils/theme_context.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
-import '../../constants/app_colors.dart';
 import '../../models/material_model.dart';
 import '../../models/module_model.dart';
 import '../../providers/auth_provider.dart';
@@ -108,7 +108,7 @@ class _ModuleDetailPageState extends State<ModuleDetailPage> {
       ScaffoldMessenger.of(context).clearSnackBars();
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: const Row(
+          content: Row(
             children: [
               Icon(Icons.error_outline_rounded, color: Colors.white),
               SizedBox(width: 12),
@@ -176,7 +176,7 @@ class _ModuleDetailPageState extends State<ModuleDetailPage> {
               size: 24,
             ),
           ),
-          const SizedBox(width: 16),
+          SizedBox(width: 16),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -189,13 +189,13 @@ class _ModuleDetailPageState extends State<ModuleDetailPage> {
                     color: Colors.red.shade900,
                   ),
                 ),
-                const SizedBox(height: 4),
-                const Text(
+                SizedBox(height: 4),
+                Text(
                   'Video pembelajaran tidak tersedia saat ini.',
                   style: TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.w600,
-                    color: AppColors.textSecondary,
+                    color: context.colors.textSecondary,
                   ),
                 ),
               ],
@@ -262,15 +262,15 @@ class _ModuleDetailPageState extends State<ModuleDetailPage> {
                       ),
                     ],
                   ),
-                  child: const Center(
+                  child: Center(
                     child: Icon(
                       Icons.play_arrow_rounded,
-                      color: Colors.white,
+                      color: context.colors.cardBg,
                       size: 32,
                     ),
                   ),
                 ),
-                const SizedBox(width: 16),
+                SizedBox(width: 16),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -295,25 +295,25 @@ class _ModuleDetailPageState extends State<ModuleDetailPage> {
                       // Video title
                       Text(
                         videoTitle,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 15,
                           fontWeight: FontWeight.w800,
-                          color: AppColors.textPrimary,
+                          color: context.colors.textPrimary,
                           height: 1.35,
                         ),
                       ),
                       if (widget.module.youtubeChannel != null && widget.module.youtubeChannel!.isNotEmpty) ...[
-                        const SizedBox(height: 4),
+                        SizedBox(height: 4),
                         Text(
                           'by ${widget.module.youtubeChannel}',
                           style: TextStyle(
                             fontSize: 12,
                             fontWeight: FontWeight.w600,
-                            color: AppColors.textSecondary.withAlpha(200),
+                            color: context.colors.textSecondary.withAlpha(200),
                           ),
                         ),
                       ],
-                      const SizedBox(height: 6),
+                      SizedBox(height: 6),
                       // Action link
                       Row(
                         children: [
@@ -325,7 +325,7 @@ class _ModuleDetailPageState extends State<ModuleDetailPage> {
                               color: accentColor,
                             ),
                           ),
-                          const SizedBox(width: 4),
+                          SizedBox(width: 4),
                           Icon(
                             Icons.arrow_forward_rounded,
                             size: 14,
@@ -355,11 +355,11 @@ class _ModuleDetailPageState extends State<ModuleDetailPage> {
       body: Container(
         width: double.infinity,
         height: double.infinity,
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           gradient: LinearGradient(
             colors: [
-              AppColors.bgGradientStart,
-              AppColors.bgGradientEnd,
+              context.colors.bgGradientStart,
+              context.colors.bgGradientEnd,
             ],
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
@@ -402,48 +402,48 @@ class _ModuleDetailPageState extends State<ModuleDetailPage> {
                                   ),
                                 ),
                               ),
-                              const SizedBox(width: 8),
-                              Icon(Icons.schedule_rounded, color: AppColors.textLight.withAlpha(180), size: 14),
-                              const SizedBox(width: 4),
+                              SizedBox(width: 8),
+                              Icon(Icons.schedule_rounded, color: context.colors.textLight.withAlpha(180), size: 14),
+                              SizedBox(width: 4),
                               Text(
                                 '${mod.estimatedMinutes} Menit Membaca',
-                                style: const TextStyle(
+                                style: TextStyle(
                                   fontSize: 11,
                                   fontWeight: FontWeight.w600,
-                                  color: AppColors.textLight,
+                                  color: context.colors.textLight,
                                 ),
                               ),
                             ],
                           ),
-                          const SizedBox(height: 12),
+                          SizedBox(height: 12),
 
                           // Module Title
                           Text(
                             mod.title,
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 22,
                               fontWeight: FontWeight.w900,
-                              color: AppColors.textPrimary,
+                              color: context.colors.textPrimary,
                               height: 1.3,
                               letterSpacing: -0.4,
                             ),
                           ),
-                          const SizedBox(height: 16),
-                          const Divider(color: AppColors.progressTrack, height: 1),
-                          const SizedBox(height: 24),
+                          SizedBox(height: 16),
+                          Divider(color: context.colors.progressTrack, height: 1),
+                          SizedBox(height: 24),
 
                           // Custom Premium Academic Markdown Text Parser
                           _buildContentRenderer(mod.content, mat.color),
 
                           if (mod.youtubeUrl != null && mod.youtubeUrl!.isNotEmpty) ...[
-                            const SizedBox(height: 32),
+                            SizedBox(height: 32),
                             if (_isValidYouTubeUrl(mod.youtubeUrl!))
                               _buildYouTubeVideoCard(context, mat.color, mod.youtubeUrl!, mod.youtubeTitle)
                             else
                               _buildYouTubeErrorCard(context),
                           ],
 
-                          const SizedBox(height: 120), // Padding to avoid overlap with floating bottom bar
+                          SizedBox(height: 120), // Padding to avoid overlap with floating bottom bar
                         ],
                       ),
                     ),
@@ -463,7 +463,7 @@ class _ModuleDetailPageState extends State<ModuleDetailPage> {
   Widget _buildHeader(BuildContext context, MaterialModel mat, ModuleModel mod) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white.withAlpha(100),
+        color: context.colors.glassBg.withAlpha(100),
         border: Border(
           bottom: BorderSide(
             color: Colors.black.withAlpha(5),
@@ -481,9 +481,9 @@ class _ModuleDetailPageState extends State<ModuleDetailPage> {
               children: [
                 IconButton(
                   onPressed: () => Navigator.of(context).pop(),
-                  icon: const Icon(
+                  icon: Icon(
                     Icons.arrow_back_ios_new_rounded,
-                    color: AppColors.textPrimary,
+                    color: context.colors.textPrimary,
                     size: 20,
                   ),
                 ),
@@ -493,14 +493,14 @@ class _ModuleDetailPageState extends State<ModuleDetailPage> {
                     textAlign: TextAlign.center,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w800,
-                      color: AppColors.textPrimary,
+                      color: context.colors.textPrimary,
                     ),
                   ),
                 ),
-                const SizedBox(width: 48), // Balanced alignment
+                SizedBox(width: 48), // Balanced alignment
               ],
             ),
           ),
@@ -509,7 +509,7 @@ class _ModuleDetailPageState extends State<ModuleDetailPage> {
           Container(
             height: 3,
             width: double.infinity,
-            color: AppColors.progressTrack,
+            color: context.colors.progressTrack,
             child: Align(
               alignment: Alignment.centerLeft,
               child: AnimatedContainer(
@@ -581,10 +581,10 @@ class _ModuleDetailPageState extends State<ModuleDetailPage> {
           padding: const EdgeInsets.only(top: 28.0, bottom: 14.0),
           child: Text(
             line.substring(2),
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 22,
               fontWeight: FontWeight.w900,
-              color: AppColors.textPrimary,
+              color: context.colors.textPrimary,
               letterSpacing: -0.5,
             ),
           ),
@@ -596,10 +596,10 @@ class _ModuleDetailPageState extends State<ModuleDetailPage> {
           padding: const EdgeInsets.only(top: 24.0, bottom: 10.0),
           child: Text(
             line.substring(3),
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.w800,
-              color: AppColors.textPrimary,
+              color: context.colors.textPrimary,
               letterSpacing: -0.3,
             ),
           ),
@@ -622,7 +622,7 @@ class _ModuleDetailPageState extends State<ModuleDetailPage> {
                   shape: BoxShape.circle,
                 ),
               ),
-              const SizedBox(width: 12),
+              SizedBox(width: 12),
               Expanded(
                 child: RichText(
                   text: _parseInlineStyles(text),
@@ -663,7 +663,7 @@ class _ModuleDetailPageState extends State<ModuleDetailPage> {
     for (final line in lines) {
       final trimmed = line.trim();
       if (trimmed.isEmpty) {
-        children.add(const SizedBox(height: 8));
+        children.add(SizedBox(height: 8));
       } else if (trimmed.startsWith('- ') || trimmed.startsWith('* ')) {
         final text = trimmed.substring(2);
         children.add(Padding(
@@ -680,7 +680,7 @@ class _ModuleDetailPageState extends State<ModuleDetailPage> {
                   shape: BoxShape.circle,
                 ),
               ),
-              const SizedBox(width: 10),
+              SizedBox(width: 10),
               Expanded(
                 child: RichText(
                   text: _parseInlineStyles(text, isCallout: true),
@@ -726,7 +726,7 @@ class _ModuleDetailPageState extends State<ModuleDetailPage> {
               size: 20,
             ),
           ),
-          const SizedBox(width: 16),
+          SizedBox(width: 16),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -754,7 +754,7 @@ class _ModuleDetailPageState extends State<ModuleDetailPage> {
         text: match.group(1),
         style: TextStyle(
           fontWeight: FontWeight.w900,
-          color: AppColors.textPrimary,
+          color: context.colors.textPrimary,
           fontStyle: isCallout ? FontStyle.italic : FontStyle.normal,
         ),
       ));
@@ -769,7 +769,7 @@ class _ModuleDetailPageState extends State<ModuleDetailPage> {
     return TextSpan(
       style: TextStyle(
         fontSize: isCallout ? 15.0 : 16.0,
-        color: isCallout ? AppColors.textPrimary.withAlpha(220) : AppColors.textSecondary,
+        color: isCallout ? context.colors.textPrimary.withAlpha(220) : context.colors.textSecondary,
         height: 1.6,
         fontWeight: FontWeight.w500,
         fontStyle: isCallout ? FontStyle.italic : FontStyle.normal,
@@ -816,10 +816,10 @@ class _ModuleDetailPageState extends State<ModuleDetailPage> {
         filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
         child: Container(
           decoration: BoxDecoration(
-            color: Colors.white.withAlpha(204), // 80% white glass
+            color: context.colors.glassBg, // 80% white glass
             border: Border(
               top: BorderSide(
-                color: Colors.white.withAlpha(120),
+                color: context.colors.glassBorder,
                 width: 1.5,
               ),
             ),
@@ -881,15 +881,15 @@ class _ModuleDetailPageState extends State<ModuleDetailPage> {
                                     children: [
                                       Icon(
                                         newStatus ? Icons.check_circle_rounded : Icons.info_outline_rounded,
-                                        color: Colors.white,
+                                        color: context.colors.cardBg,
                                       ),
-                                      const SizedBox(width: 12),
+                                      SizedBox(width: 12),
                                       Expanded(
                                         child: Text(
                                           newStatus
                                               ? '🎉 Hore! Modul "${mod.title}" ditandai selesai!'
                                               : 'Modul "${mod.title}" dibatalkan selesai.',
-                                          style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 13),
+                                          style: TextStyle(fontWeight: FontWeight.w700, fontSize: 13),
                                         ),
                                       ),
                                     ],
@@ -913,14 +913,14 @@ class _ModuleDetailPageState extends State<ModuleDetailPage> {
                               children: [
                                 Icon(
                                   isCompleted ? Icons.check_circle_rounded : Icons.task_alt_rounded,
-                                  color: Colors.white,
+                                  color: context.colors.cardBg,
                                   size: 20,
                                 ),
-                                const SizedBox(width: 10),
+                                SizedBox(width: 10),
                                 Text(
                                   isCompleted ? 'Sudah Selesai (Batal?)' : 'Tandai Selesai',
-                                  style: const TextStyle(
-                                    color: Colors.white,
+                                  style: TextStyle(
+                                    color: context.colors.cardBg,
                                     fontWeight: FontWeight.w900,
                                     fontSize: 14.5,
                                     letterSpacing: 0.2,

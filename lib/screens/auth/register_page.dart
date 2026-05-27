@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../utils/theme_context.dart';
 import 'package:provider/provider.dart';
 import '../../constants/app_colors.dart';
 import '../../utils/custom_textfield.dart';
@@ -41,11 +42,11 @@ class _RegisterPageState extends State<RegisterPage> {
       body: Container(
         width: double.infinity,
         height: double.infinity,
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           gradient: LinearGradient(
             colors: [
-              AppColors.bgGradientStart,
-              AppColors.bgGradientEnd,
+              context.colors.bgGradientStart,
+              context.colors.bgGradientEnd,
             ],
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
@@ -69,14 +70,14 @@ class _RegisterPageState extends State<RegisterPage> {
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          const SizedBox(height: 10),
+                          SizedBox(height: 10),
 
                           // Register Card
                           Center(
                             child: Container(
                               constraints: const BoxConstraints(maxWidth: 420),
                               decoration: BoxDecoration(
-                                color: Colors.white,
+                                color: context.colors.cardBg,
                                 borderRadius: BorderRadius.circular(36),
                                 boxShadow: [
                                   BoxShadow(
@@ -85,7 +86,7 @@ class _RegisterPageState extends State<RegisterPage> {
                                     offset: const Offset(0, 20.0),
                                   ),
                                   BoxShadow(
-                                    color: AppColors.primaryGradientStart
+                                    color: context.colors.primaryGradientStart
                                         .withAlpha(5),
                                     blurRadius: 20.0,
                                     offset: const Offset(0, 10.0),
@@ -107,10 +108,10 @@ class _RegisterPageState extends State<RegisterPage> {
                                             width: 56,
                                             height: 56,
                                             decoration: BoxDecoration(
-                                              gradient: const LinearGradient(
+                                              gradient: LinearGradient(
                                                 colors: [
-                                                  AppColors.primaryGradientStart,
-                                                  AppColors.primaryGradientEnd,
+                                                  context.colors.primaryGradientStart,
+                                                  context.colors.primaryGradientEnd,
                                                 ],
                                                 begin: Alignment.topLeft,
                                                 end: Alignment.bottomRight,
@@ -127,24 +128,24 @@ class _RegisterPageState extends State<RegisterPage> {
                                                 ),
                                               ],
                                             ),
-                                            child: const Icon(
+                                            child: Icon(
                                               Icons.school,
                                               color: Colors.white,
                                               size: 26,
                                             ),
                                           ),
-                                          const SizedBox(height: 20),
+                                          SizedBox(height: 20),
 
                                           // Brand Text: StudyMate AI
                                           ShaderMask(
                                             shaderCallback: (bounds) =>
-                                                const LinearGradient(
+                                                LinearGradient(
                                               colors: [
-                                                AppColors.primaryGradientStart,
-                                                AppColors.primaryGradientEnd,
+                                                context.colors.primaryGradientStart,
+                                                context.colors.primaryGradientEnd,
                                               ],
                                             ).createShader(bounds),
-                                            child: const Text(
+                                            child: Text(
                                               'StudyMate AI',
                                               style: TextStyle(
                                                 fontSize: 28,
@@ -154,29 +155,29 @@ class _RegisterPageState extends State<RegisterPage> {
                                               ),
                                             ),
                                           ),
-                                          const SizedBox(height: 12),
+                                          SizedBox(height: 12),
 
                                           // Subtitle
-                                          const Text(
+                                          Text(
                                             'Create Account',
                                             style: TextStyle(
                                               fontSize: 22,
                                               fontWeight: FontWeight.w800,
-                                              color: AppColors.textPrimary,
+                                              color: context.colors.textPrimary,
                                             ),
                                           ),
-                                          const SizedBox(height: 6),
+                                          SizedBox(height: 6),
 
-                                          const Text(
+                                          Text(
                                             'Mulai petualangan belajarmu sekarang!',
                                             textAlign: TextAlign.center,
                                             style: TextStyle(
                                               fontSize: 14,
                                               fontWeight: FontWeight.w500,
-                                              color: AppColors.textSecondary,
+                                              color: context.colors.textSecondary,
                                             ),
                                           ),
-                                          const SizedBox(height: 28),
+                                          SizedBox(height: 28),
 
                                           // Name Textfield
                                           CustomTextField(
@@ -192,7 +193,7 @@ class _RegisterPageState extends State<RegisterPage> {
                                               return null;
                                             },
                                           ),
-                                          const SizedBox(height: 18),
+                                          SizedBox(height: 18),
 
                                           // Email Textfield
                                           CustomTextField(
@@ -215,7 +216,7 @@ class _RegisterPageState extends State<RegisterPage> {
                                               return null;
                                             },
                                           ),
-                                          const SizedBox(height: 18),
+                                          SizedBox(height: 18),
 
                                           // Password Textfield
                                           CustomTextField(
@@ -235,7 +236,7 @@ class _RegisterPageState extends State<RegisterPage> {
                                                 _obscurePassword
                                                     ? Icons.visibility_off_outlined
                                                     : Icons.visibility_outlined,
-                                                color: AppColors.textLight,
+                                                color: context.colors.textLight,
                                                 size: 20,
                                               ),
                                             ),
@@ -249,7 +250,7 @@ class _RegisterPageState extends State<RegisterPage> {
                                               return null;
                                             },
                                           ),
-                                          const SizedBox(height: 18),
+                                          SizedBox(height: 18),
 
                                           // Confirm Password Textfield
                                           CustomTextField(
@@ -269,7 +270,7 @@ class _RegisterPageState extends State<RegisterPage> {
                                                 _obscureConfirmPassword
                                                     ? Icons.visibility_off_outlined
                                                     : Icons.visibility_outlined,
-                                                color: AppColors.textLight,
+                                                color: context.colors.textLight,
                                                 size: 20,
                                               ),
                                             ),
@@ -283,7 +284,7 @@ class _RegisterPageState extends State<RegisterPage> {
                                               return null;
                                             },
                                           ),
-                                          const SizedBox(height: 18),
+                                          SizedBox(height: 18),
 
                                           // Agree to Terms Checkbox
                                           Row(
@@ -310,30 +311,30 @@ class _RegisterPageState extends State<RegisterPage> {
                                                   ),
                                                 ),
                                               ),
-                                              const SizedBox(width: 10),
-                                              const Expanded(
+                                              SizedBox(width: 10),
+                                              Expanded(
                                                 child: Text(
                                                   'Saya setuju dengan Ketentuan & Kebijakan Privasi',
                                                   style: TextStyle(
                                                     fontSize: 13,
                                                     fontWeight: FontWeight.w600,
-                                                    color: AppColors.textSecondary,
+                                                    color: context.colors.textSecondary,
                                                   ),
                                                 ),
                                               ),
                                             ],
                                           ),
-                                          const SizedBox(height: 24),
+                                          SizedBox(height: 24),
 
                                           // Gradient Sign Up Button
                                           Container(
                                             width: double.infinity,
                                             height: 56,
                                             decoration: BoxDecoration(
-                                              gradient: const LinearGradient(
+                                              gradient: LinearGradient(
                                                 colors: [
-                                                  AppColors.primaryGradientStart,
-                                                  AppColors.primaryGradientEnd,
+                                                  context.colors.primaryGradientStart,
+                                                  context.colors.primaryGradientEnd,
                                                 ],
                                                 begin: Alignment.centerLeft,
                                                 end: Alignment.centerRight,
@@ -437,7 +438,7 @@ class _RegisterPageState extends State<RegisterPage> {
                                                 ),
                                               ),
                                               child: authProvider.isLoading
-                                                  ? const SizedBox(
+                                                  ? SizedBox(
                                                       width: 24,
                                                       height: 24,
                                                       child:
@@ -446,7 +447,7 @@ class _RegisterPageState extends State<RegisterPage> {
                                                         strokeWidth: 2.5,
                                                       ),
                                                     )
-                                                  : const Text(
+                                                  : Text(
                                                       'Sign Up',
                                                       style: TextStyle(
                                                         fontSize: 16,
@@ -466,36 +467,36 @@ class _RegisterPageState extends State<RegisterPage> {
                             ),
                           ),
 
-                          const SizedBox(height: 24),
+                          SizedBox(height: 24),
 
                           // Already have an account? Sign In
                           Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              const Text(
+                              Text(
                                 "Already have an account? ",
                                 style: TextStyle(
                                   fontSize: 14,
                                   fontWeight: FontWeight.w600,
-                                  color: AppColors.textSecondary,
+                                  color: context.colors.textSecondary,
                                 ),
                               ),
                               GestureDetector(
                                 onTap: () {
                                   Navigator.of(context).pop();
                                 },
-                                child: const Text(
+                                child: Text(
                                   'Sign In',
                                   style: TextStyle(
                                     fontSize: 14,
                                     fontWeight: FontWeight.w800,
-                                    color: AppColors.primaryGradientStart,
+                                    color: context.colors.primaryGradientStart,
                                   ),
                                 ),
                               ),
                             ],
                           ),
-                          const SizedBox(height: 20),
+                          SizedBox(height: 20),
                         ],
                       ),
                     ),

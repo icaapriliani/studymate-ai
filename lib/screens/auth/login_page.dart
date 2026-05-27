@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../utils/theme_context.dart';
 import 'package:provider/provider.dart';
 import '../../constants/app_colors.dart';
 import '../../utils/custom_textfield.dart';
@@ -37,11 +38,11 @@ class _LoginPageState extends State<LoginPage> {
       body: Container(
         width: double.infinity,
         height: double.infinity,
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           gradient: LinearGradient(
             colors: [
-              AppColors.bgGradientStart,
-              AppColors.bgGradientEnd,
+              context.colors.bgGradientStart,
+              context.colors.bgGradientEnd,
             ],
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
@@ -65,14 +66,14 @@ class _LoginPageState extends State<LoginPage> {
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          const SizedBox(height: 20),
+                          SizedBox(height: 20),
 
                           // Login Card
                           Center(
                             child: Container(
                               constraints: const BoxConstraints(maxWidth: 420),
                               decoration: BoxDecoration(
-                                color: Colors.white,
+                                color: context.colors.cardBg,
                                 borderRadius: BorderRadius.circular(36),
                                 boxShadow: [
                                   BoxShadow(
@@ -81,7 +82,7 @@ class _LoginPageState extends State<LoginPage> {
                                     offset: const Offset(0, 20.0),
                                   ),
                                   BoxShadow(
-                                    color: AppColors.primaryGradientStart
+                                    color: context.colors.primaryGradientStart
                                         .withAlpha(5),
                                     blurRadius: 20.0,
                                     offset: const Offset(0, 10.0),
@@ -101,10 +102,10 @@ class _LoginPageState extends State<LoginPage> {
                                         width: 56,
                                         height: 56,
                                         decoration: BoxDecoration(
-                                          gradient: const LinearGradient(
+                                          gradient: LinearGradient(
                                             colors: [
-                                              AppColors.primaryGradientStart,
-                                              AppColors.primaryGradientEnd,
+                                              context.colors.primaryGradientStart,
+                                              context.colors.primaryGradientEnd,
                                             ],
                                             begin: Alignment.topLeft,
                                             end: Alignment.bottomRight,
@@ -121,24 +122,24 @@ class _LoginPageState extends State<LoginPage> {
                                             ),
                                           ],
                                         ),
-                                        child: const Icon(
+                                        child: Icon(
                                           Icons.school,
                                           color: Colors.white,
                                           size: 26,
                                         ),
                                       ),
-                                      const SizedBox(height: 20),
+                                      SizedBox(height: 20),
 
                                       // Brand Text: StudyMate AI
                                       ShaderMask(
                                         shaderCallback: (bounds) =>
-                                            const LinearGradient(
+                                            LinearGradient(
                                           colors: [
-                                            AppColors.primaryGradientStart,
-                                            AppColors.primaryGradientEnd,
+                                            context.colors.primaryGradientStart,
+                                            context.colors.primaryGradientEnd,
                                           ],
                                         ).createShader(bounds),
-                                        child: const Text(
+                                        child: Text(
                                           'StudyMate AI',
                                           style: TextStyle(
                                             fontSize: 28,
@@ -148,30 +149,30 @@ class _LoginPageState extends State<LoginPage> {
                                           ),
                                         ),
                                       ),
-                                      const SizedBox(height: 12),
+                                      SizedBox(height: 12),
 
                                       // Welcome Text
-                                      const Text(
+                                      Text(
                                         'Welcome Back',
                                         style: TextStyle(
                                           fontSize: 22,
                                           fontWeight: FontWeight.w800,
-                                          color: AppColors.textPrimary,
+                                          color: context.colors.textPrimary,
                                         ),
                                       ),
-                                      const SizedBox(height: 6),
+                                      SizedBox(height: 6),
 
                                       // Subtitle
-                                      const Text(
+                                      Text(
                                         'Elevate your learning with AI intelligence',
                                         textAlign: TextAlign.center,
                                         style: TextStyle(
                                           fontSize: 14,
                                           fontWeight: FontWeight.w500,
-                                          color: AppColors.textSecondary,
+                                          color: context.colors.textSecondary,
                                         ),
                                       ),
-                                      const SizedBox(height: 32),
+                                      SizedBox(height: 32),
 
                                       // Email Textfield
                                       CustomTextField(
@@ -194,7 +195,7 @@ class _LoginPageState extends State<LoginPage> {
                                           return null;
                                         },
                                       ),
-                                      const SizedBox(height: 20),
+                                      SizedBox(height: 20),
 
                                       // Password Textfield
                                       CustomTextField(
@@ -207,7 +208,7 @@ class _LoginPageState extends State<LoginPage> {
                                           onTap: () {
                                             // Handle forgot password action
                                           },
-                                          child: const Text(
+                                          child: Text(
                                             'Forgot?',
                                             style: TextStyle(
                                               fontSize: 13,
@@ -228,7 +229,7 @@ class _LoginPageState extends State<LoginPage> {
                                             _obscurePassword
                                                 ? Icons.visibility_off_outlined
                                                 : Icons.visibility_outlined,
-                                            color: AppColors.textLight,
+                                            color: context.colors.textLight,
                                             size: 20,
                                           ),
                                         ),
@@ -242,7 +243,7 @@ class _LoginPageState extends State<LoginPage> {
                                           return null;
                                         },
                                       ),
-                                      const SizedBox(height: 20),
+                                      SizedBox(height: 20),
 
                                       // Remember Me Checkbox Row
                                       Row(
@@ -269,18 +270,18 @@ class _LoginPageState extends State<LoginPage> {
                                               ),
                                             ),
                                           ),
-                                          const SizedBox(width: 10),
-                                          const Text(
+                                          SizedBox(width: 10),
+                                          Text(
                                             'Remember for 30 days',
                                             style: TextStyle(
                                               fontSize: 14,
                                               fontWeight: FontWeight.w600,
-                                              color: AppColors.textSecondary,
+                                              color: context.colors.textSecondary,
                                             ),
                                           ),
                                         ],
                                       ),
-                                      const SizedBox(height: 32),
+                                      SizedBox(height: 32),
 
                                       // Gradient Sign In Button
                                       Consumer<AuthProvider>(
@@ -289,10 +290,10 @@ class _LoginPageState extends State<LoginPage> {
                                             width: double.infinity,
                                             height: 56,
                                             decoration: BoxDecoration(
-                                              gradient: const LinearGradient(
+                                              gradient: LinearGradient(
                                                 colors: [
-                                                  AppColors.primaryGradientStart,
-                                                  AppColors.primaryGradientEnd,
+                                                  context.colors.primaryGradientStart,
+                                                  context.colors.primaryGradientEnd,
                                                 ],
                                                 begin: Alignment.centerLeft,
                                                 end: Alignment.centerRight,
@@ -362,7 +363,7 @@ class _LoginPageState extends State<LoginPage> {
                                                 ),
                                               ),
                                               child: authProvider.isLoading
-                                                  ? const SizedBox(
+                                                  ? SizedBox(
                                                       width: 24,
                                                       height: 24,
                                                       child: CircularProgressIndicator(
@@ -370,7 +371,7 @@ class _LoginPageState extends State<LoginPage> {
                                                         strokeWidth: 2.5,
                                                       ),
                                                     )
-                                                  : const Text(
+                                                  : Text(
                                                       'Sign In',
                                                       style: TextStyle(
                                                         fontSize: 16,
@@ -383,18 +384,18 @@ class _LoginPageState extends State<LoginPage> {
                                           );
                                         },
                                       ),
-                                      const SizedBox(height: 24),
+                                      SizedBox(height: 24),
 
                                       // Don't have an account? Sign Up
                                       Row(
                                         mainAxisAlignment: MainAxisAlignment.center,
                                         children: [
-                                          const Text(
+                                          Text(
                                             "Don't have an account? ",
                                             style: TextStyle(
                                               fontSize: 14,
                                               fontWeight: FontWeight.w600,
-                                              color: AppColors.textSecondary,
+                                              color: context.colors.textSecondary,
                                             ),
                                           ),
                                           GestureDetector(
@@ -405,7 +406,7 @@ class _LoginPageState extends State<LoginPage> {
                                                 ),
                                               );
                                             },
-                                            child: const Text(
+                                            child: Text(
                                               'Sign Up',
                                               style: TextStyle(
                                                 fontSize: 14,
@@ -424,7 +425,7 @@ class _LoginPageState extends State<LoginPage> {
                             ),
                           ),
 
-                          const SizedBox(height: 24),
+                          SizedBox(height: 24),
 
                           // Bottom Badges Row
                           Row(
@@ -433,11 +434,11 @@ class _LoginPageState extends State<LoginPage> {
                               // Badge 1: Secure AI Protocol
                               Row(
                                 mainAxisSize: MainAxisSize.min,
-                                children: const [
+                                children: [
                                   Icon(
                                     Icons.shield_outlined,
                                     size: 16,
-                                    color: AppColors.textLight,
+                                    color: context.colors.textLight,
                                   ),
                                   SizedBox(width: 6),
                                   Text(
@@ -445,7 +446,7 @@ class _LoginPageState extends State<LoginPage> {
                                     style: TextStyle(
                                       fontSize: 11,
                                       fontWeight: FontWeight.w700,
-                                      color: AppColors.textLight,
+                                      color: context.colors.textLight,
                                     ),
                                   ),
                                 ],
@@ -458,8 +459,8 @@ class _LoginPageState extends State<LoginPage> {
                                 child: Container(
                                   width: 4,
                                   height: 4,
-                                  decoration: const BoxDecoration(
-                                    color: AppColors.textLight,
+                                  decoration: BoxDecoration(
+                                    color: context.colors.textLight,
                                     shape: BoxShape.circle,
                                   ),
                                 ),
@@ -468,11 +469,11 @@ class _LoginPageState extends State<LoginPage> {
                               // Badge 2: Academic Integrity
                               Row(
                                 mainAxisSize: MainAxisSize.min,
-                                children: const [
+                                children: [
                                   Icon(
                                     Icons.verified_outlined,
                                     size: 16,
-                                    color: AppColors.textLight,
+                                    color: context.colors.textLight,
                                   ),
                                   SizedBox(width: 6),
                                   Text(
@@ -480,14 +481,14 @@ class _LoginPageState extends State<LoginPage> {
                                     style: TextStyle(
                                       fontSize: 11,
                                       fontWeight: FontWeight.w700,
-                                      color: AppColors.textLight,
+                                      color: context.colors.textLight,
                                     ),
                                   ),
                                 ],
                               ),
                             ],
                           ),
-                          const SizedBox(height: 10),
+                          SizedBox(height: 10),
                         ],
                       ),
                     ),

@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
+import '../../utils/theme_context.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 import '../../providers/quiz_provider.dart';
 import '../../providers/auth_provider.dart';
-import '../../constants/app_colors.dart';
 import 'quiz_page.dart';
 
 class QuizSessionListPage extends StatefulWidget {
@@ -39,12 +39,12 @@ class _QuizSessionListPageState extends State<QuizSessionListPage> {
       barrierDismissible: false,
       builder: (ctx) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        content: const Column(
+        content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             SizedBox(height: 16),
             CircularProgressIndicator(
-              valueColor: AlwaysStoppedAnimation<Color>(AppColors.primaryGradientStart),
+              valueColor: AlwaysStoppedAnimation<Color>(context.colors.primaryGradientStart),
             ),
             SizedBox(height: 24),
             Text(
@@ -52,7 +52,7 @@ class _QuizSessionListPageState extends State<QuizSessionListPage> {
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontWeight: FontWeight.w600,
-                color: AppColors.textPrimary,
+                color: context.colors.textPrimary,
               ),
             ),
             SizedBox(height: 8),
@@ -61,7 +61,7 @@ class _QuizSessionListPageState extends State<QuizSessionListPage> {
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 13,
-                color: AppColors.textSecondary,
+                color: context.colors.textSecondary,
               ),
             ),
             SizedBox(height: 8),
@@ -96,21 +96,21 @@ class _QuizSessionListPageState extends State<QuizSessionListPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: context.colors.bgGradientStart,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
         centerTitle: true,
-        title: const Text(
+        title: Text(
           'Daftar Sesi Kuis',
           style: TextStyle(
-            color: AppColors.textPrimary,
+            color: context.colors.textPrimary,
             fontSize: 18,
             fontWeight: FontWeight.bold,
           ),
         ),
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new_rounded, color: AppColors.textPrimary, size: 20),
+          icon: Icon(Icons.arrow_back_ios_new_rounded, color: context.colors.textPrimary, size: 20),
           onPressed: () => Navigator.pop(context),
         ),
       ),
@@ -118,7 +118,7 @@ class _QuizSessionListPageState extends State<QuizSessionListPage> {
         children: [
           Container(
             padding: const EdgeInsets.all(20),
-            color: AppColors.primaryGradientStart.withAlpha(12),
+            color: context.colors.primaryGradientStart.withAlpha(12),
             child: Row(
               children: [
                 Expanded(
@@ -127,18 +127,18 @@ class _QuizSessionListPageState extends State<QuizSessionListPage> {
                     children: [
                       Text(
                         widget.materialTitle,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
-                          color: AppColors.primaryGradientStart,
+                          color: context.colors.primaryGradientStart,
                         ),
                       ),
-                      const SizedBox(height: 4),
-                      const Text(
+                      SizedBox(height: 4),
+                      Text(
                         'Kamu bisa mengulang atau membuat kuis baru tanpa batas untuk sesi lama. Kuis baru dibatasi 5 per hari.',
                         style: TextStyle(
                           fontSize: 12,
-                          color: AppColors.textSecondary,
+                          color: context.colors.textSecondary,
                         ),
                       ),
                     ],
@@ -151,9 +151,9 @@ class _QuizSessionListPageState extends State<QuizSessionListPage> {
             child: Consumer<QuizProvider>(
               builder: (context, provider, child) {
                 if (provider.isLoading && provider.sessions.isEmpty) {
-                  return const Center(
+                  return Center(
                     child: CircularProgressIndicator(
-                      valueColor: AlwaysStoppedAnimation<Color>(AppColors.primaryGradientStart),
+                      valueColor: AlwaysStoppedAnimation<Color>(context.colors.primaryGradientStart),
                     ),
                   );
                 }
@@ -165,7 +165,7 @@ class _QuizSessionListPageState extends State<QuizSessionListPage> {
                       child: Text(
                         provider.errorMessage!,
                         textAlign: TextAlign.center,
-                        style: const TextStyle(color: Colors.redAccent),
+                        style: TextStyle(color: Colors.redAccent),
                       ),
                     ),
                   );
@@ -181,11 +181,11 @@ class _QuizSessionListPageState extends State<QuizSessionListPage> {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Icon(Icons.quiz_outlined, size: 80, color: Colors.grey.shade300),
-                        const SizedBox(height: 16),
-                        const Text(
+                        Icon(Icons.quiz_outlined, size: 80, color: context.colors.textSecondary.withAlpha(80)),
+                        SizedBox(height: 16),
+                        Text(
                           'Belum ada sesi kuis.',
-                          style: TextStyle(color: AppColors.textSecondary),
+                          style: TextStyle(color: context.colors.textSecondary),
                         ),
                       ],
                     ),
@@ -196,7 +196,7 @@ class _QuizSessionListPageState extends State<QuizSessionListPage> {
                   padding: const EdgeInsets.all(20),
                   physics: const BouncingScrollPhysics(),
                   itemCount: materialSessions.length,
-                  separatorBuilder: (context, index) => const SizedBox(height: 12),
+                  separatorBuilder: (context, index) => SizedBox(height: 12),
                   itemBuilder: (context, index) {
                     final session = materialSessions[index];
                     final dateStr = DateFormat('dd MMM yyyy, HH:mm').format(session.createdAt);
@@ -217,9 +217,9 @@ class _QuizSessionListPageState extends State<QuizSessionListPage> {
                       child: Container(
                         padding: const EdgeInsets.all(16),
                         decoration: BoxDecoration(
-                          color: Colors.white,
+                          color: context.colors.cardBg,
                           borderRadius: BorderRadius.circular(16),
-                          border: Border.all(color: Colors.grey.shade200),
+                          border: Border.all(color: context.colors.textPrimary.withAlpha(20)),
                         ),
                         child: Row(
                           children: [
@@ -236,7 +236,7 @@ class _QuizSessionListPageState extends State<QuizSessionListPage> {
                                 color: session.completed ? Colors.green : Colors.orange,
                               ),
                             ),
-                            const SizedBox(width: 16),
+                            SizedBox(width: 16),
                             Expanded(
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -246,23 +246,23 @@ class _QuizSessionListPageState extends State<QuizSessionListPage> {
                                     style: TextStyle(
                                       fontSize: 16,
                                       fontWeight: FontWeight.bold,
-                                      color: session.completed ? AppColors.textPrimary : Colors.orange,
+                                      color: session.completed ? context.colors.textPrimary : Colors.orange,
                                     ),
                                   ),
-                                  const SizedBox(height: 4),
+                                  SizedBox(height: 4),
                                   Text(
                                     dateStr,
-                                    style: const TextStyle(
+                                    style: TextStyle(
                                       fontSize: 13,
-                                      color: AppColors.textSecondary,
+                                      color: context.colors.textSecondary,
                                     ),
                                   ),
                                 ],
                               ),
                             ),
-                            const Icon(
+                            Icon(
                               Icons.arrow_forward_ios_rounded,
-                              color: Colors.grey,
+                              color: context.colors.textSecondary,
                               size: 16,
                             ),
                           ],
@@ -277,10 +277,10 @@ class _QuizSessionListPageState extends State<QuizSessionListPage> {
           Container(
             padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: context.colors.cardBg,
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.05),
+                  color: context.colors.glassShadow,
                   blurRadius: 10,
                   offset: const Offset(0, -5),
                 ),
@@ -292,15 +292,15 @@ class _QuizSessionListPageState extends State<QuizSessionListPage> {
                 height: 56,
                 child: ElevatedButton.icon(
                   onPressed: () => _generateNewSession(context),
-                  icon: const Icon(Icons.add_task_rounded, color: Colors.white),
+                  icon: Icon(Icons.add_task_rounded, color: Colors.white),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.primaryGradientStart,
+                    backgroundColor: context.colors.primaryGradientStart,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(16),
                     ),
                     elevation: 0,
                   ),
-                  label: const Text(
+                  label: Text(
                     'Generate Quiz Baru',
                     style: TextStyle(
                       fontSize: 16,

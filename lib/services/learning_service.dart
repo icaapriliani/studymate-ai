@@ -618,8 +618,8 @@ Sistem Inferensi Fuzzy Mamdani memetakan input tegas sensor menjadi keputusan te
       });
 
       // Modules for Material 3
-      final m1_3Ref_mod = mat3Ref.collection('modules').doc('statistics_prob_m1');
-      batch.set(m1_3Ref_mod, {
+      final m13refMod = mat3Ref.collection('modules').doc('statistics_prob_m1');
+      batch.set(m13refMod, {
         'title': 'Statistika Deskriptif: Pemusatan & Sebaran Data',
         'content': r'''# Statistika Deskriptif: Pemusatan & Sebaran Data
 
@@ -662,8 +662,8 @@ Statistika Deskriptif merangkum kompleksitas data melalui ukuran pemusatan (mean
         'createdAt': now,
       });
 
-      final m2_3Ref_mod = mat3Ref.collection('modules').doc('statistics_prob_m2');
-      batch.set(m2_3Ref_mod, {
+      final m23refMod = mat3Ref.collection('modules').doc('statistics_prob_m2');
+      batch.set(m23refMod, {
         'title': 'Teori Peluang & Pembuktian Teorema Bayes',
         'content': r'''# Teori Peluang & Pembuktian Teorema Bayes
 
@@ -715,8 +715,8 @@ Teorema Bayes adalah hukum probabilitas yang sangat kuat untuk memperbarui estim
         'createdAt': now,
       });
 
-      final m3_3Ref_mod = mat3Ref.collection('modules').doc('statistics_prob_m3');
-      batch.set(m3_3Ref_mod, {
+      final m33refMod = mat3Ref.collection('modules').doc('statistics_prob_m3');
+      batch.set(m33refMod, {
         'title': 'Distribusi Normal (Gauss) & Aturan Empiris 68-95-99.7',
         'content': r'''# Distribusi Normal (Gauss) & Aturan Empiris 68-95-99.7
 
@@ -755,8 +755,8 @@ Distribusi Normal adalah distribusi kontinu simetris berbentuk lonceng yang meng
         'createdAt': now,
       });
 
-      final m3_4Ref_mod = mat3Ref.collection('modules').doc('statistics_prob_m4');
-      batch.set(m3_4Ref_mod, {
+      final m34refMod = mat3Ref.collection('modules').doc('statistics_prob_m4');
+      batch.set(m34refMod, {
         'title': 'Metodologi Uji Hipotesis & Signifikansi P-Value',
         'content': r'''# Metodologi Uji Hipotesis & Signifikansi P-Value
 
@@ -820,8 +820,8 @@ Metodologi Uji Hipotesis merumuskan klaim ilmiah ke dalam hipotesis nol (H0) dan
       });
 
       // Modules for Material 4
-      final m4_1Ref_mod = mat4Ref.collection('modules').doc('academic_english_m1');
-      batch.set(m4_1Ref_mod, {
+      final m41refMod = mat4Ref.collection('modules').doc('academic_english_m1');
+      batch.set(m41refMod, {
         'title': 'Strategi Membaca Kritis & Evaluasi Jurnal Ilmiah (SQ3R)',
         'content': r'''# Strategi Membaca Kritis & Evaluasi Jurnal Ilmiah (SQ3R)
 
@@ -858,8 +858,8 @@ Strategi membaca kritis melalui metode SQ3R mengubah proses membaca pasif menjad
         'createdAt': now,
       });
 
-      final m4_2Ref_mod = mat4Ref.collection('modules').doc('academic_english_m2');
-      batch.set(m4_2Ref_mod, {
+      final m42refMod = mat4Ref.collection('modules').doc('academic_english_m2');
+      batch.set(m42refMod, {
         'title': 'Merumuskan Thesis Statement yang Kuat & Terstruktur',
         'content': r'''# Merumuskan Thesis Statement yang Kuat & Terstruktur
 
@@ -895,8 +895,8 @@ Kalimat kedua sangat kuat karena secara eksplisit menyatakan posisi penulis (mem
         'createdAt': now,
       });
 
-      final m4_3Ref_mod = mat4Ref.collection('modules').doc('academic_english_m3');
-      batch.set(m4_3Ref_mod, {
+      final m43refMod = mat4Ref.collection('modules').doc('academic_english_m3');
+      batch.set(m43refMod, {
         'title': 'Struktur Paragraf Akademik Terintegrasi (Metode PEEL)',
         'content': r'''# Struktur Paragraf Akademik Terintegrasi (Metode PEEL)
 
@@ -938,8 +938,8 @@ Metode PEEL menyediakan panduan praktis yang luar biasa bagi mahasiswa untuk mer
         'createdAt': now,
       });
 
-      final m4_4Ref_mod = mat4Ref.collection('modules').doc('academic_english_m4');
-      batch.set(m4_4Ref_mod, {
+      final m44refMod = mat4Ref.collection('modules').doc('academic_english_m4');
+      batch.set(m44refMod, {
         'title': 'Etika Sitasi Ilmiah APA Edisi ke-7 & Pencegahan Plagiarisme',
         'content': r'''# Etika Sitasi Ilmiah APA Edisi ke-7 & Pencegahan Plagiarisme
 

@@ -2,11 +2,11 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
-import '../../constants/app_colors.dart';
 import '../../models/chat_model.dart';
 import '../../providers/ai_chat_provider.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/statistics_provider.dart';
+import '../../utils/theme_context.dart';
 
 class AITutorPage extends StatefulWidget {
   final bool showBackButton;
@@ -142,11 +142,11 @@ class _AITutorPageState extends State<AITutorPage> {
       body: Container(
         width: double.infinity,
         height: double.infinity,
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           gradient: LinearGradient(
             colors: [
-              AppColors.bgGradientStart,
-              AppColors.bgGradientEnd,
+              context.colors.bgGradientStart,
+              context.colors.bgGradientEnd,
             ],
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
@@ -184,10 +184,10 @@ class _AITutorPageState extends State<AITutorPage> {
         vertical: 12.0,
       ),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.4),
-        border: const Border(
+        color: context.colors.glassBg,
+        border: Border(
           bottom: BorderSide(
-            color: AppColors.glassBorder,
+            color: context.colors.glassBorder,
             width: 1.5,
           ),
         ),
@@ -197,10 +197,10 @@ class _AITutorPageState extends State<AITutorPage> {
           // Back button
           if (widget.showBackButton) ...[
             IconButton(
-              icon: const Icon(Icons.arrow_back_ios_new_rounded, color: AppColors.textPrimary),
+              icon: Icon(Icons.arrow_back_ios_new_rounded, color: context.colors.textPrimary),
               onPressed: () => Navigator.of(context).pop(),
             ),
-            const SizedBox(width: 8),
+            SizedBox(width: 8),
           ],
 
           // Custom Painted AI Avatar with glowing border
@@ -209,23 +209,26 @@ class _AITutorPageState extends State<AITutorPage> {
             height: 44,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              color: Colors.white.withOpacity(0.6),
-              border: Border.all(color: Colors.white, width: 1.5),
-              boxShadow: const [
+              color: context.colors.cardBg.withOpacity(0.6),
+              border: Border.all(color: context.colors.glassBorder, width: 1.5),
+              boxShadow: [
                 BoxShadow(
-                  color: AppColors.glassShadow,
+                  color: context.colors.glassShadow,
                   blurRadius: 8,
-                  offset: Offset(0, 2),
+                  offset: const Offset(0, 2),
                 ),
               ],
             ),
             child: ClipOval(
               child: CustomPaint(
-                painter: _AITutorLogoPainter(),
+                painter: _AITutorLogoPainter(
+                  startColor: context.colors.primaryGradientStart,
+                  endColor: context.colors.primaryGradientEnd,
+                ),
               ),
             ),
           ),
-          const SizedBox(width: 12),
+          SizedBox(width: 12),
 
           // Name and real-time typing status
           Expanded(
@@ -238,11 +241,11 @@ class _AITutorPageState extends State<AITutorPage> {
                   style: TextStyle(
                     fontSize: isTablet ? 18.0 : 15.0,
                     fontWeight: FontWeight.w800,
-                    color: AppColors.textPrimary,
+                    color: context.colors.textPrimary,
                     letterSpacing: -0.2,
                   ),
                 ),
-                const SizedBox(height: 2),
+                SizedBox(height: 2),
                 Row(
                   children: [
                     Container(
@@ -253,12 +256,12 @@ class _AITutorPageState extends State<AITutorPage> {
                         shape: BoxShape.circle,
                       ),
                     ),
-                    const SizedBox(width: 6),
+                    SizedBox(width: 6),
                     Text(
                       provider.isLoading ? 'Sedang mengetik...' : 'Aktif & Siap Membantu',
                       style: TextStyle(
                         fontSize: isTablet ? 12.0 : 10.5,
-                        color: AppColors.textSecondary,
+                        color: context.colors.textSecondary,
                         fontWeight: FontWeight.w600,
                       ),
                     ),
@@ -270,7 +273,7 @@ class _AITutorPageState extends State<AITutorPage> {
 
           // History / Drawer button
           IconButton(
-            icon: const Icon(Icons.history_rounded, color: AppColors.textSecondary),
+            icon: Icon(Icons.history_rounded, color: context.colors.textSecondary),
             tooltip: 'Riwayat Obrolan',
             onPressed: () {
               _scaffoldKey.currentState?.openDrawer();
@@ -293,14 +296,14 @@ class _AITutorPageState extends State<AITutorPage> {
             Container(
               padding: const EdgeInsets.all(24.0),
               decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.5),
+                color: context.colors.cardBg.withOpacity(0.5),
                 shape: BoxShape.circle,
-                border: Border.all(color: Colors.white, width: 2),
-                boxShadow: const [
+                border: Border.all(color: context.colors.glassBorder, width: 2),
+                boxShadow: [
                   BoxShadow(
-                    color: AppColors.glassShadow,
+                    color: context.colors.glassShadow,
                     blurRadius: 20,
-                    offset: Offset(0, 10),
+                    offset: const Offset(0, 10),
                   ),
                 ],
               ),
@@ -308,11 +311,14 @@ class _AITutorPageState extends State<AITutorPage> {
                 width: isTablet ? 80 : 60,
                 height: isTablet ? 80 : 60,
                 child: CustomPaint(
-                  painter: _AITutorLogoPainter(),
+                  painter: _AITutorLogoPainter(
+                    startColor: context.colors.primaryGradientStart,
+                    endColor: context.colors.primaryGradientEnd,
+                  ),
                 ),
               ),
             ),
-            const SizedBox(height: 24),
+            SizedBox(height: 24),
 
             // Welcome Text
             Text(
@@ -321,10 +327,10 @@ class _AITutorPageState extends State<AITutorPage> {
               style: TextStyle(
                 fontSize: isTablet ? 26.0 : 20.0,
                 fontWeight: FontWeight.w800,
-                color: AppColors.textPrimary,
+                color: context.colors.textPrimary,
               ),
             ),
-            const SizedBox(height: 12),
+            SizedBox(height: 12),
             Text(
               'Tanyakan apa saja seputar materi pelajaran, tugas, '
               'atau minta penjelasan konsep yang sulit dipahami. '
@@ -332,16 +338,16 @@ class _AITutorPageState extends State<AITutorPage> {
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: isTablet ? 16.0 : 13.5,
-                color: AppColors.textSecondary,
+                color: context.colors.textSecondary,
                 height: 1.4,
                 fontWeight: FontWeight.w500,
               ),
             ),
-            const SizedBox(height: 32),
+            SizedBox(height: 32),
 
             // Pre-made quick action helper prompts
             _buildQuickPromptCard('💡 Jelaskan konsep fotosintesis secara ringkas.', isTablet),
-            const SizedBox(height: 12),
+            SizedBox(height: 12),
             _buildQuickPromptCard('✍️ Bantu saya membuat kerangka karangan esai.', isTablet),
           ],
         ),
@@ -360,14 +366,14 @@ class _AITutorPageState extends State<AITutorPage> {
         constraints: const BoxConstraints(maxWidth: 400),
         padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 14.0),
         decoration: BoxDecoration(
-          color: Colors.white.withOpacity(0.7),
+          color: context.colors.cardBg.withOpacity(0.7),
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: Colors.white, width: 1),
-          boxShadow: const [
+          border: Border.all(color: context.colors.glassBorder, width: 1),
+          boxShadow: [
             BoxShadow(
-              color: AppColors.glassShadow,
+              color: context.colors.glassShadow,
               blurRadius: 8,
-              offset: Offset(0, 2),
+              offset: const Offset(0, 2),
             ),
           ],
         ),
@@ -378,15 +384,15 @@ class _AITutorPageState extends State<AITutorPage> {
                 promptText,
                 style: TextStyle(
                   fontSize: isTablet ? 14.0 : 12.5,
-                  color: AppColors.textPrimary,
+                  color: context.colors.textPrimary,
                   fontWeight: FontWeight.w600,
                 ),
               ),
             ),
-            const SizedBox(width: 8),
-            const Icon(
+            SizedBox(width: 8),
+            Icon(
               Icons.chevron_right_rounded,
-              color: AppColors.textSecondary,
+              color: context.colors.textSecondary,
               size: 20,
             ),
           ],
@@ -404,32 +410,32 @@ class _AITutorPageState extends State<AITutorPage> {
           Container(
             padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.5),
+              color: context.colors.cardBg.withOpacity(0.5),
               shape: BoxShape.circle,
-              border: Border.all(color: Colors.white, width: 1.5),
-              boxShadow: const [
+              border: Border.all(color: context.colors.glassBorder, width: 1.5),
+              boxShadow: [
                 BoxShadow(
-                  color: AppColors.glassShadow,
+                  color: context.colors.glassShadow,
                   blurRadius: 15,
-                  offset: Offset(0, 5),
+                  offset: const Offset(0, 5),
                 ),
               ],
             ),
-            child: const SizedBox(
+            child: SizedBox(
               width: 40,
               height: 40,
               child: CircularProgressIndicator(
                 strokeWidth: 3.5,
-                valueColor: AlwaysStoppedAnimation<Color>(AppColors.primaryGradientStart),
+                valueColor: AlwaysStoppedAnimation<Color>(context.colors.primaryGradientStart),
               ),
             ),
           ),
-          const SizedBox(height: 16),
-          const Text(
+          SizedBox(height: 16),
+          Text(
             'Memuat riwayat percakapan...',
             style: TextStyle(
               fontSize: 14,
-              color: AppColors.textSecondary,
+              color: context.colors.textSecondary,
               fontWeight: FontWeight.w600,
             ),
           ),
@@ -445,11 +451,11 @@ class _AITutorPageState extends State<AITutorPage> {
 
     return Drawer(
       child: Container(
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           gradient: LinearGradient(
             colors: [
-              AppColors.bgGradientStart,
-              AppColors.bgGradientEnd,
+              context.colors.bgGradientStart,
+              context.colors.bgGradientEnd,
             ],
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
@@ -462,29 +468,29 @@ class _AITutorPageState extends State<AITutorPage> {
               Container(
                 padding: const EdgeInsets.all(16.0),
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.4),
-                  border: const Border(
-                    bottom: BorderSide(color: AppColors.glassBorder, width: 1.5),
+                  color: context.colors.cardBg.withOpacity(0.4),
+                  border: Border(
+                    bottom: BorderSide(color: context.colors.glassBorder, width: 1.5),
                   ),
                 ),
                 child: Row(
                   children: [
                     CircleAvatar(
                       radius: 22,
-                      backgroundColor: AppColors.primaryGradientStart.withOpacity(0.2),
+                      backgroundColor: context.colors.primaryGradientStart.withOpacity(0.2),
                       backgroundImage: user.photoUrl.isNotEmpty ? NetworkImage(user.photoUrl) : null,
                       child: user.photoUrl.isEmpty
                           ? Text(
                               user.displayName.isNotEmpty ? user.displayName[0].toUpperCase() : 'U',
-                              style: const TextStyle(
-                                color: AppColors.primaryGradientStart,
+                              style: TextStyle(
+                                color: context.colors.primaryGradientStart,
                                 fontWeight: FontWeight.bold,
                                 fontSize: 18,
                               ),
                             )
                           : null,
                     ),
-                    const SizedBox(width: 12),
+                    SizedBox(width: 12),
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -493,20 +499,20 @@ class _AITutorPageState extends State<AITutorPage> {
                             user.displayName.isNotEmpty ? user.displayName : 'Pengguna StudyMate',
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 14.5,
                               fontWeight: FontWeight.w800,
-                              color: AppColors.textPrimary,
+                              color: context.colors.textPrimary,
                             ),
                           ),
-                          const SizedBox(height: 2),
+                          SizedBox(height: 2),
                           Text(
                             user.email.isNotEmpty ? user.email : 'Email tidak terdaftar',
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 11.5,
-                              color: AppColors.textSecondary,
+                              color: context.colors.textSecondary,
                               fontWeight: FontWeight.w500,
                             ),
                           ),
@@ -529,21 +535,21 @@ class _AITutorPageState extends State<AITutorPage> {
                     width: double.infinity,
                     padding: const EdgeInsets.symmetric(vertical: 12.0),
                     decoration: BoxDecoration(
-                      gradient: const LinearGradient(
-                        colors: [AppColors.primaryGradientStart, AppColors.primaryGradientEnd],
+                      gradient: LinearGradient(
+                        colors: [context.colors.primaryGradientStart, context.colors.primaryGradientEnd],
                         begin: Alignment.topLeft,
                         end: Alignment.bottomRight,
                       ),
                       borderRadius: BorderRadius.circular(14),
                       boxShadow: [
                         BoxShadow(
-                          color: AppColors.primaryGradientStart.withOpacity(0.25),
+                          color: context.colors.primaryGradientStart.withOpacity(0.25),
                           blurRadius: 8,
                           offset: const Offset(0, 3),
                         ),
                       ],
                     ),
-                    child: const Row(
+                    child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Icon(Icons.add_rounded, color: Colors.white, size: 20),
@@ -567,32 +573,32 @@ class _AITutorPageState extends State<AITutorPage> {
                 padding: const EdgeInsets.symmetric(horizontal: 18.0, vertical: 4.0),
                 child: Row(
                   children: [
-                    const Icon(Icons.history_rounded, size: 16, color: AppColors.textSecondary),
-                    const SizedBox(width: 6),
+                    Icon(Icons.history_rounded, size: 16, color: context.colors.textSecondary),
+                    SizedBox(width: 6),
                     Text(
                       'RIWAYAT PERCAKAPAN',
                       style: TextStyle(
                         fontSize: 10,
                         fontWeight: FontWeight.w800,
-                        color: AppColors.textSecondary,
+                        color: context.colors.textSecondary,
                         letterSpacing: 0.8,
                       ),
                     ),
                   ],
                 ),
               ),
-              const SizedBox(height: 4),
+              SizedBox(height: 4),
 
               // Conversations List
               Expanded(
                 child: chatProvider.isHistoryLoading
-                    ? const Center(
+                    ? Center(
                         child: SizedBox(
                           width: 28,
                           height: 28,
                           child: CircularProgressIndicator(
                             strokeWidth: 2.5,
-                            valueColor: AlwaysStoppedAnimation<Color>(AppColors.primaryGradientStart),
+                            valueColor: AlwaysStoppedAnimation<Color>(context.colors.primaryGradientStart),
                           ),
                         ),
                       )
@@ -605,7 +611,7 @@ class _AITutorPageState extends State<AITutorPage> {
                                 textAlign: TextAlign.center,
                                 style: TextStyle(
                                   fontSize: 12.5,
-                                  color: AppColors.textSecondary,
+                                  color: context.colors.textSecondary,
                                   fontWeight: FontWeight.w600,
                                 ),
                               ),
@@ -623,11 +629,11 @@ class _AITutorPageState extends State<AITutorPage> {
                                 child: Container(
                                   decoration: BoxDecoration(
                                     color: isActive
-                                        ? Colors.white.withOpacity(0.8)
+                                        ? context.colors.cardBg.withOpacity(0.8)
                                         : Colors.transparent,
                                     borderRadius: BorderRadius.circular(12),
                                     border: isActive
-                                        ? Border.all(color: Colors.white, width: 1)
+                                        ? Border.all(color: context.colors.glassBorder, width: 1)
                                         : null,
                                   ),
                                   child: ListTile(
@@ -637,8 +643,8 @@ class _AITutorPageState extends State<AITutorPage> {
                                       Icons.chat_bubble_outline_rounded,
                                       size: 18,
                                       color: isActive
-                                          ? AppColors.primaryGradientStart
-                                          : AppColors.textSecondary,
+                                          ? context.colors.primaryGradientStart
+                                          : context.colors.textSecondary,
                                     ),
                                     title: Text(
                                       conv.title,
@@ -648,12 +654,12 @@ class _AITutorPageState extends State<AITutorPage> {
                                         fontSize: 13,
                                         fontWeight: isActive ? FontWeight.bold : FontWeight.w600,
                                         color: isActive
-                                            ? AppColors.textPrimary
-                                            : AppColors.textSecondary,
+                                            ? context.colors.textPrimary
+                                            : context.colors.textSecondary,
                                       ),
                                     ),
                                     trailing: IconButton(
-                                      icon: const Icon(Icons.delete_outline_rounded, size: 18),
+                                      icon: Icon(Icons.delete_outline_rounded, size: 18),
                                       color: Colors.redAccent.withOpacity(0.7),
                                       onPressed: () => _showDeleteConversationDialog(context, chatProvider, conv.id),
                                     ),
@@ -682,19 +688,19 @@ class _AITutorPageState extends State<AITutorPage> {
       context: context,
       builder: (context) {
         return AlertDialog(
-          backgroundColor: Colors.white,
+          backgroundColor: Theme.of(context).dialogTheme.backgroundColor,
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-          title: const Text(
+          title: Text(
             'Hapus Obrolan Ini?',
             style: TextStyle(
-              color: AppColors.textPrimary,
+              color: context.colors.textPrimary,
               fontWeight: FontWeight.w800,
             ),
           ),
-          content: const Text(
+          content: Text(
             'Percakapan ini dan seluruh pesannya akan dihapus secara permanen dari riwayat obrolan Anda.',
             style: TextStyle(
-              color: AppColors.textSecondary,
+              color: context.colors.textSecondary,
               fontSize: 14,
               height: 1.3,
             ),
@@ -702,10 +708,10 @@ class _AITutorPageState extends State<AITutorPage> {
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(),
-              child: const Text(
+              child: Text(
                 'Batal',
                 style: TextStyle(
-                  color: AppColors.textSecondary,
+                  color: context.colors.textSecondary,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -717,7 +723,7 @@ class _AITutorPageState extends State<AITutorPage> {
                 Navigator.of(context).pop();
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
-                    content: const Text('Percakapan berhasil dihapus.'),
+                    content: Text('Percakapan berhasil dihapus.'),
                     behavior: SnackBarBehavior.floating,
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
                   ),
@@ -727,7 +733,7 @@ class _AITutorPageState extends State<AITutorPage> {
                 backgroundColor: Colors.redAccent,
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
               ),
-              child: const Text(
+              child: Text(
                 'Hapus',
                 style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
               ),
@@ -774,12 +780,15 @@ class _AITutorPageState extends State<AITutorPage> {
               margin: const EdgeInsets.only(right: 8, bottom: 4),
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: Colors.white.withOpacity(0.6),
-                border: Border.all(color: Colors.white, width: 1),
+                color: context.colors.cardBg.withOpacity(0.6),
+                border: Border.all(color: context.colors.glassBorder, width: 1),
               ),
               child: ClipOval(
                 child: CustomPaint(
-                  painter: _AITutorLogoPainter(),
+                  painter: _AITutorLogoPainter(
+                    startColor: context.colors.primaryGradientStart,
+                    endColor: context.colors.primaryGradientEnd,
+                  ),
                 ),
               ),
             ),
@@ -806,7 +815,7 @@ class _AITutorPageState extends State<AITutorPage> {
                   Clipboard.setData(ClipboardData(text: message.text));
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
-                      content: const Text('Teks pesan berhasil disalin ke papan klip.'),
+                      content: Text('Teks pesan berhasil disalin ke papan klip.'),
                       duration: const Duration(seconds: 2),
                       behavior: SnackBarBehavior.floating,
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
@@ -817,13 +826,13 @@ class _AITutorPageState extends State<AITutorPage> {
                   padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
                   decoration: BoxDecoration(
                     gradient: isUser
-                        ? const LinearGradient(
-                            colors: [AppColors.primaryGradientStart, AppColors.primaryGradientEnd],
+                        ? LinearGradient(
+                            colors: [context.colors.primaryGradientStart, context.colors.primaryGradientEnd],
                             begin: Alignment.topLeft,
                             end: Alignment.bottomRight,
                           )
                         : null,
-                    color: isUser ? null : Colors.white.withOpacity(0.85),
+                    color: isUser ? null : context.colors.cardBg.withOpacity(0.85),
                     borderRadius: BorderRadius.only(
                       topLeft: const Radius.circular(20),
                       topRight: const Radius.circular(20),
@@ -832,12 +841,12 @@ class _AITutorPageState extends State<AITutorPage> {
                     ),
                     border: isUser
                         ? null
-                        : Border.all(color: Colors.white, width: 1),
+                        : Border.all(color: context.colors.glassBorder, width: 1),
                     boxShadow: [
                       BoxShadow(
                         color: isUser
-                            ? AppColors.primaryGradientStart.withOpacity(0.15)
-                            : AppColors.glassShadow,
+                            ? context.colors.primaryGradientStart.withOpacity(0.15)
+                            : context.colors.glassShadow,
                         blurRadius: 10,
                         offset: const Offset(0, 4),
                       ),
@@ -846,7 +855,7 @@ class _AITutorPageState extends State<AITutorPage> {
                   child: Text(
                     message.text,
                     style: TextStyle(
-                      color: isUser ? Colors.white : AppColors.textPrimary,
+                      color: isUser ? Colors.white : context.colors.textPrimary,
                       fontSize: 14.5,
                       fontWeight: isUser ? FontWeight.w600 : FontWeight.w500,
                       height: 1.4,
@@ -875,35 +884,40 @@ class _AITutorPageState extends State<AITutorPage> {
             margin: const EdgeInsets.only(right: 8, bottom: 4),
             decoration: BoxDecoration(
               shape: BoxShape.circle,
-              color: Colors.white.withOpacity(0.6),
-              border: Border.all(color: Colors.white, width: 1),
+              color: context.colors.cardBg.withOpacity(0.6),
+              border: Border.all(color: context.colors.glassBorder, width: 1),
             ),
             child: ClipOval(
               child: CustomPaint(
-                painter: _AITutorLogoPainter(),
+                painter: _AITutorLogoPainter(
+                  startColor: context.colors.primaryGradientStart,
+                  endColor: context.colors.primaryGradientEnd,
+                ),
               ),
             ),
           ),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 16.0),
             decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.85),
-              borderRadius: const BorderRadius.only(
+              color: context.colors.cardBg.withOpacity(0.85),
+              borderRadius: BorderRadius.only(
                 topLeft: Radius.circular(20),
                 topRight: Radius.circular(20),
                 bottomLeft: Radius.circular(4),
                 bottomRight: Radius.circular(20),
               ),
-              border: Border.all(color: Colors.white, width: 1),
-              boxShadow: const [
+              border: Border.all(color: context.colors.glassBorder, width: 1),
+              boxShadow: [
                 BoxShadow(
-                  color: AppColors.glassShadow,
+                  color: context.colors.glassShadow,
                   blurRadius: 10,
-                  offset: Offset(0, 4),
+                  offset: const Offset(0, 4),
                 ),
               ],
             ),
-            child: const _TypingIndicator(),
+            child: _TypingIndicator(
+              dotColor: context.colors.textSecondary,
+            ),
           ),
         ],
       ),
@@ -920,10 +934,10 @@ class _AITutorPageState extends State<AITutorPage> {
         bottom: 12.0 + widget.bottomPadding,
       ),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.35),
-        border: const Border(
+        color: context.colors.glassBg,
+        border: Border(
           top: BorderSide(
-            color: AppColors.glassBorder,
+            color: context.colors.glassBorder,
             width: 1.5,
           ),
         ),
@@ -935,14 +949,14 @@ class _AITutorPageState extends State<AITutorPage> {
           Expanded(
             child: Container(
               decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.8),
+                color: context.colors.cardBg.withOpacity(0.8),
                 borderRadius: BorderRadius.circular(24),
-                border: Border.all(color: Colors.white, width: 1.5),
-                boxShadow: const [
+                border: Border.all(color: context.colors.glassBorder, width: 1.5),
+                boxShadow: [
                   BoxShadow(
-                    color: AppColors.glassShadow,
+                    color: context.colors.glassShadow,
                     blurRadius: 8,
-                    offset: Offset(0, 2),
+                    offset: const Offset(0, 2),
                   ),
                 ],
               ),
@@ -951,15 +965,15 @@ class _AITutorPageState extends State<AITutorPage> {
                 minLines: 1,
                 maxLines: 5,
                 keyboardType: TextInputType.multiline,
-                style: const TextStyle(
-                  color: AppColors.textPrimary,
+                style: TextStyle(
+                  color: context.colors.textPrimary,
                   fontSize: 14.5,
                   fontWeight: FontWeight.w500,
                 ),
                 decoration: InputDecoration(
                   hintText: 'Tanya apa saja kepada StudyMate AI...',
-                  hintStyle: const TextStyle(
-                    color: AppColors.textLight,
+                  hintStyle: TextStyle(
+                    color: context.colors.textLight,
                     fontSize: 14.0,
                     fontWeight: FontWeight.w500,
                   ),
@@ -972,7 +986,7 @@ class _AITutorPageState extends State<AITutorPage> {
               ),
             ),
           ),
-          const SizedBox(width: 10),
+          SizedBox(width: 10),
 
           // Send message action button
           GestureDetector(
@@ -984,17 +998,17 @@ class _AITutorPageState extends State<AITutorPage> {
                 shape: BoxShape.circle,
                 gradient: provider.isLoading
                     ? null
-                    : const LinearGradient(
-                        colors: [AppColors.primaryGradientStart, AppColors.primaryGradientEnd],
+                    : LinearGradient(
+                        colors: [context.colors.primaryGradientStart, context.colors.primaryGradientEnd],
                         begin: Alignment.topLeft,
                         end: Alignment.bottomRight,
                       ),
-                color: provider.isLoading ? Colors.white.withOpacity(0.4) : null,
+                color: provider.isLoading ? context.colors.cardBg.withOpacity(0.4) : null,
                 boxShadow: provider.isLoading
                     ? null
                     : [
                         BoxShadow(
-                          color: AppColors.primaryGradientStart.withOpacity(0.25),
+                          color: context.colors.primaryGradientStart.withOpacity(0.25),
                           blurRadius: 10,
                           offset: const Offset(0, 4),
                         ),
@@ -1002,7 +1016,7 @@ class _AITutorPageState extends State<AITutorPage> {
               ),
               child: Icon(
                 Icons.send_rounded,
-                color: provider.isLoading ? AppColors.textLight : Colors.white,
+                color: provider.isLoading ? context.colors.textLight : Colors.white,
                 size: 20,
               ),
             ),
@@ -1010,11 +1024,13 @@ class _AITutorPageState extends State<AITutorPage> {
         ],
       ),
     );
-  }}
+  }
+}
 
 /// A premium, custom-pulsing typing indicator representing real-time thoughts.
 class _TypingIndicator extends StatefulWidget {
-  const _TypingIndicator();
+  final Color dotColor;
+  const _TypingIndicator({required this.dotColor});
 
   @override
   State<_TypingIndicator> createState() => _TypingIndicatorState();
@@ -1057,8 +1073,8 @@ class _TypingIndicatorState extends State<_TypingIndicator>
                 margin: const EdgeInsets.symmetric(horizontal: 2.5),
                 width: 6.5,
                 height: 6.5,
-                decoration: const BoxDecoration(
-                  color: AppColors.textSecondary,
+                decoration: BoxDecoration(
+                  color: widget.dotColor,
                   shape: BoxShape.circle,
                 ),
               ),
@@ -1072,11 +1088,19 @@ class _TypingIndicatorState extends State<_TypingIndicator>
 
 /// A custom-painted modern AI logo shape optimized for avatar representations
 class _AITutorLogoPainter extends CustomPainter {
+  final Color startColor;
+  final Color endColor;
+
+  _AITutorLogoPainter({
+    required this.startColor,
+    required this.endColor,
+  });
+
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
-      ..shader = const LinearGradient(
-        colors: [AppColors.primaryGradientStart, AppColors.primaryGradientEnd],
+      ..shader = LinearGradient(
+        colors: [startColor, endColor],
         begin: Alignment.topCenter,
         end: Alignment.bottomCenter,
       ).createShader(Rect.fromLTWH(0, 0, size.width, size.height))

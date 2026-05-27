@@ -143,9 +143,9 @@ class AuthRepositoryImpl implements AuthRepository {
       
       final updateData = <String, dynamic>{
         if (displayName != null && displayName.isNotEmpty) 'displayName': displayName,
-        if (nim != null) 'nim': nim,
-        if (major != null) 'major': major,
-        if (studyTargetHours != null) 'studyTargetHours': studyTargetHours,
+        'nim': ?nim,
+        'major': ?major,
+        'studyTargetHours': ?studyTargetHours,
         'lastActive': FieldValue.serverTimestamp(),
       };
 

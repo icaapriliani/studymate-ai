@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
+import '../../utils/theme_context.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
-import '../../constants/app_colors.dart';
 import '../../models/material_model.dart';
 import '../../models/module_model.dart';
 import '../../providers/ai_chat_provider.dart';
@@ -68,11 +68,11 @@ class _MaterialDetailPageState extends State<MaterialDetailPage> {
       body: Container(
         width: double.infinity,
         height: double.infinity,
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           gradient: LinearGradient(
             colors: [
-              AppColors.bgGradientStart,
-              AppColors.bgGradientEnd,
+              context.colors.bgGradientStart,
+              context.colors.bgGradientEnd,
             ],
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
@@ -100,21 +100,21 @@ class _MaterialDetailPageState extends State<MaterialDetailPage> {
                         children: [
                           // 2a. Premium Title & Metadata Card
                           _buildTitleCard(mat, isTablet),
-                          const SizedBox(height: 20),
+                          SizedBox(height: 20),
 
                           // 2b. Progress Visual Card
                           _buildProgressVisualCard(mat),
-                          const SizedBox(height: 20),
+                          SizedBox(height: 20),
 
                           // 2c. Complete Description Card
                           _buildSectionTitle('Deskripsi Materi'),
-                          const SizedBox(height: 10),
+                          SizedBox(height: 10),
                           _buildDescriptionCard(mat),
-                          const SizedBox(height: 24),
+                          SizedBox(height: 24),
 
                           // 2c-2. Modul Pembelajaran Checklist
                           _buildSectionTitle('Daftar Modul Pembelajaran'),
-                          const SizedBox(height: 10),
+                          SizedBox(height: 10),
                           if (modules.isEmpty)
                             _buildEmptyModulesCard(mat, learningProvider.isLoading, uid)
                           else
@@ -124,31 +124,31 @@ class _MaterialDetailPageState extends State<MaterialDetailPage> {
                                 return _buildModuleTile(context, mat, mod, isCompleted);
                               }).toList(),
                             ),
-                          const SizedBox(height: 24),
+                          SizedBox(height: 24),
 
                           // 2d. Key Points Summary Panel
                           _buildSectionTitle('Poin Ringkasan Akademik'),
-                          const SizedBox(height: 10),
+                          SizedBox(height: 10),
                           _buildKeyPointsPanel(mat),
-                          const SizedBox(height: 24),
+                          SizedBox(height: 24),
 
                           // 2e. Interactive Sample Questions (Accordion)
                           if (mat.sampleQuestions.isNotEmpty) ...[
                             _buildSectionTitle('Latihan Mandiri & Contoh Soal'),
-                            const SizedBox(height: 4),
+                            SizedBox(height: 4),
                             Text(
                               'Ketuk kartu soal untuk membuka jawaban dan pembahasan',
                               style: TextStyle(
                                 fontSize: 12,
                                 fontWeight: FontWeight.w500,
-                                color: AppColors.textSecondary.withAlpha(200),
+                                color: context.colors.textSecondary.withAlpha(200),
                               ),
                             ),
-                            const SizedBox(height: 10),
+                            SizedBox(height: 10),
                             _buildSampleQuestionsAccordion(mat),
                           ],
 
-                          const SizedBox(height: 100), // Spacing for floating action button
+                          SizedBox(height: 100), // Spacing for floating action button
                         ],
                       ),
                     ),
@@ -172,23 +172,23 @@ class _MaterialDetailPageState extends State<MaterialDetailPage> {
         children: [
           IconButton(
             onPressed: () => Navigator.of(context).pop(),
-            icon: const Icon(
+            icon: Icon(
               Icons.arrow_back_ios_new_rounded,
-              color: AppColors.textPrimary,
+              color: context.colors.textPrimary,
               size: 20,
             ),
           ),
-          const Text(
+          Text(
             'Detail Materi',
             style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.w800,
-              color: AppColors.textPrimary,
+              color: context.colors.textPrimary,
               letterSpacing: -0.2,
             ),
           ),
           // Empty placeholder to balance the back button
-          const SizedBox(width: 48),
+          SizedBox(width: 48),
         ],
       ),
     );
@@ -198,7 +198,7 @@ class _MaterialDetailPageState extends State<MaterialDetailPage> {
     return Container(
       width: double.infinity,
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: context.colors.cardBg,
         borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
@@ -230,22 +230,22 @@ class _MaterialDetailPageState extends State<MaterialDetailPage> {
                 ),
               ),
             ),
-            const SizedBox(height: 12),
+            SizedBox(height: 12),
 
             // Title
             Text(
               mat.title,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.w900,
-                color: AppColors.textPrimary,
+                color: context.colors.textPrimary,
                 height: 1.25,
               ),
             ),
-            const SizedBox(height: 16),
+            SizedBox(height: 16),
 
-            const Divider(color: AppColors.progressTrack, height: 1),
-            const SizedBox(height: 16),
+            Divider(color: context.colors.progressTrack, height: 1),
+            SizedBox(height: 16),
 
             // Metadata Row
             Row(
@@ -254,25 +254,25 @@ class _MaterialDetailPageState extends State<MaterialDetailPage> {
                   child: Row(
                     children: [
                       Icon(Icons.menu_book_rounded, color: mat.color, size: 18),
-                      const SizedBox(width: 8),
+                      SizedBox(width: 8),
                       Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const Text(
+                            Text(
                               'Cakupan Modul',
                               style: TextStyle(
                                 fontSize: 10,
                                 fontWeight: FontWeight.bold,
-                                color: AppColors.textLight,
+                                color: context.colors.textLight,
                               ),
                             ),
                             Text(
                               mat.modules.split(' • ').first,
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: 12,
                                 fontWeight: FontWeight.w800,
-                                color: AppColors.textPrimary,
+                                color: context.colors.textPrimary,
                               ),
                             ),
                           ],
@@ -281,31 +281,31 @@ class _MaterialDetailPageState extends State<MaterialDetailPage> {
                     ],
                   ),
                 ),
-                Container(width: 1, height: 32, color: AppColors.progressTrack),
-                const SizedBox(width: 16),
+                Container(width: 1, height: 32, color: context.colors.progressTrack),
+                SizedBox(width: 16),
                 Expanded(
                   child: Row(
                     children: [
                       Icon(Icons.schedule_rounded, color: mat.color, size: 18),
-                      const SizedBox(width: 8),
+                      SizedBox(width: 8),
                       Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const Text(
+                            Text(
                               'Estimasi Waktu',
                               style: TextStyle(
                                 fontSize: 10,
                                 fontWeight: FontWeight.bold,
-                                color: AppColors.textLight,
+                                color: context.colors.textLight,
                               ),
                             ),
                             Text(
                               mat.estimatedTime,
-                              style: const TextStyle(
+                              style: TextStyle(
                                 fontSize: 12,
                                 fontWeight: FontWeight.w800,
-                                color: AppColors.textPrimary,
+                                color: context.colors.textPrimary,
                               ),
                             ),
                           ],
@@ -326,7 +326,7 @@ class _MaterialDetailPageState extends State<MaterialDetailPage> {
     return Container(
       width: double.infinity,
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: context.colors.cardBg,
         borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
@@ -344,12 +344,12 @@ class _MaterialDetailPageState extends State<MaterialDetailPage> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text(
+                Text(
                   'Progress Belajar Anda',
                   style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w800,
-                    color: AppColors.textPrimary,
+                    color: context.colors.textPrimary,
                   ),
                 ),
                 Text(
@@ -362,14 +362,14 @@ class _MaterialDetailPageState extends State<MaterialDetailPage> {
                 ),
               ],
             ),
-            const SizedBox(height: 12),
+            SizedBox(height: 12),
 
             // Animated Visual Progress Bar with gradient effects
             Container(
               height: 12,
               width: double.infinity,
               decoration: BoxDecoration(
-                color: AppColors.progressTrack,
+                color: context.colors.progressTrack,
                 borderRadius: BorderRadius.circular(100),
               ),
               child: ClipRRect(
@@ -381,7 +381,7 @@ class _MaterialDetailPageState extends State<MaterialDetailPage> {
                 ),
               ),
             ),
-            const SizedBox(height: 10),
+            SizedBox(height: 10),
 
             // Friendly progress descriptor text
             Text(
@@ -390,10 +390,10 @@ class _MaterialDetailPageState extends State<MaterialDetailPage> {
                   : mat.progress == 1.0
                       ? 'Luar biasa! Materi ini telah selesai Anda pelajari.'
                       : '${mat.modules.split(' • ').last} selesai. Lanjutkan konsistensi belajar Anda!',
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 12,
                 fontWeight: FontWeight.w600,
-                color: AppColors.textSecondary,
+                color: context.colors.textSecondary,
               ),
             ),
           ],
@@ -406,7 +406,7 @@ class _MaterialDetailPageState extends State<MaterialDetailPage> {
     return Container(
       width: double.infinity,
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: context.colors.cardBg,
         borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
@@ -420,10 +420,10 @@ class _MaterialDetailPageState extends State<MaterialDetailPage> {
         padding: const EdgeInsets.all(20.0),
         child: Text(
           mat.description,
-          style: const TextStyle(
+          style: TextStyle(
             fontSize: 14,
             fontWeight: FontWeight.w500,
-            color: AppColors.textSecondary,
+            color: context.colors.textSecondary,
             height: 1.5,
           ),
         ),
@@ -435,7 +435,7 @@ class _MaterialDetailPageState extends State<MaterialDetailPage> {
     return Container(
       width: double.infinity,
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: context.colors.cardBg,
         borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
@@ -471,21 +471,21 @@ class _MaterialDetailPageState extends State<MaterialDetailPage> {
                       size: 14,
                     ),
                   ),
-                  const SizedBox(width: 14),
+                  SizedBox(width: 14),
                   Expanded(
                     child: RichText(
                       text: TextSpan(
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 13.5,
-                          color: AppColors.textSecondary,
+                          color: context.colors.textSecondary,
                           height: 1.45,
                         ),
                         children: [
                           TextSpan(
                             text: '$title: ',
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontWeight: FontWeight.w800,
-                              color: AppColors.textPrimary,
+                              color: context.colors.textPrimary,
                             ),
                           ),
                           TextSpan(text: body),
@@ -511,7 +511,7 @@ class _MaterialDetailPageState extends State<MaterialDetailPage> {
         return Container(
           margin: const EdgeInsets.only(bottom: 12),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: context.colors.cardBg,
             borderRadius: BorderRadius.circular(20),
             boxShadow: [
               BoxShadow(
@@ -553,22 +553,22 @@ class _MaterialDetailPageState extends State<MaterialDetailPage> {
                             ),
                           ),
                         ),
-                        const SizedBox(width: 12),
+                        SizedBox(width: 12),
                         Expanded(
                           child: Text(
                             item.question,
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 14,
                               fontWeight: FontWeight.w800,
-                              color: AppColors.textPrimary,
+                              color: context.colors.textPrimary,
                               height: 1.35,
                             ),
                           ),
                         ),
-                        const SizedBox(width: 8),
+                        SizedBox(width: 8),
                         Icon(
                           isExpanded ? Icons.keyboard_arrow_up_rounded : Icons.keyboard_arrow_down_rounded,
-                          color: AppColors.textLight,
+                          color: context.colors.textLight,
                           size: 20,
                         ),
                       ],
@@ -576,13 +576,13 @@ class _MaterialDetailPageState extends State<MaterialDetailPage> {
 
                     // Expandable Section
                     AnimatedCrossFade(
-                      firstChild: const SizedBox(width: double.infinity),
+                      firstChild: SizedBox(width: double.infinity),
                       secondChild: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const SizedBox(height: 16),
-                          const Divider(color: AppColors.progressTrack, height: 1),
-                          const SizedBox(height: 16),
+                          SizedBox(height: 16),
+                          Divider(color: context.colors.progressTrack, height: 1),
+                          SizedBox(height: 16),
 
                           // Answer Card
                           Row(
@@ -594,7 +594,7 @@ class _MaterialDetailPageState extends State<MaterialDetailPage> {
                                   color: Colors.green.shade100,
                                   borderRadius: BorderRadius.circular(6),
                                 ),
-                                child: const Text(
+                                child: Text(
                                   'JAWAB',
                                   style: TextStyle(
                                     fontSize: 9,
@@ -603,21 +603,21 @@ class _MaterialDetailPageState extends State<MaterialDetailPage> {
                                   ),
                                 ),
                               ),
-                              const SizedBox(width: 12),
+                              SizedBox(width: 12),
                               Expanded(
                                 child: Text(
                                   item.answer,
-                                  style: const TextStyle(
+                                  style: TextStyle(
                                     fontSize: 13.5,
                                     fontWeight: FontWeight.w700,
-                                    color: AppColors.textPrimary,
+                                    color: context.colors.textPrimary,
                                     height: 1.4,
                                   ),
                                 ),
                               ),
                             ],
                           ),
-                          const SizedBox(height: 16),
+                          SizedBox(height: 16),
 
                           // Explanation Card
                           Container(
@@ -634,7 +634,7 @@ class _MaterialDetailPageState extends State<MaterialDetailPage> {
                                 Row(
                                   children: [
                                     Icon(Icons.info_outline_rounded, color: mat.color, size: 16),
-                                    const SizedBox(width: 6),
+                                    SizedBox(width: 6),
                                     Text(
                                       'Penjelasan & Konsep',
                                       style: TextStyle(
@@ -645,13 +645,13 @@ class _MaterialDetailPageState extends State<MaterialDetailPage> {
                                     ),
                                   ],
                                 ),
-                                const SizedBox(height: 8),
+                                SizedBox(height: 8),
                                 Text(
                                   item.explanation,
-                                  style: const TextStyle(
+                                  style: TextStyle(
                                     fontSize: 12.5,
                                     fontWeight: FontWeight.w500,
-                                    color: AppColors.textSecondary,
+                                    color: context.colors.textSecondary,
                                     height: 1.45,
                                   ),
                                 ),
@@ -676,10 +676,10 @@ class _MaterialDetailPageState extends State<MaterialDetailPage> {
   Widget _buildSectionTitle(String title) {
     return Text(
       title,
-      style: const TextStyle(
+      style: TextStyle(
         fontSize: 15,
         fontWeight: FontWeight.w900,
-        color: AppColors.textPrimary,
+        color: context.colors.textPrimary,
         letterSpacing: -0.2,
       ),
     );
@@ -688,7 +688,7 @@ class _MaterialDetailPageState extends State<MaterialDetailPage> {
   Widget _buildBottomActionBar(BuildContext context, MaterialModel mat) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white.withAlpha(220), // 85% solid background
+        color: context.colors.cardBg.withAlpha(220), // 85% solid background
         border: Border(
           top: BorderSide(
             color: Colors.black.withAlpha(5),
@@ -707,17 +707,17 @@ class _MaterialDetailPageState extends State<MaterialDetailPage> {
                   height: 52,
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(16),
-                    gradient: const LinearGradient(
+                    gradient: LinearGradient(
                       colors: [
-                        AppColors.primaryGradientStart,
-                        AppColors.primaryGradientEnd,
+                        context.colors.primaryGradientStart,
+                        context.colors.primaryGradientEnd,
                       ],
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
                     ),
                     boxShadow: [
                       BoxShadow(
-                        color: AppColors.primaryGradientStart.withAlpha(80),
+                        color: context.colors.primaryGradientStart.withAlpha(80),
                         blurRadius: 16,
                         offset: const Offset(0, 4),
                       ),
@@ -736,16 +736,16 @@ class _MaterialDetailPageState extends State<MaterialDetailPage> {
                         );
                         Navigator.of(context).pop('tanya_ai');
                       },
-                      child: const Center(
+                      child: Center(
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Icon(Icons.auto_awesome_rounded, color: Colors.white, size: 18),
+                            Icon(Icons.auto_awesome_rounded, color: context.colors.cardBg, size: 18),
                             SizedBox(width: 8),
                             Text(
                               'Tanya AI',
                               style: TextStyle(
-                                color: Colors.white,
+                                color: context.colors.cardBg,
                                 fontWeight: FontWeight.w900,
                                 fontSize: 14,
                                 letterSpacing: 0.1,
@@ -758,17 +758,17 @@ class _MaterialDetailPageState extends State<MaterialDetailPage> {
                   ),
                 ),
               ),
-              const SizedBox(width: 12),
+              SizedBox(width: 12),
               Expanded(
                 child: Container(
                   height: 52,
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(16),
-                    color: Colors.white,
-                    border: Border.all(color: AppColors.primaryGradientStart, width: 2),
+                    color: context.colors.cardBg,
+                    border: Border.all(color: context.colors.primaryGradientStart, width: 2),
                     boxShadow: [
                       BoxShadow(
-                        color: AppColors.primaryGradientStart.withAlpha(20),
+                        color: context.colors.primaryGradientStart.withAlpha(20),
                         blurRadius: 8,
                         offset: const Offset(0, 4),
                       ),
@@ -789,16 +789,16 @@ class _MaterialDetailPageState extends State<MaterialDetailPage> {
                           ),
                         );
                       },
-                      child: const Center(
+                      child: Center(
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Icon(Icons.quiz_rounded, color: AppColors.primaryGradientStart, size: 18),
+                            Icon(Icons.quiz_rounded, color: context.colors.primaryGradientStart, size: 18),
                             SizedBox(width: 8),
                             Text(
                               'Mulai Kuis',
                               style: TextStyle(
-                                color: AppColors.primaryGradientStart,
+                                color: context.colors.primaryGradientStart,
                                 fontWeight: FontWeight.w900,
                                 fontSize: 14,
                                 letterSpacing: 0.1,
@@ -826,7 +826,7 @@ class _MaterialDetailPageState extends State<MaterialDetailPage> {
       width: double.infinity,
       padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 28.0),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: context.colors.cardBg,
         borderRadius: BorderRadius.circular(24),
         border: Border.all(
           color: isLoading ? mat.color.withAlpha(20) : Colors.amber.withAlpha(50),
@@ -857,36 +857,36 @@ class _MaterialDetailPageState extends State<MaterialDetailPage> {
                       valueColor: AlwaysStoppedAnimation<Color>(mat.color),
                     ),
                   )
-                : const Icon(
+                : Icon(
                     Icons.warning_amber_rounded,
                     color: Colors.amber,
                     size: 32,
                   ),
           ),
-          const SizedBox(height: 16),
+          SizedBox(height: 16),
           Text(
             isLoading ? 'Menghubungkan Database' : 'Modul Belum Tersedia',
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 15,
               fontWeight: FontWeight.w900,
-              color: AppColors.textPrimary,
+              color: context.colors.textPrimary,
               letterSpacing: -0.2,
             ),
           ),
-          const SizedBox(height: 6),
+          SizedBox(height: 6),
           Text(
             isLoading
                 ? 'Harap tunggu sebentar, modul akademik sedang disinkronisasikan ke Firestore...'
                 : 'Peta pembelajaran modular untuk materi ini belum terdaftar di database.',
             textAlign: TextAlign.center,
-            style: const TextStyle(
+            style: TextStyle(
               fontSize: 12,
-              color: AppColors.textSecondary,
+              color: context.colors.textSecondary,
               height: 1.4,
             ),
           ),
           if (errorMessage != null && !isLoading) ...[
-            const SizedBox(height: 12),
+            SizedBox(height: 12),
             Container(
               width: double.infinity,
               padding: const EdgeInsets.all(12),
@@ -908,7 +908,7 @@ class _MaterialDetailPageState extends State<MaterialDetailPage> {
             ),
           ],
           if (!isLoading) ...[
-            const SizedBox(height: 20),
+            SizedBox(height: 20),
             ElevatedButton.icon(
               onPressed: () async {
                 await HapticFeedback.mediumImpact();
@@ -917,7 +917,7 @@ class _MaterialDetailPageState extends State<MaterialDetailPage> {
                     SnackBar(
                       content: Row(
                         children: [
-                          const SizedBox(
+                          SizedBox(
                             width: 16,
                             height: 16,
                             child: CircularProgressIndicator(
@@ -925,8 +925,8 @@ class _MaterialDetailPageState extends State<MaterialDetailPage> {
                               valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
                             ),
                           ),
-                          const SizedBox(width: 12),
-                          const Expanded(
+                          SizedBox(width: 12),
+                          Expanded(
                             child: Text(
                               'Menjalankan uji koneksi & sinkronisasi database...',
                               style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.white),
@@ -952,7 +952,7 @@ class _MaterialDetailPageState extends State<MaterialDetailPage> {
                     if (context.mounted) {
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
-                          content: const Text(
+                          content: Text(
                             'Database berhasil disinkronkan & modul telah dimuat!',
                             style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.white),
                           ),
@@ -969,7 +969,7 @@ class _MaterialDetailPageState extends State<MaterialDetailPage> {
                         SnackBar(
                           content: Text(
                             'Gagal sinkron: ${e.toString().replaceFirst('Exception: ', '')}',
-                            style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.white),
+                            style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.white),
                           ),
                           backgroundColor: Colors.red,
                           behavior: SnackBarBehavior.floating,
@@ -980,8 +980,8 @@ class _MaterialDetailPageState extends State<MaterialDetailPage> {
                   }
                 }
               },
-              icon: const Icon(Icons.sync_rounded, size: 16, color: Colors.white),
-              label: const Text(
+              icon: Icon(Icons.sync_rounded, size: 16, color: Colors.white),
+              label: Text(
                 'Sinkronkan Ulang Database',
                 style: TextStyle(fontSize: 12, fontWeight: FontWeight.w800, color: Colors.white),
               ),
@@ -1002,7 +1002,7 @@ class _MaterialDetailPageState extends State<MaterialDetailPage> {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: context.colors.cardBg,
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
           color: isCompleted ? mat.color.withAlpha(80) : Colors.transparent,
@@ -1060,15 +1060,15 @@ class _MaterialDetailPageState extends State<MaterialDetailPage> {
                             children: [
                               Icon(
                                 newStatus ? Icons.check_circle_rounded : Icons.info_outline_rounded,
-                                color: Colors.white,
+                                color: context.colors.cardBg,
                               ),
-                              const SizedBox(width: 12),
+                              SizedBox(width: 12),
                               Expanded(
                                 child: Text(
                                   newStatus 
                                       ? '🎉 Modul "${module.title}" ditandai selesai!' 
                                       : 'Modul "${module.title}" dibatalkan selesai.',
-                                  style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
+                                  style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
                                 ),
                               ),
                             ],
@@ -1093,16 +1093,16 @@ class _MaterialDetailPageState extends State<MaterialDetailPage> {
                       color: isCompleted ? mat.color : Colors.transparent,
                       borderRadius: BorderRadius.circular(8),
                       border: Border.all(
-                        color: isCompleted ? mat.color : AppColors.textLight.withAlpha(100),
+                        color: isCompleted ? mat.color : context.colors.textLight.withAlpha(100),
                         width: 2,
                       ),
                     ),
                     child: isCompleted
-                        ? const Icon(Icons.check_rounded, color: Colors.white, size: 18)
+                        ? Icon(Icons.check_rounded, color: context.colors.cardBg, size: 18)
                         : null,
                   ),
                 ),
-                const SizedBox(width: 16),
+                SizedBox(width: 16),
 
                 // Title and duration details
                 Expanded(
@@ -1111,24 +1111,24 @@ class _MaterialDetailPageState extends State<MaterialDetailPage> {
                     children: [
                       Text(
                         module.title,
-                        style: const TextStyle(
+                        style: TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.w800,
-                          color: AppColors.textPrimary,
+                          color: context.colors.textPrimary,
                           height: 1.3,
                         ),
                       ),
-                      const SizedBox(height: 4),
+                      SizedBox(height: 4),
                       Row(
                         children: [
-                          Icon(Icons.schedule_rounded, color: AppColors.textLight.withAlpha(150), size: 12),
-                          const SizedBox(width: 4),
+                          Icon(Icons.schedule_rounded, color: context.colors.textLight.withAlpha(150), size: 12),
+                          SizedBox(width: 4),
                           Text(
                             '${module.estimatedMinutes} Menit',
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 11,
                               fontWeight: FontWeight.w600,
-                              color: AppColors.textLight,
+                              color: context.colors.textLight,
                             ),
                           ),
                         ],
@@ -1136,12 +1136,12 @@ class _MaterialDetailPageState extends State<MaterialDetailPage> {
                     ],
                   ),
                 ),
-                const SizedBox(width: 8),
+                SizedBox(width: 8),
 
                 // Arrow icon styled to go to reader
                 Icon(
                   Icons.arrow_forward_ios_rounded,
-                  color: AppColors.textLight.withAlpha(100),
+                  color: context.colors.textLight.withAlpha(100),
                   size: 14,
                 ),
               ],

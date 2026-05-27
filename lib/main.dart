@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 // Services & Repositories
 import 'services/firebase_auth_service.dart';
@@ -15,6 +16,10 @@ import 'repositories/chat_repository_impl.dart';
 import 'providers/auth_provider.dart';
 import 'providers/ai_chat_provider.dart';
 import 'providers/statistics_provider.dart';
+import 'providers/theme_provider.dart';
+
+// Constants & Themes
+import 'constants/app_theme.dart';
 
 // Services & Repositories additions
 import 'services/activity_service.dart';
@@ -48,12 +53,21 @@ void main() async {
   
   // Initialize Firebase using the google-services.json context
   await Firebase.initializeApp();
+
+  // Load SharedPreferences and initialize ThemeProvider at startup for 0 flicker
+  final prefs = await SharedPreferences.getInstance();
+  final themeProvider = ThemeProvider(prefs);
   
-  runApp(const StudyMateAI());
+  runApp(StudyMateAI(themeProvider: themeProvider));
 }
 
 class StudyMateAI extends StatelessWidget {
-  const StudyMateAI({super.key});
+  final ThemeProvider themeProvider;
+
+  const StudyMateAI({
+    super.key,
+    required this.themeProvider,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -92,6 +106,9 @@ class StudyMateAI extends StatelessWidget {
 
     return MultiProvider(
       providers: [
+        ChangeNotifierProvider<ThemeProvider>.value(
+          value: themeProvider,
+        ),
         ChangeNotifierProvider<AuthProvider>(
           create: (_) => AuthProvider(authRepository: authRepository)..checkCurrentUser(),
         ),
@@ -126,10 +143,17 @@ class StudyMateAI extends StatelessWidget {
           ),
         ),
       ],
-      child: const MaterialApp(
-        debugShowCheckedModeBanner: false,
-        title: 'StudyMate AI',
-        home: SplashPage(),
+      child: Consumer<ThemeProvider>(
+        builder: (context, themeProvider, child) {
+          return MaterialApp(
+            debugShowCheckedModeBanner: false,
+            title: 'StudyMate AI',
+            themeMode: themeProvider.themeMode,
+            theme: AppTheme.lightTheme,
+            darkTheme: AppTheme.darkTheme,
+            home: const SplashPage(),
+          );
+        },
       ),
     );
   }

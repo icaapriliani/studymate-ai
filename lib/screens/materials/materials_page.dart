@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../../constants/app_colors.dart';
 import '../../models/material_model.dart';
 import '../../providers/learning_provider.dart';
+import '../../utils/theme_context.dart';
 import 'material_detail_page.dart';
 
 class MaterialsPage extends StatefulWidget {
@@ -33,11 +33,11 @@ class _MaterialsPageState extends State<MaterialsPage> {
     final learningProvider = Provider.of<LearningProvider>(context);
 
     if (learningProvider.isLoading && learningProvider.materials.isEmpty) {
-      return const Center(
+      return Center(
         child: Padding(
-          padding: EdgeInsets.all(40.0),
+          padding: const EdgeInsets.all(40.0),
           child: CircularProgressIndicator(
-            valueColor: AlwaysStoppedAnimation<Color>(AppColors.primaryGradientStart),
+            valueColor: AlwaysStoppedAnimation<Color>(context.colors.primaryGradientStart),
           ),
         ),
       );
@@ -69,22 +69,22 @@ class _MaterialsPageState extends State<MaterialsPage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
+                  Text(
                     'Materi Belajar',
                     style: TextStyle(
                       fontSize: 22,
                       fontWeight: FontWeight.w900,
-                      color: AppColors.textPrimary,
+                      color: context.colors.textPrimary,
                       letterSpacing: -0.5,
                     ),
                   ),
                   const SizedBox(height: 4),
-                  const Text(
+                  Text(
                     'Temukan modul kuliah dan bahan belajarmu',
                     style: TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w500,
-                      color: AppColors.textSecondary,
+                      color: context.colors.textSecondary,
                     ),
                   ),
                   const SizedBox(height: 20),
@@ -92,7 +92,7 @@ class _MaterialsPageState extends State<MaterialsPage> {
                   // Search Bar
                   Container(
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: context.colors.cardBg,
                       borderRadius: BorderRadius.circular(16),
                       boxShadow: [
                         BoxShadow(
@@ -108,13 +108,13 @@ class _MaterialsPageState extends State<MaterialsPage> {
                           _searchQuery = val;
                         });
                       },
-                      style: const TextStyle(fontSize: 14, color: AppColors.textPrimary),
-                      decoration: const InputDecoration(
-                        prefixIcon: Icon(Icons.search_rounded, color: AppColors.textLight, size: 20),
+                      style: TextStyle(fontSize: 14, color: context.colors.textPrimary),
+                      decoration: InputDecoration(
+                        prefixIcon: Icon(Icons.search_rounded, color: context.colors.textLight, size: 20),
                         hintText: 'Cari modul atau materi kuliah...',
-                        hintStyle: TextStyle(color: AppColors.textLight, fontSize: 14),
+                        hintStyle: TextStyle(color: context.colors.textLight, fontSize: 14),
                         border: InputBorder.none,
-                        contentPadding: EdgeInsets.symmetric(vertical: 15),
+                        contentPadding: const EdgeInsets.symmetric(vertical: 15),
                       ),
                     ),
                   ),
@@ -143,7 +143,7 @@ class _MaterialsPageState extends State<MaterialsPage> {
                             return Container(
                               margin: const EdgeInsets.only(bottom: 16),
                               decoration: BoxDecoration(
-                                color: Colors.white,
+                                color: context.colors.cardBg,
                                 borderRadius: BorderRadius.circular(24),
                                 boxShadow: [
                                   BoxShadow(
@@ -196,17 +196,17 @@ class _MaterialsPageState extends State<MaterialsPage> {
                                             Expanded(
                                               child: Text(
                                                 mat.title,
-                                                style: const TextStyle(
+                                                style: TextStyle(
                                                   fontSize: 16,
                                                   fontWeight: FontWeight.w800,
-                                                  color: AppColors.textPrimary,
+                                                  color: context.colors.textPrimary,
                                                 ),
                                               ),
                                             ),
                                             const SizedBox(width: 8),
                                             Icon(
                                               Icons.arrow_forward_ios_rounded,
-                                              color: AppColors.textLight.withAlpha(120),
+                                              color: context.colors.textLight.withAlpha(120),
                                               size: 16,
                                             ),
                                           ],
@@ -214,10 +214,10 @@ class _MaterialsPageState extends State<MaterialsPage> {
                                         const SizedBox(height: 6),
                                         Text(
                                           mat.modules,
-                                          style: const TextStyle(
+                                          style: TextStyle(
                                             fontSize: 12,
                                             fontWeight: FontWeight.w600,
-                                            color: AppColors.textSecondary,
+                                            color: context.colors.textSecondary,
                                           ),
                                         ),
                                         const SizedBox(height: 16),
@@ -227,7 +227,7 @@ class _MaterialsPageState extends State<MaterialsPage> {
                                               child: Container(
                                                 height: 6,
                                                 decoration: BoxDecoration(
-                                                  color: AppColors.progressTrack,
+                                                  color: context.colors.progressTrack,
                                                   borderRadius: BorderRadius.circular(100),
                                                 ),
                                                 child: ClipRRect(
@@ -273,12 +273,12 @@ class _MaterialsPageState extends State<MaterialsPage> {
 
   Widget _buildFilterPill(String label, bool isSelected) {
     return Container(
-      margin: const EdgeInsets.only(right: 8),
+      margin: const EdgeInsets.only(right: 8, top: 4, bottom: 4),
       child: Material(
-        color: isSelected ? AppColors.primaryGradientStart : Colors.white,
+        color: isSelected ? context.colors.primaryGradientStart : context.colors.cardBg,
         borderRadius: BorderRadius.circular(100),
         elevation: isSelected ? 3 : 1,
-        shadowColor: isSelected ? AppColors.primaryGradientStart.withAlpha(60) : Colors.black12,
+        shadowColor: isSelected ? context.colors.primaryGradientStart.withAlpha(60) : Colors.black12,
         child: InkWell(
           borderRadius: BorderRadius.circular(100),
           onTap: () {
@@ -293,7 +293,7 @@ class _MaterialsPageState extends State<MaterialsPage> {
               style: TextStyle(
                 fontSize: 12,
                 fontWeight: isSelected ? FontWeight.w900 : FontWeight.w700,
-                color: isSelected ? Colors.white : AppColors.textSecondary,
+                color: isSelected ? Colors.white : context.colors.textSecondary,
               ),
             ),
           ),
@@ -312,24 +312,24 @@ class _MaterialsPageState extends State<MaterialsPage> {
           Icon(
             Icons.search_off_rounded,
             size: 64,
-            color: AppColors.textLight.withAlpha(100),
+            color: context.colors.textLight.withAlpha(100),
           ),
           const SizedBox(height: 16),
-          const Text(
+          Text(
             'Materi Tidak Ditemukan',
             style: TextStyle(
               fontSize: 16,
               fontWeight: FontWeight.bold,
-              color: AppColors.textPrimary,
+              color: context.colors.textPrimary,
             ),
           ),
           const SizedBox(height: 8),
-          const Text(
+          Text(
             'Silakan coba gunakan kata kunci pencarian lain atau pilih kategori yang berbeda.',
             textAlign: TextAlign.center,
             style: TextStyle(
               fontSize: 13,
-              color: AppColors.textSecondary,
+              color: context.colors.textSecondary,
               height: 1.4,
             ),
           ),
