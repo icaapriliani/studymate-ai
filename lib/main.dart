@@ -3,6 +3,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'firebase_options.dart';
 
 // Services & Repositories
 import 'services/firebase_auth_service.dart';
@@ -51,8 +52,10 @@ void main() async {
     debugPrint('[StudyMate AI Main] GAGAL memuat file .env: $e');
   }
   
-  // Initialize Firebase using the google-services.json context
-  await Firebase.initializeApp();
+  // Initialize Firebase using generated options for each platform.
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
 
   // Load SharedPreferences and initialize ThemeProvider at startup for 0 flicker
   final prefs = await SharedPreferences.getInstance();
