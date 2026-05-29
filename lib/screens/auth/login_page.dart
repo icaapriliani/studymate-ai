@@ -6,6 +6,7 @@ import '../../utils/custom_textfield.dart';
 import '../../providers/auth_provider.dart';
 import '../home/home_page.dart';
 import 'register_page.dart';
+import '../../widgets/brand_header.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -54,9 +55,7 @@ class _LoginPageState extends State<LoginPage> {
               return SingleChildScrollView(
                 physics: const BouncingScrollPhysics(),
                 child: ConstrainedBox(
-                  constraints: BoxConstraints(
-                    minHeight: constraints.maxHeight,
-                  ),
+                  constraints: BoxConstraints(minHeight: constraints.maxHeight),
                   child: IntrinsicHeight(
                     child: Padding(
                       padding: EdgeInsets.symmetric(
@@ -90,66 +89,14 @@ class _LoginPageState extends State<LoginPage> {
                                 ],
                               ),
                               child: Padding(
-                                padding:
-                                    EdgeInsets.all(isTablet ? 40.0 : 28.0),
+                                padding: EdgeInsets.all(isTablet ? 40.0 : 28.0),
                                 child: Form(
                                   key: _formKey,
                                   child: Column(
                                     mainAxisSize: MainAxisSize.min,
                                     children: [
-                                      // Graduation Cap Badge
-                                      Container(
-                                        width: 56,
-                                        height: 56,
-                                        decoration: BoxDecoration(
-                                          gradient: LinearGradient(
-                                            colors: [
-                                              context.colors.primaryGradientStart,
-                                              context.colors.primaryGradientEnd,
-                                            ],
-                                            begin: Alignment.topLeft,
-                                            end: Alignment.bottomRight,
-                                          ),
-                                          borderRadius:
-                                              BorderRadius.circular(16),
-                                          boxShadow: [
-                                            BoxShadow(
-                                              color: AppColors
-                                                  .primaryGradientStart
-                                                  .withAlpha(51),
-                                              blurRadius: 10,
-                                              offset: const Offset(0, 4),
-                                            ),
-                                          ],
-                                        ),
-                                        child: Icon(
-                                          Icons.school,
-                                          color: Colors.white,
-                                          size: 26,
-                                        ),
-                                      ),
-                                      SizedBox(height: 20),
-
-                                      // Brand Text: StudyMate AI
-                                      ShaderMask(
-                                        shaderCallback: (bounds) =>
-                                            LinearGradient(
-                                          colors: [
-                                            context.colors.primaryGradientStart,
-                                            context.colors.primaryGradientEnd,
-                                          ],
-                                        ).createShader(bounds),
-                                        child: Text(
-                                          'StudyMate AI',
-                                          style: TextStyle(
-                                            fontSize: 28,
-                                            fontWeight: FontWeight.w900,
-                                            color: Colors.white,
-                                            letterSpacing: -0.5,
-                                          ),
-                                        ),
-                                      ),
-                                      SizedBox(height: 12),
+                                      const BrandHeader(logoWidth: 230),
+                                      const SizedBox(height: 20),
 
                                       // Welcome Text
                                       Text(
@@ -188,8 +135,8 @@ class _LoginPageState extends State<LoginPage> {
                                             return 'Please enter your email';
                                           }
                                           if (!RegExp(
-                                                  r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$')
-                                              .hasMatch(value)) {
+                                            r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$',
+                                          ).hasMatch(value)) {
                                             return 'Please enter a valid email';
                                           }
                                           return null;
@@ -276,7 +223,8 @@ class _LoginPageState extends State<LoginPage> {
                                             style: TextStyle(
                                               fontSize: 14,
                                               fontWeight: FontWeight.w600,
-                                              color: context.colors.textSecondary,
+                                              color:
+                                                  context.colors.textSecondary,
                                             ),
                                           ),
                                         ],
@@ -292,8 +240,12 @@ class _LoginPageState extends State<LoginPage> {
                                             decoration: BoxDecoration(
                                               gradient: LinearGradient(
                                                 colors: [
-                                                  context.colors.primaryGradientStart,
-                                                  context.colors.primaryGradientEnd,
+                                                  context
+                                                      .colors
+                                                      .primaryGradientStart,
+                                                  context
+                                                      .colors
+                                                      .primaryGradientEnd,
                                                 ],
                                                 begin: Alignment.centerLeft,
                                                 end: Alignment.centerRight,
@@ -314,48 +266,89 @@ class _LoginPageState extends State<LoginPage> {
                                               onPressed: authProvider.isLoading
                                                   ? null
                                                   : () async {
-                                                      if (_formKey.currentState!.validate()) {
-                                                        final navigator = Navigator.of(context);
-                                                        final scaffoldMessenger = ScaffoldMessenger.of(context);
+                                                      if (_formKey.currentState!
+                                                          .validate()) {
+                                                        final navigator =
+                                                            Navigator.of(
+                                                              context,
+                                                            );
+                                                        final scaffoldMessenger =
+                                                            ScaffoldMessenger.of(
+                                                              context,
+                                                            );
 
-                                                        final success = await authProvider.signIn(
-                                                          email: _emailController.text,
-                                                          password: _passwordController.text,
-                                                        );
+                                                        final success =
+                                                            await authProvider.signIn(
+                                                              email:
+                                                                  _emailController
+                                                                      .text,
+                                                              password:
+                                                                  _passwordController
+                                                                      .text,
+                                                            );
 
                                                         if (success) {
-                                                          scaffoldMessenger.showSnackBar(
-                                                            const SnackBar(
-                                                              content: Text('Login berhasil!'),
-                                                              backgroundColor: Colors.green,
-                                                            ),
-                                                          );
+                                                          scaffoldMessenger
+                                                              .showSnackBar(
+                                                                const SnackBar(
+                                                                  content: Text(
+                                                                    'Login berhasil!',
+                                                                  ),
+                                                                  backgroundColor:
+                                                                      Colors
+                                                                          .green,
+                                                                ),
+                                                              );
 
                                                           navigator.pushReplacement(
                                                             PageRouteBuilder(
-                                                              pageBuilder: (context, animation, secondaryAnimation) =>
-                                                                  const HomePage(),
-                                                              transitionsBuilder: (context, animation, secondaryAnimation, child) {
-                                                                return FadeTransition(
-                                                                  opacity: animation,
-                                                                  child: child,
-                                                                );
-                                                              },
-                                                              transitionDuration: const Duration(milliseconds: 500),
+                                                              pageBuilder:
+                                                                  (
+                                                                    context,
+                                                                    animation,
+                                                                    secondaryAnimation,
+                                                                  ) =>
+                                                                      const HomePage(),
+                                                              transitionsBuilder:
+                                                                  (
+                                                                    context,
+                                                                    animation,
+                                                                    secondaryAnimation,
+                                                                    child,
+                                                                  ) {
+                                                                    return FadeTransition(
+                                                                      opacity:
+                                                                          animation,
+                                                                      child:
+                                                                          child,
+                                                                    );
+                                                                  },
+                                                              transitionDuration:
+                                                                  const Duration(
+                                                                    milliseconds:
+                                                                        500,
+                                                                  ),
                                                             ),
                                                           );
                                                         } else {
                                                           scaffoldMessenger.showSnackBar(
                                                             SnackBar(
-                                                              content: Text(authProvider.errorMessage ?? 'Login gagal.'),
-                                                              backgroundColor: Colors.redAccent,
+                                                              content: Text(
+                                                                authProvider
+                                                                        .errorMessage ??
+                                                                    'Login gagal.',
+                                                              ),
+                                                              backgroundColor:
+                                                                  Colors
+                                                                      .redAccent,
                                                             ),
                                                           );
                                                         }
                                                       }
                                                     },
                                               style: ElevatedButton.styleFrom(
-                                                backgroundColor: Colors.transparent,
+                                                backgroundColor:
+                                                    Colors.transparent,
                                                 shadowColor: Colors.transparent,
                                                 shape: RoundedRectangleBorder(
                                                   borderRadius:
@@ -366,16 +359,18 @@ class _LoginPageState extends State<LoginPage> {
                                                   ? SizedBox(
                                                       width: 24,
                                                       height: 24,
-                                                      child: CircularProgressIndicator(
-                                                        color: Colors.white,
-                                                        strokeWidth: 2.5,
-                                                      ),
+                                                      child:
+                                                          CircularProgressIndicator(
+                                                            color: Colors.white,
+                                                            strokeWidth: 2.5,
+                                                          ),
                                                     )
                                                   : Text(
                                                       'Sign In',
                                                       style: TextStyle(
                                                         fontSize: 16,
-                                                        fontWeight: FontWeight.w800,
+                                                        fontWeight:
+                                                            FontWeight.w800,
                                                         color: Colors.white,
                                                         letterSpacing: 0.2,
                                                       ),
@@ -388,21 +383,24 @@ class _LoginPageState extends State<LoginPage> {
 
                                       // Don't have an account? Sign Up
                                       Row(
-                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
                                         children: [
                                           Text(
                                             "Don't have an account? ",
                                             style: TextStyle(
                                               fontSize: 14,
                                               fontWeight: FontWeight.w600,
-                                              color: context.colors.textSecondary,
+                                              color:
+                                                  context.colors.textSecondary,
                                             ),
                                           ),
                                           GestureDetector(
                                             onTap: () {
                                               Navigator.of(context).push(
                                                 MaterialPageRoute(
-                                                  builder: (context) => const RegisterPage(),
+                                                  builder: (context) =>
+                                                      const RegisterPage(),
                                                 ),
                                               );
                                             },
@@ -455,7 +453,8 @@ class _LoginPageState extends State<LoginPage> {
                               // Separation Dot
                               Padding(
                                 padding: const EdgeInsets.symmetric(
-                                    horizontal: 12.0),
+                                  horizontal: 12.0,
+                                ),
                                 child: Container(
                                   width: 4,
                                   height: 4,

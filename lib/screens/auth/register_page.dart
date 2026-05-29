@@ -5,6 +5,7 @@ import '../../constants/app_colors.dart';
 import '../../utils/custom_textfield.dart';
 import '../../providers/auth_provider.dart';
 import '../home/home_page.dart';
+import '../../widgets/brand_header.dart';
 
 class RegisterPage extends StatefulWidget {
   const RegisterPage({super.key});
@@ -58,9 +59,7 @@ class _RegisterPageState extends State<RegisterPage> {
               return SingleChildScrollView(
                 physics: const BouncingScrollPhysics(),
                 child: ConstrainedBox(
-                  constraints: BoxConstraints(
-                    minHeight: constraints.maxHeight,
-                  ),
+                  constraints: BoxConstraints(minHeight: constraints.maxHeight),
                   child: IntrinsicHeight(
                     child: Padding(
                       padding: EdgeInsets.symmetric(
@@ -94,8 +93,7 @@ class _RegisterPageState extends State<RegisterPage> {
                                 ],
                               ),
                               child: Padding(
-                                padding:
-                                    EdgeInsets.all(isTablet ? 40.0 : 28.0),
+                                padding: EdgeInsets.all(isTablet ? 40.0 : 28.0),
                                 child: Form(
                                   key: _formKey,
                                   child: Consumer<AuthProvider>(
@@ -103,59 +101,8 @@ class _RegisterPageState extends State<RegisterPage> {
                                       return Column(
                                         mainAxisSize: MainAxisSize.min,
                                         children: [
-                                          // Graduation Cap Badge
-                                          Container(
-                                            width: 56,
-                                            height: 56,
-                                            decoration: BoxDecoration(
-                                              gradient: LinearGradient(
-                                                colors: [
-                                                  context.colors.primaryGradientStart,
-                                                  context.colors.primaryGradientEnd,
-                                                ],
-                                                begin: Alignment.topLeft,
-                                                end: Alignment.bottomRight,
-                                              ),
-                                              borderRadius:
-                                                  BorderRadius.circular(16),
-                                              boxShadow: [
-                                                BoxShadow(
-                                                  color: AppColors
-                                                      .primaryGradientStart
-                                                      .withAlpha(51),
-                                                  blurRadius: 10,
-                                                  offset: const Offset(0, 4),
-                                                ),
-                                              ],
-                                            ),
-                                            child: Icon(
-                                              Icons.school,
-                                              color: Colors.white,
-                                              size: 26,
-                                            ),
-                                          ),
-                                          SizedBox(height: 20),
-
-                                          // Brand Text: StudyMate AI
-                                          ShaderMask(
-                                            shaderCallback: (bounds) =>
-                                                LinearGradient(
-                                              colors: [
-                                                context.colors.primaryGradientStart,
-                                                context.colors.primaryGradientEnd,
-                                              ],
-                                            ).createShader(bounds),
-                                            child: Text(
-                                              'StudyMate AI',
-                                              style: TextStyle(
-                                                fontSize: 28,
-                                                fontWeight: FontWeight.w900,
-                                                color: Colors.white,
-                                                letterSpacing: -0.5,
-                                              ),
-                                            ),
-                                          ),
-                                          SizedBox(height: 12),
+                                          const BrandHeader(logoWidth: 230),
+                                          const SizedBox(height: 20),
 
                                           // Subtitle
                                           Text(
@@ -174,7 +121,8 @@ class _RegisterPageState extends State<RegisterPage> {
                                             style: TextStyle(
                                               fontSize: 14,
                                               fontWeight: FontWeight.w500,
-                                              color: context.colors.textSecondary,
+                                              color:
+                                                  context.colors.textSecondary,
                                             ),
                                           ),
                                           SizedBox(height: 28),
@@ -182,7 +130,8 @@ class _RegisterPageState extends State<RegisterPage> {
                                           // Name Textfield
                                           CustomTextField(
                                             labelText: 'Nama Lengkap',
-                                            hintText: 'Masukkan nama lengkap Anda',
+                                            hintText:
+                                                'Masukkan nama lengkap Anda',
                                             controller: _nameController,
                                             prefixIcon: Icons.person_outline,
                                             validator: (value) {
@@ -209,8 +158,8 @@ class _RegisterPageState extends State<RegisterPage> {
                                                 return 'Silakan masukkan alamat email Anda';
                                               }
                                               if (!RegExp(
-                                                      r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$')
-                                                  .hasMatch(value)) {
+                                                r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$',
+                                              ).hasMatch(value)) {
                                                 return 'Silakan masukkan format alamat email yang valid';
                                               }
                                               return null;
@@ -234,14 +183,16 @@ class _RegisterPageState extends State<RegisterPage> {
                                               },
                                               child: Icon(
                                                 _obscurePassword
-                                                    ? Icons.visibility_off_outlined
+                                                    ? Icons
+                                                          .visibility_off_outlined
                                                     : Icons.visibility_outlined,
                                                 color: context.colors.textLight,
                                                 size: 20,
                                               ),
                                             ),
                                             validator: (value) {
-                                              if (value == null || value.isEmpty) {
+                                              if (value == null ||
+                                                  value.isEmpty) {
                                                 return 'Silakan masukkan kata sandi Anda';
                                               }
                                               if (value.length < 6) {
@@ -256,9 +207,11 @@ class _RegisterPageState extends State<RegisterPage> {
                                           CustomTextField(
                                             labelText: 'Konfirmasi Password',
                                             hintText: '••••••••',
-                                            controller: _confirmPasswordController,
+                                            controller:
+                                                _confirmPasswordController,
                                             prefixIcon: Icons.lock_outline,
-                                            obscureText: _obscureConfirmPassword,
+                                            obscureText:
+                                                _obscureConfirmPassword,
                                             suffixIcon: GestureDetector(
                                               onTap: () {
                                                 setState(() {
@@ -268,17 +221,20 @@ class _RegisterPageState extends State<RegisterPage> {
                                               },
                                               child: Icon(
                                                 _obscureConfirmPassword
-                                                    ? Icons.visibility_off_outlined
+                                                    ? Icons
+                                                          .visibility_off_outlined
                                                     : Icons.visibility_outlined,
                                                 color: context.colors.textLight,
                                                 size: 20,
                                               ),
                                             ),
                                             validator: (value) {
-                                              if (value == null || value.isEmpty) {
+                                              if (value == null ||
+                                                  value.isEmpty) {
                                                 return 'Silakan konfirmasi kata sandi Anda';
                                               }
-                                              if (value != _passwordController.text) {
+                                              if (value !=
+                                                  _passwordController.text) {
                                                 return 'Konfirmasi kata sandi tidak cocok dengan kata sandi di atas';
                                               }
                                               return null;
@@ -296,14 +252,17 @@ class _RegisterPageState extends State<RegisterPage> {
                                                   value: _agreeToTerms,
                                                   onChanged: (value) {
                                                     setState(() {
-                                                      _agreeToTerms = value ?? false;
+                                                      _agreeToTerms =
+                                                          value ?? false;
                                                     });
                                                   },
                                                   activeColor: AppColors
                                                       .primaryGradientStart,
                                                   shape: RoundedRectangleBorder(
                                                     borderRadius:
-                                                        BorderRadius.circular(6),
+                                                        BorderRadius.circular(
+                                                          6,
+                                                        ),
                                                   ),
                                                   side: BorderSide(
                                                     color: Colors.grey.shade300,
@@ -318,7 +277,9 @@ class _RegisterPageState extends State<RegisterPage> {
                                                   style: TextStyle(
                                                     fontSize: 13,
                                                     fontWeight: FontWeight.w600,
-                                                    color: context.colors.textSecondary,
+                                                    color: context
+                                                        .colors
+                                                        .textSecondary,
                                                   ),
                                                 ),
                                               ),
@@ -333,8 +294,12 @@ class _RegisterPageState extends State<RegisterPage> {
                                             decoration: BoxDecoration(
                                               gradient: LinearGradient(
                                                 colors: [
-                                                  context.colors.primaryGradientStart,
-                                                  context.colors.primaryGradientEnd,
+                                                  context
+                                                      .colors
+                                                      .primaryGradientStart,
+                                                  context
+                                                      .colors
+                                                      .primaryGradientEnd,
                                                 ],
                                                 begin: Alignment.centerLeft,
                                                 end: Alignment.centerRight,
@@ -356,13 +321,16 @@ class _RegisterPageState extends State<RegisterPage> {
                                                   ? null
                                                   : () async {
                                                       if (!_agreeToTerms) {
-                                                        ScaffoldMessenger.of(context)
-                                                            .showSnackBar(
+                                                        ScaffoldMessenger.of(
+                                                          context,
+                                                        ).showSnackBar(
                                                           const SnackBar(
                                                             content: Text(
-                                                                'Anda harus menyetujui Ketentuan & Kebijakan Privasi.'),
+                                                              'Anda harus menyetujui Ketentuan & Kebijakan Privasi.',
+                                                            ),
                                                             backgroundColor:
-                                                                Colors.orangeAccent,
+                                                                Colors
+                                                                    .orangeAccent,
                                                           ),
                                                         );
                                                         return;
@@ -370,67 +338,90 @@ class _RegisterPageState extends State<RegisterPage> {
 
                                                       if (_formKey.currentState!
                                                           .validate()) {
-                                                        final navigator = Navigator.of(context);
-                                                        final scaffoldMessenger = ScaffoldMessenger.of(context);
+                                                        final navigator =
+                                                            Navigator.of(
+                                                              context,
+                                                            );
+                                                        final scaffoldMessenger =
+                                                            ScaffoldMessenger.of(
+                                                              context,
+                                                            );
 
-                                                        final success = await authProvider.signUp(
-                                                          email: _emailController.text,
-                                                          password: _passwordController.text,
-                                                          displayName: _nameController.text,
-                                                        );
+                                                        final success =
+                                                            await authProvider.signUp(
+                                                              email:
+                                                                  _emailController
+                                                                      .text,
+                                                              password:
+                                                                  _passwordController
+                                                                      .text,
+                                                              displayName:
+                                                                  _nameController
+                                                                      .text,
+                                                            );
 
                                                         if (success) {
                                                           scaffoldMessenger
                                                               .showSnackBar(
-                                                            const SnackBar(
-                                                              content: Text(
-                                                                  'Registrasi berhasil!'),
-                                                              backgroundColor:
-                                                                  Colors.green,
-                                                            ),
-                                                          );
+                                                                const SnackBar(
+                                                                  content: Text(
+                                                                    'Registrasi berhasil!',
+                                                                  ),
+                                                                  backgroundColor:
+                                                                      Colors
+                                                                          .green,
+                                                                ),
+                                                              );
 
-                                                          navigator
-                                                              .pushReplacement(
+                                                          navigator.pushReplacement(
                                                             PageRouteBuilder(
-                                                              pageBuilder: (context,
-                                                                      animation,
-                                                                      secondaryAnimation) =>
-                                                                  const HomePage(),
+                                                              pageBuilder:
+                                                                  (
+                                                                    context,
+                                                                    animation,
+                                                                    secondaryAnimation,
+                                                                  ) =>
+                                                                      const HomePage(),
                                                               transitionsBuilder:
-                                                                  (context,
-                                                                      animation,
-                                                                      secondaryAnimation,
-                                                                      child) {
-                                                                return FadeTransition(
-                                                                  opacity:
-                                                                      animation,
-                                                                  child: child,
-                                                                );
-                                                              },
+                                                                  (
+                                                                    context,
+                                                                    animation,
+                                                                    secondaryAnimation,
+                                                                    child,
+                                                                  ) {
+                                                                    return FadeTransition(
+                                                                      opacity:
+                                                                          animation,
+                                                                      child:
+                                                                          child,
+                                                                    );
+                                                                  },
                                                               transitionDuration:
                                                                   const Duration(
-                                                                      milliseconds:
-                                                                          500),
+                                                                    milliseconds:
+                                                                        500,
+                                                                  ),
                                                             ),
                                                           );
                                                         } else {
-                                                          scaffoldMessenger
-                                                              .showSnackBar(
+                                                          scaffoldMessenger.showSnackBar(
                                                             SnackBar(
                                                               content: Text(
-                                                                  authProvider
-                                                                          .errorMessage ??
-                                                                      'Registrasi gagal.'),
+                                                                authProvider
+                                                                        .errorMessage ??
+                                                                    'Registrasi gagal.',
+                                                              ),
                                                               backgroundColor:
-                                                                  Colors.redAccent,
+                                                                  Colors
+                                                                      .redAccent,
                                                             ),
                                                           );
                                                         }
                                                       }
                                                     },
                                               style: ElevatedButton.styleFrom(
-                                                backgroundColor: Colors.transparent,
+                                                backgroundColor:
+                                                    Colors.transparent,
                                                 shadowColor: Colors.transparent,
                                                 shape: RoundedRectangleBorder(
                                                   borderRadius:
@@ -443,15 +434,16 @@ class _RegisterPageState extends State<RegisterPage> {
                                                       height: 24,
                                                       child:
                                                           CircularProgressIndicator(
-                                                        color: Colors.white,
-                                                        strokeWidth: 2.5,
-                                                      ),
+                                                            color: Colors.white,
+                                                            strokeWidth: 2.5,
+                                                          ),
                                                     )
                                                   : Text(
                                                       'Sign Up',
                                                       style: TextStyle(
                                                         fontSize: 16,
-                                                        fontWeight: FontWeight.w800,
+                                                        fontWeight:
+                                                            FontWeight.w800,
                                                         color: Colors.white,
                                                         letterSpacing: 0.2,
                                                       ),

@@ -1,11 +1,11 @@
 {
-    "name": "studymate_ai",
-    "short_name": "studymate_ai",
+    "name": "StudyMate AI",
+    "short_name": "StudyMate AI",
     "start_url": ".",
     "display": "standalone",
-    "background_color": "#0175C2",
-    "theme_color": "#0175C2",
-    "description": "A new Flutter project.",
+    "background_color": "#0B1220",
+    "theme_color": "#1E58C1",
+    "description": "StudyMate AI - Smart AI Learning Companion.",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [
