@@ -90,8 +90,8 @@ class _AITutorPageState extends State<AITutorPage> {
 
     await chatProvider.sendMessage(text, uid);
 
-    // Record "chat" activity dynamically
-    if (uid.isNotEmpty) {
+    // Record "chat" activity dynamically only if successful
+    if (uid.isNotEmpty && chatProvider.errorMessage == null) {
       Provider.of<StatisticsProvider>(context, listen: false).saveActivity(
         uid,
         'chat',
@@ -102,8 +102,9 @@ class _AITutorPageState extends State<AITutorPage> {
     // Smooth scroll down when AI message arrives or error occurs
     WidgetsBinding.instance.addPostFrameCallback((_) => _scrollToBottom());
 
-    // Display SnackBar if there was an error
+    // Display SnackBar if there was an error and restore the text input to avoid re-typing
     if (chatProvider.errorMessage != null && mounted) {
+      _messageController.text = text;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(chatProvider.errorMessage!),

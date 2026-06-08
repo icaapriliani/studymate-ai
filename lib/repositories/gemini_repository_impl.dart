@@ -13,18 +13,7 @@ class GeminiRepositoryImpl implements GeminiRepository {
 
   @override
   Future<String> getAIResponse(String prompt) async {
-    try {
-      return await _geminiService.generateResponse(prompt);
-    } catch (e, stackTrace) {
-      // Proactively print the original error in console for debugging
-      debugPrint('[StudyMate AI Debug] Terjadi error pada repository impl saat memanggil service:');
-      debugPrint('[StudyMate AI Debug] Error Asli: $e');
-      debugPrint('[StudyMate AI Debug] StackTrace:\n$stackTrace');
-      
-      // Complete user-friendly error handling in Indonesian, preserving original exception
-      final friendlyMessage = _mapErrorToUserFriendlyMessage(e);
-      throw Exception('$friendlyMessage (Detail Galat Asli: $e)');
-    }
+    return _executeWithRetry(() => _geminiService.generateResponse(prompt));
   }
 
   @override
@@ -44,12 +33,51 @@ Output WAJIB berupa JSON array valid persis seperti format berikut tanpa tambaha
 ]
 ''';
 
+    return _executeWithRetry(() => _geminiService.generateResponse(prompt));
+  }
+
+  /// Helper method to detect HTTP 503, UNAVAILABLE, or high demand errors.
+  bool _is503Error(dynamic error) {
+    final errorString = error.toString().toLowerCase();
+    return errorString.contains('503') ||
+        errorString.contains('unavailable') ||
+        errorString.contains('high demand') ||
+        errorString.contains('overloaded') ||
+        errorString.contains('busy');
+  }
+
+  /// Private runner method to execute a Gemini API call with automatic 1-time retry for 503 errors.
+  Future<String> _executeWithRetry(Future<String> Function() call) async {
     try {
-      final response = await _geminiService.generateResponse(prompt);
-      return response;
+      return await call();
     } catch (e, stackTrace) {
-      debugPrint('[StudyMate AI Debug] Error generating quiz questions: $e');
+      if (_is503Error(e)) {
+        // Log the initial 503 error for debugging
+        debugPrint('[StudyMate AI Debug] Mendeteksi error 503/UNAVAILABLE/High Demand:');
+        debugPrint('[StudyMate AI Debug] Error Asli: $e');
+        debugPrint('[StudyMate AI Debug] Menunggu 2 detik sebelum melakukan retry...');
+        
+        await Future.delayed(const Duration(seconds: 2));
+        
+        try {
+          debugPrint('[StudyMate AI Debug] Melakukan retry request ke Gemini...');
+          return await call();
+        } catch (retryError, retryStackTrace) {
+          // Log the retry failure for debugging
+          debugPrint('[StudyMate AI Debug] Retry gagal:');
+          debugPrint('[StudyMate AI Debug] Error Asli Retry: $retryError');
+          debugPrint('[StudyMate AI Debug] StackTrace Retry:\n$retryStackTrace');
+          
+          // Throw friendly message without technical details
+          throw Exception('StudyMate AI sedang sibuk melayani banyak pengguna. Silakan coba lagi dalam beberapa detik.');
+        }
+      }
+
+      // Log other errors for debugging
+      debugPrint('[StudyMate AI Debug] Terjadi error pada repository impl saat memanggil service:');
+      debugPrint('[StudyMate AI Debug] Error Asli: $e');
       debugPrint('[StudyMate AI Debug] StackTrace:\n$stackTrace');
+      
       final friendlyMessage = _mapErrorToUserFriendlyMessage(e);
       throw Exception('$friendlyMessage (Detail Galat Asli: $e)');
     }
@@ -100,12 +128,19 @@ Output WAJIB berupa JSON array valid persis seperti format berikut tanpa tambaha
       return 'Pertanyaan Anda diblokir oleh kebijakan keamanan konten. Harap ubah kata-kata Anda menjadi pertanyaan yang sesuai untuk pembelajaran.';
     }
 
-    // 5. Argument error (e.g. empty prompt)
+    // 5. 503 / Service Unavailable / High Demand
+    if (errorString.contains('503') ||
+        errorString.contains('unavailable') ||
+        errorString.contains('high demand')) {
+      return 'StudyMate AI sedang sibuk melayani banyak pengguna. Silakan coba lagi dalam beberapa detik.';
+    }
+
+    // 6. Argument error (e.g. empty prompt)
     if (errorString.contains('argumenterror') || errorString.contains('prompt tidak boleh kosong')) {
       return 'Pertanyaan tidak boleh kosong. Silakan ketik sesuatu untuk mulai belajar!';
     }
 
-    // 6. Generic / Unexpected Exceptions
+    // 7. Generic / Unexpected Exceptions
     return 'Maaf, terjadi kesalahan teknis saat menghubungi StudyMate AI. Silakan coba beberapa saat lagi.';
   }
 }
