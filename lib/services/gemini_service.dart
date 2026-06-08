@@ -18,7 +18,7 @@ class GeminiService {
     }
 
     // Logging pemuatan dotenv
-    final dotenvKeys = dotenv.env.keys.toList();
+    final dotenvKeys = dotenv.env.keys.toList(); 
     debugPrint('[StudyMate AI Service] Memeriksa status load dotenv. Variabel yang dimuat: $dotenvKeys');
 
     final apiKey = dotenv.env['GEMINI_API_KEY']?.trim();

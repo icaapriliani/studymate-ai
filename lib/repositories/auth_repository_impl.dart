@@ -183,4 +183,23 @@ class AuthRepositoryImpl implements AuthRepository {
   Future<void> sendPasswordResetEmail(String email) async {
     await fb.FirebaseAuth.instance.sendPasswordResetEmail(email: email);
   }
+
+  @override
+  Future<void> deleteAccount() async {
+    final fbUser = _authService.currentUser;
+    if (fbUser == null) {
+      throw Exception('User is not logged in.');
+    }
+    final uid = fbUser.uid;
+
+    // 1. Delete all Firestore data for the user first
+    await _firestoreService.deleteUserData(uid);
+
+    // 2. Delete the Firebase Auth user
+    try {
+      await fbUser.delete();
+    } catch (e) {
+      rethrow;
+    }
+  }
 }

@@ -150,6 +150,23 @@ class AuthProvider extends ChangeNotifier {
     }
   }
 
+  // Delete User Account and all data
+  Future<bool> deleteAccount() async {
+    _setLoading(true);
+    _clearErrorOnly();
+    try {
+      await _authRepository.deleteAccount();
+      _currentUser = UserEntity.empty;
+      _setLoading(false);
+      return true;
+    } catch (e) {
+      _setLoading(false);
+      _errorMessage = _parseException(e);
+      notifyListeners();
+      return false;
+    }
+  }
+
   // Helper methods
   void _setLoading(bool value) {
     _isLoading = value;
@@ -163,6 +180,11 @@ class AuthProvider extends ChangeNotifier {
   // Parse Firebase exceptions into user-friendly messages in Indonesian
   String _parseException(dynamic exception) {
     final message = exception.toString();
+    
+    // Check for re-authentication requirement (token expired/session old)
+    if (message.contains('requires-recent-login') || message.contains('credential-too-old-allowed-action-link')) {
+      return 'Akun tidak bisa dihapus sekarang. Silakan login ulang dan coba lagi.';
+    }
     
     // Cloud Firestore-specific troubleshooting errors
     if (message.contains('PERMISSION_DENIED')) {

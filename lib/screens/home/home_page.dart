@@ -1,5 +1,6 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/theme_provider.dart';
@@ -1461,6 +1462,14 @@ class _HomePageState extends State<HomePage> {
                             title: 'Tentang StudyMate AI', 
                             subtitle: 'Info rilis aplikasi v1.0.0',
                           ),
+                          _buildProfileOption(
+                            icon: Icons.delete_outline_rounded,
+                            title: 'Hapus Akun Saya',
+                            subtitle: 'Hapus akun dan data secara permanen',
+                            iconColor: Colors.redAccent,
+                            textColor: Colors.redAccent,
+                            onTap: () => _confirmDeleteAccount(context),
+                          ),
                         ],
                       ),
                     ),
@@ -1521,6 +1530,8 @@ class _HomePageState extends State<HomePage> {
     required IconData icon,
     required String title,
     required String subtitle,
+    Color? iconColor,
+    Color? textColor,
     VoidCallback? onTap,
   }) {
     return ListTile(
@@ -1528,17 +1539,17 @@ class _HomePageState extends State<HomePage> {
         width: 36,
         height: 36,
         decoration: BoxDecoration(
-          color: context.colors.progressTrack,
+          color: iconColor != null ? iconColor.withAlpha(20) : context.colors.progressTrack,
           shape: BoxShape.circle,
         ),
-        child: Icon(icon, color: context.colors.primaryGradientStart, size: 18),
+        child: Icon(icon, color: iconColor ?? context.colors.primaryGradientStart, size: 18),
       ),
       title: Text(
         title,
         style: TextStyle(
           fontSize: 14,
           fontWeight: FontWeight.w800,
-          color: context.colors.textPrimary,
+          color: textColor ?? context.colors.textPrimary,
         ),
       ),
       subtitle: Text(
@@ -1717,6 +1728,207 @@ class _HomePageState extends State<HomePage> {
         ),
       ),
     );
+  }
+
+  void _confirmDeleteAccount(BuildContext context) {
+    HapticFeedback.mediumImpact();
+    showDialog(
+      context: context,
+      builder: (dialogContext) {
+        return Center(
+          child: Container(
+            margin: const EdgeInsets.symmetric(horizontal: 24),
+            constraints: const BoxConstraints(maxWidth: 400),
+            decoration: BoxDecoration(
+              color: context.colors.cardBg.withAlpha(240),
+              borderRadius: BorderRadius.circular(32),
+              border: Border.all(color: context.colors.glassBorder, width: 2),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withAlpha(15),
+                  blurRadius: 30,
+                  offset: const Offset(0, 15),
+                ),
+              ],
+            ),
+            child: Material(
+              color: Colors.transparent,
+              child: Padding(
+                padding: const EdgeInsets.all(28.0),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Row(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            color: Colors.redAccent.withAlpha(20),
+                            shape: BoxShape.circle,
+                          ),
+                          child: const Icon(
+                            Icons.warning_amber_rounded,
+                            color: Colors.redAccent,
+                            size: 28,
+                          ),
+                        ),
+                        const SizedBox(width: 16),
+                        Expanded(
+                          child: Text(
+                            'Konfirmasi Hapus Akun',
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.w900,
+                              color: context.colors.textPrimary,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const Divider(height: 24),
+                    Text(
+                      'Data Anda akan dihapus permanen termasuk chat, progres, dan kuis. Apakah Anda yakin?',
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w500,
+                        color: context.colors.textSecondary,
+                        height: 1.4,
+                      ),
+                      textAlign: TextAlign.start,
+                    ),
+                    const SizedBox(height: 24),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        TextButton(
+                          onPressed: () {
+                            Navigator.of(dialogContext).pop();
+                          },
+                          style: TextButton.styleFrom(
+                            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(100),
+                            ),
+                          ),
+                          child: Text(
+                            'Batal',
+                            style: TextStyle(
+                              color: context.colors.textSecondary,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        ElevatedButton(
+                          onPressed: () {
+                            Navigator.of(dialogContext).pop();
+                            _deleteAccount(context);
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.redAccent,
+                            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                            elevation: 0,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(100),
+                            ),
+                          ),
+                          child: const Text(
+                            'Hapus',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Future<void> _deleteAccount(BuildContext context) async {
+    HapticFeedback.heavyImpact();
+    
+    // Show premium glassmorphic loading dialog
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (dialogContext) {
+        return Center(
+          child: Container(
+            padding: const EdgeInsets.all(32),
+            decoration: BoxDecoration(
+              color: context.colors.cardBg.withAlpha(240),
+              borderRadius: BorderRadius.circular(24),
+              border: Border.all(color: context.colors.glassBorder, width: 2),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                CircularProgressIndicator(
+                  valueColor: AlwaysStoppedAnimation<Color>(context.colors.primaryGradientStart),
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  'Menghapus Akun...',
+                  style: TextStyle(
+                    color: context.colors.textPrimary,
+                    fontSize: 14,
+                    fontWeight: FontWeight.w700,
+                    decoration: TextDecoration.none,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    final success = await authProvider.deleteAccount();
+
+    if (context.mounted) {
+      // Dismiss loading dialog
+      Navigator.of(context).pop();
+
+      if (success) {
+        // Show success snackbar
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Akun dan semua data berhasil dihapus'),
+            backgroundColor: Colors.green,
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+
+        // Transition smoothly to LoginPage
+        Navigator.of(context).pushReplacement(
+          PageRouteBuilder(
+            pageBuilder: (context, animation, secondaryAnimation) => const LoginPage(),
+            transitionsBuilder: (context, animation, secondaryAnimation, child) {
+              return FadeTransition(opacity: animation, child: child);
+            },
+            transitionDuration: const Duration(milliseconds: 500),
+          ),
+        );
+      } else {
+        // Show error message
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(authProvider.errorMessage ?? 'Terjadi kesalahan saat menghapus akun.'),
+            backgroundColor: Colors.redAccent,
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      }
+    }
   }
 
   void _showTargetSettingsDialog(BuildContext context, String uid, StatisticsProvider statsProvider) {

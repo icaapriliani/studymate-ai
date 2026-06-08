@@ -164,4 +164,55 @@ class FirestoreService {
       rethrow;
     }
   }
+
+  /// Deletes all user documents and subcollections (chats, conversations, messages, module_progress, quiz_sessions, activities, notifications)
+  Future<void> deleteUserData(String uid) async {
+    try {
+      final batch = _firestore.batch();
+
+      // List of basic subcollections under users/{uid}
+      final subcollections = [
+        'chats',
+        'conversations',
+        'module_progress',
+        'quiz_sessions',
+        'activities',
+        'notifications',
+        'ai_chat',
+      ];
+
+      for (final subName in subcollections) {
+        final collectionRef = _firestore.collection('users').doc(uid).collection(subName);
+        final snapshot = await collectionRef.get();
+
+        for (final doc in snapshot.docs) {
+          // If the subcollection is conversations, we need to delete its nested subcollection 'messages'
+          if (subName == 'conversations') {
+            final messagesRef = doc.reference.collection('messages');
+            final messagesSnapshot = await messagesRef.get();
+            for (final msgDoc in messagesSnapshot.docs) {
+              batch.delete(msgDoc.reference);
+            }
+          }
+          // If the subcollection is quiz_sessions, we need to delete its nested subcollection 'questions'
+          if (subName == 'quiz_sessions') {
+            final questionsRef = doc.reference.collection('questions');
+            final questionsSnapshot = await questionsRef.get();
+            for (final qDoc in questionsSnapshot.docs) {
+              batch.delete(qDoc.reference);
+            }
+          }
+          batch.delete(doc.reference);
+        }
+      }
+
+      // Finally, delete the parent user document itself
+      final userDocRef = _firestore.collection('users').doc(uid);
+      batch.delete(userDocRef);
+
+      await batch.commit();
+    } catch (e) {
+      rethrow;
+    }
+  }
 }
