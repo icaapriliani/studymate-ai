@@ -34,10 +34,10 @@ class GeminiService {
       debugPrint('[StudyMate AI Service] Berhasil membaca GEMINI_API_KEY dari .env (Masked: $maskedKey, Panjang: ${apiKey.length})');
     }
 
-    // Memverifikasi apakah model gemini-2.5-flash benar digunakan
-    debugPrint('[StudyMate AI Service] Menginisialisasi GenerativeModel dengan nama model: gemini-2.5-flash');
+    // Memverifikasi apakah model gemini-2.5-flash-lite benar digunakan
+    debugPrint('[StudyMate AI Service] Menginisialisasi GenerativeModel dengan nama model: gemini-2.5-flash-lite');
     return GenerativeModel(
-      model: 'gemini-2.5-flash',
+      model: 'gemini-2.5-flash-lite',
       apiKey: apiKey,
       systemInstruction: Content.system(
         'Anda adalah StudyMate AI, asisten belajar AI yang ramah, interaktif, dan cerdas. '

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -41,6 +42,14 @@ import 'providers/learning_provider.dart';
 // Screens
 import 'screens/splash/splash_page.dart';
 
+@pragma('vm:entry-point')
+Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+  try {
+    await Firebase.initializeApp();
+  } catch (_) {}
+  debugPrint('[StudyMate AI Background] Menerima pesan di background: ${message.messageId}');
+}
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   
@@ -56,6 +65,9 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+
+  // Register FCM background handler
+  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
 
   // Load SharedPreferences and initialize ThemeProvider at startup for 0 flicker
   final prefs = await SharedPreferences.getInstance();
@@ -80,7 +92,7 @@ class StudyMateAI extends StatelessWidget {
     final geminiService = GeminiService();
     final activityService = ActivityService();
     final firestoreQuizService = FirestoreQuizService();
-    final notificationService = NotificationService();
+    final notificationService = NotificationService()..initialize();
     final learningService = LearningService();
 
     // Instantiate repositories (Data Layer Orchestrator)

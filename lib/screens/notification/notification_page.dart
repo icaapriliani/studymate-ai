@@ -71,7 +71,7 @@ class _NotificationPageState extends State<NotificationPage> {
                         ),
                       )
                     : filteredNotifications.isEmpty
-                        ? _buildEmptyState()
+                        ? _buildEmptyState(notificationProvider)
                         : _buildNotificationList(uid, filteredNotifications, notificationProvider),
               ),
             ],
@@ -163,9 +163,21 @@ class _NotificationPageState extends State<NotificationPage> {
                 );
               } else if (value == 'clear_all') {
                 _showClearConfirmationDialog(context, uid, provider);
+              } else if (value == 'test_notification') {
+                provider.triggerLocalTestNotification();
               }
             },
             itemBuilder: (context) => [
+              PopupMenuItem(
+                value: 'test_notification',
+                child: Row(
+                  children: const [
+                    Icon(Icons.notification_important_rounded, color: AppColors.primaryGradientStart, size: 18),
+                    SizedBox(width: 12),
+                    Text('Kirim Notifikasi Uji Coba'),
+                  ],
+                ),
+              ),
               PopupMenuItem(
                 value: 'read_all',
                 enabled: provider.unreadCount > 0,
@@ -436,7 +448,7 @@ class _NotificationPageState extends State<NotificationPage> {
   }
 
   // Elegant Empty State
-  Widget _buildEmptyState() {
+  Widget _buildEmptyState(NotificationProvider provider) {
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(32.0),
@@ -495,6 +507,40 @@ class _NotificationPageState extends State<NotificationPage> {
                   fontWeight: FontWeight.w500,
                   color: AppColors.textSecondary,
                   height: 1.4,
+                ),
+              ),
+              const SizedBox(height: 20),
+              // Elegant testing button for developers/testers
+              Container(
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(
+                    colors: [
+                      AppColors.primaryGradientStart,
+                      AppColors.primaryGradientEnd,
+                    ],
+                  ),
+                  borderRadius: BorderRadius.circular(16),
+                  boxShadow: [
+                    BoxShadow(
+                      color: AppColors.primaryGradientStart.withAlpha(60),
+                      blurRadius: 10,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+                ),
+                child: ElevatedButton.icon(
+                  onPressed: () => provider.triggerLocalTestNotification(),
+                  icon: const Icon(Icons.notifications_active_rounded, size: 16, color: Colors.white),
+                  label: const Text(
+                    'Kirim Notifikasi Uji Coba',
+                    style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                  ),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.transparent,
+                    shadowColor: Colors.transparent,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                  ),
                 ),
               ),
             ],

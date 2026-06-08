@@ -18,4 +18,15 @@ abstract class NotificationRepository {
 
   /// Clears/deletes all notifications for a user.
   Future<void> clearNotifications(String uid);
+
+  /// Sends a local test notification instantly (Developer Mode).
+  Future<void> sendLocalTestNotification();
+
+  /// Displays a local notification on the status bar dynamically.
+  Future<void> showLocalNotification({
+    required int id,
+    required String title,
+    required String body,
+    String? payload,
+  });
 }

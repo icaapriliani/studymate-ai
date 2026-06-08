@@ -64,6 +64,26 @@ class NotificationRepositoryImpl implements NotificationRepository {
     }
   }
 
+  @override
+  Future<void> sendLocalTestNotification() async {
+    await _notificationService.sendTestNotification();
+  }
+
+  @override
+  Future<void> showLocalNotification({
+    required int id,
+    required String title,
+    required String body,
+    String? payload,
+  }) async {
+    await _notificationService.showLocalNotification(
+      id: id,
+      title: title,
+      body: body,
+      payload: payload,
+    );
+  }
+
   /// Low-level database error translation into helpful Indonesian messages.
   String _mapErrorToUserFriendlyMessage(dynamic error) {
     final errorString = error.toString().toLowerCase();

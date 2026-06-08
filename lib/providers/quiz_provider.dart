@@ -149,10 +149,11 @@ class QuizProvider extends ChangeNotifier {
       return true;
     } catch (e) {
       debugPrint('[QuizProvider] Error generateNewSession: $e');
-      if (e.toString().contains('batas generate quiz')) {
-        _errorMessage = e.toString().replaceFirst('Exception: ', '');
+      final cleanMessage = e.toString().replaceFirst('Exception: ', '');
+      if (cleanMessage.contains('batas generate quiz')) {
+        _errorMessage = cleanMessage;
       } else {
-        _errorMessage = 'Gagal membuat kuis baru. AI mungkin merespons dengan format yang salah. Silakan coba lagi.';
+        _errorMessage = 'Gagal membuat kuis baru: $cleanMessage';
       }
       return false;
     } finally {

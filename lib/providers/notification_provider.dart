@@ -33,11 +33,30 @@ class NotificationProvider extends ChangeNotifier {
     _errorMessage = null;
 
     _subscription?.cancel();
+    
+    bool isFirstLoad = true;
+    
     _subscription = _notificationRepository.listenToNotifications(uid).listen(
       (list) {
+        if (!isFirstLoad) {
+          final existingIds = _notifications.map((n) => n.id).toSet();
+          for (var notification in list) {
+            // If the notification is newly added and unread, trigger local notification on status bar
+            if (!existingIds.contains(notification.id) && !notification.isRead) {
+              _notificationRepository.showLocalNotification(
+                id: notification.id.hashCode,
+                title: notification.title,
+                body: notification.message,
+                payload: notification.id,
+              );
+            }
+          }
+        }
+        
         _notifications = list;
         _isLoading = false;
         _errorMessage = null;
+        isFirstLoad = false;
         notifyListeners();
       },
       onError: (error) {
@@ -111,6 +130,15 @@ class NotificationProvider extends ChangeNotifier {
       await _notificationRepository.clearNotifications(uid);
     } catch (e) {
       debugPrint('[NotificationProvider] Gagal menghapus notifikasi: $e');
+    }
+  }
+
+  /// Triggers a local test notification instantly (Developer Mode).
+  Future<void> triggerLocalTestNotification() async {
+    try {
+      await _notificationRepository.sendLocalTestNotification();
+    } catch (e) {
+      debugPrint('[NotificationProvider] Gagal mengirim notifikasi uji coba: $e');
     }
   }
 
