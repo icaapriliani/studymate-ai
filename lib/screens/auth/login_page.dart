@@ -21,7 +21,6 @@ class _LoginPageState extends State<LoginPage> {
   final _passwordController = TextEditingController();
 
   bool _obscurePassword = true;
-  bool _rememberMe = false;
 
   @override
   void dispose() {
@@ -151,20 +150,6 @@ class _LoginPageState extends State<LoginPage> {
                                         controller: _passwordController,
                                         prefixIcon: Icons.lock_outline,
                                         obscureText: _obscurePassword,
-                                        headerRightWidget: GestureDetector(
-                                          onTap: () {
-                                            // Handle forgot password action
-                                          },
-                                          child: Text(
-                                            'Forgot?',
-                                            style: TextStyle(
-                                              fontSize: 13,
-                                              fontWeight: FontWeight.w700,
-                                              color: AppColors
-                                                  .primaryGradientStart,
-                                            ),
-                                          ),
-                                        ),
                                         suffixIcon: GestureDetector(
                                           onTap: () {
                                             setState(() {
@@ -189,45 +174,6 @@ class _LoginPageState extends State<LoginPage> {
                                           }
                                           return null;
                                         },
-                                      ),
-                                      SizedBox(height: 20),
-
-                                      // Remember Me Checkbox Row
-                                      Row(
-                                        children: [
-                                          SizedBox(
-                                            width: 24,
-                                            height: 24,
-                                            child: Checkbox(
-                                              value: _rememberMe,
-                                              onChanged: (value) {
-                                                setState(() {
-                                                  _rememberMe = value ?? false;
-                                                });
-                                              },
-                                              activeColor: AppColors
-                                                  .primaryGradientStart,
-                                              shape: RoundedRectangleBorder(
-                                                borderRadius:
-                                                    BorderRadius.circular(6),
-                                              ),
-                                              side: BorderSide(
-                                                color: Colors.grey.shade300,
-                                                width: 1.5,
-                                              ),
-                                            ),
-                                          ),
-                                          SizedBox(width: 10),
-                                          Text(
-                                            'Remember for 30 days',
-                                            style: TextStyle(
-                                              fontSize: 14,
-                                              fontWeight: FontWeight.w600,
-                                              color:
-                                                  context.colors.textSecondary,
-                                            ),
-                                          ),
-                                        ],
                                       ),
                                       SizedBox(height: 32),
 

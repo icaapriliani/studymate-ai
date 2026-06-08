@@ -1439,25 +1439,6 @@ class _HomePageState extends State<HomePage> {
                             onTap: () => _showThemeSelector(context),
                           ),
                           _buildProfileOption(
-                            icon: Icons.security_rounded, 
-                            title: 'Keamanan Akun', 
-                            subtitle: 'Ubah kata sandi',
-                            onTap: () async {
-                              if (user.email.isEmpty) return;
-                              final success = await authProvider.resetPassword(user.email);
-                              if (context.mounted) {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                    content: Text(success 
-                                      ? 'Tautan atur ulang kata sandi telah dikirim ke ${user.email}' 
-                                      : (authProvider.errorMessage ?? 'Gagal mengirim email reset')),
-                                    backgroundColor: success ? Colors.green : Colors.red,
-                                  ),
-                                );
-                              }
-                            }
-                          ),
-                          _buildProfileOption(
                             icon: Icons.info_outline_rounded, 
                             title: 'Tentang StudyMate AI', 
                             subtitle: 'Info rilis aplikasi v1.0.0',
