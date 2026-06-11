@@ -166,9 +166,22 @@ class FirestoreService {
   }
 
   /// Deletes all user documents and subcollections (chats, conversations, messages, module_progress, quiz_sessions, activities, notifications)
+  /// Using chunked batches to avoid the 500-operation limit of Firestore batches.
   Future<void> deleteUserData(String uid) async {
     try {
-      final batch = _firestore.batch();
+      WriteBatch batch = _firestore.batch();
+      int operationCount = 0;
+
+      // Helper function to add a delete operation to the batch and commit if limit is reached
+      Future<void> addDeleteToBatch(DocumentReference docRef) async {
+        batch.delete(docRef);
+        operationCount++;
+        if (operationCount >= 400) {
+          await batch.commit();
+          batch = _firestore.batch();
+          operationCount = 0;
+        }
+      }
 
       // List of basic subcollections under users/{uid}
       final subcollections = [
@@ -191,7 +204,7 @@ class FirestoreService {
             final messagesRef = doc.reference.collection('messages');
             final messagesSnapshot = await messagesRef.get();
             for (final msgDoc in messagesSnapshot.docs) {
-              batch.delete(msgDoc.reference);
+              await addDeleteToBatch(msgDoc.reference);
             }
           }
           // If the subcollection is quiz_sessions, we need to delete its nested subcollection 'questions'
@@ -199,18 +212,21 @@ class FirestoreService {
             final questionsRef = doc.reference.collection('questions');
             final questionsSnapshot = await questionsRef.get();
             for (final qDoc in questionsSnapshot.docs) {
-              batch.delete(qDoc.reference);
+              await addDeleteToBatch(qDoc.reference);
             }
           }
-          batch.delete(doc.reference);
+          await addDeleteToBatch(doc.reference);
         }
       }
 
       // Finally, delete the parent user document itself
       final userDocRef = _firestore.collection('users').doc(uid);
-      batch.delete(userDocRef);
+      await addDeleteToBatch(userDocRef);
 
-      await batch.commit();
+      // Commit any remaining operations in the final batch
+      if (operationCount > 0) {
+        await batch.commit();
+      }
     } catch (e) {
       rethrow;
     }

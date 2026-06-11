@@ -190,6 +190,22 @@ class AuthRepositoryImpl implements AuthRepository {
     if (fbUser == null) {
       throw Exception('User is not logged in.');
     }
+
+    // Check if the user's session is recent enough to delete their account
+    // Firebase Auth requires recent login for user deletion. We check if lastSignInTime
+    // is older than 5 minutes. If it is, we proactively throw a requires-recent-login exception
+    // before modifying/deleting any Firestore data.
+    final lastSignInTime = fbUser.metadata.lastSignInTime;
+    if (lastSignInTime != null) {
+      final difference = DateTime.now().difference(lastSignInTime);
+      if (difference.inMinutes > 5) {
+        throw fb.FirebaseAuthException(
+          code: 'requires-recent-login',
+          message: 'This operation is sensitive and requires recent authentication. Log in again before retrying this request.',
+        );
+      }
+    }
+
     final uid = fbUser.uid;
 
     // 1. Delete all Firestore data for the user first
